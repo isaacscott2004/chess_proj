@@ -23,7 +23,6 @@ public class ChessPosition {
      * 1 codes for the bottom row
      */
     public int getRow() {
-//        throw new RuntimeException("Not implemented");
         return this.row;
     }
 
@@ -32,28 +31,27 @@ public class ChessPosition {
      * 1 codes for the left row
      */
     public int getColumn() {
-//        throw new RuntimeException("Not implemented");
         return this.col;
     }
 
     @Override
     public String toString() {
         return "ChessPosition{" +
-                "row=" + row +
-                ", col=" + col +
+                "row=" + this.row +
+                ", col=" + this.col +
                 '}';
     }
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof ChessPosition that)) {
+        if (!(o instanceof ChessPosition other)) {
             return false;
         }
-        return row == that.row && col == that.col;
+        return this.row == other.row && this.col == other.col;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(row, col);
+        return Objects.hash(this.row, this.col);
     }
 }
