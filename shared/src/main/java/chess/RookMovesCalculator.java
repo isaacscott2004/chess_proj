@@ -18,6 +18,15 @@ public class RookMovesCalculator implements PieceMovesCalculator{
                 if ((currentPosition.getRow() > 8) || (currentPosition.getRow() < 1) || (currentPosition.getColumn() > 8) || (currentPosition.getColumn() < 1)){
                     break;
                 }
+                ChessPiece current = board.getPiece(myPosition);
+                ChessPiece other = board.getPiece(currentPosition);
+                if (other != null && current.getTeamColor() == other.getTeamColor()){
+                    break;
+                } else if (other != null && current.getTeamColor() != other.getTeamColor()) {
+                    potentialMoves.add(new ChessMove(myPosition, currentPosition, null));
+                    break;
+
+                }
                 potentialMoves.add(new ChessMove(myPosition, currentPosition, null));
             }
         }
