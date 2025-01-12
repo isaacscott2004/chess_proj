@@ -55,43 +55,28 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        PieceMovesCalculator calculator;
-        Collection<ChessMove> moves = null;
+        PieceMovesCalculator calculator = null;
         switch (type) {
             case KING:
                 calculator = new KingMovesCalculator();
-                moves = calculator.pieceMoves(board, myPosition);
-                moves.removeIf(move -> {
-                    ChessPiece other = board.getPiece(move.getEndPosition());
-                    return other != null && this.getTeamColor() == other.getTeamColor();
-                });
                 break;
             case QUEEN:
                 calculator = new QueenMovesCalculator();
-                moves = calculator.pieceMoves(board, myPosition);
                 break;
             case BISHOP:
                 calculator = new BishopMovesCalculator();
-                moves = calculator.pieceMoves(board, myPosition);
                 break;
             case KNIGHT:
                 calculator = new KnightMovesCalculator();
-                moves = calculator.pieceMoves(board, myPosition);
-                moves.removeIf(move -> {
-                    ChessPiece other = board.getPiece(move.getEndPosition());
-                    return other != null && this.getTeamColor() == other.getTeamColor();
-                });
                 break;
             case ROOK:
                 calculator = new RookMovesCalculator();
-                moves = calculator.pieceMoves(board, myPosition);
                 break;
             case PAWN:
                 calculator = new PawnMovesCalculator();
-                moves = calculator.pieceMoves(board, myPosition);
                 break;
             }
-        return moves;
+        return calculator.pieceMoves(board, myPosition);
 
     }
 

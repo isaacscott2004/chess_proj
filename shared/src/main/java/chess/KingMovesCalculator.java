@@ -19,6 +19,14 @@ public class KingMovesCalculator implements PieceMovesCalculator{
         potentialMoves.add(new ChessMove(myPosition, new ChessPosition(myPosition.getRow()-1, myPosition.getColumn()-1), null));
 
         potentialMoves.removeIf(move -> (move.getEndPosition().getColumn() > 8) || (move.getEndPosition().getColumn() < 1) || (move.getEndPosition().getRow() > 8) || (move.getEndPosition().getRow() < 1));
+
+        potentialMoves.removeIf(move -> {
+            ChessPiece other = board.getPiece(move.getEndPosition());
+            ChessPiece current = board.getPiece(move.getStartPosition());
+            return other != null && current.getTeamColor() == other.getTeamColor();
+        });
         return potentialMoves;
+
+
     }
 }
