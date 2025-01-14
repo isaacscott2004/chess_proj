@@ -1,6 +1,5 @@
 package chess;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
@@ -29,6 +28,10 @@ public class ChessBoard {
     public void addPiece(ChessPosition position, ChessPiece piece) {
         board[position.getRow() - 1][position.getColumn() - 1] = piece;
         locations[position.getRow() - 1][position.getColumn() - 1] = true;
+    }
+    public void removePiece(ChessPosition position){
+        board[position.getRow()-1][position.getColumn()-1] = null;
+        locations[position.getRow()-1][position.getColumn()-1] = false;
     }
 
     /**
@@ -70,7 +73,13 @@ public class ChessBoard {
         }
     }
 
-
+    /**
+     * checks if a piece is on a specific square
+     * @param row The row of the piece to check
+     * @param col The column of the piece to check
+     * @return true if there is a piece on the square
+     * false if there is not a piece on the square
+     */
     public boolean isPieceOnSquare(int row, int col){
         try{
             return locations[row - 1][col - 1];
@@ -80,6 +89,10 @@ public class ChessBoard {
 
     }
 
+    /**
+     * a getter for the board instance variable
+     * @return the board
+     */
     public ChessPiece[][] getBoard(){
         return this.board;
     }
