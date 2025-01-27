@@ -29,9 +29,15 @@ public class ChessBoard {
         board[position.getRow() - 1][position.getColumn() - 1] = piece;
         locations[position.getRow() - 1][position.getColumn() - 1] = true;
     }
+
     public void removePiece(ChessPosition position){
         board[position.getRow()-1][position.getColumn()-1] = null;
         locations[position.getRow()-1][position.getColumn()-1] = false;
+    }
+
+    public void movePiece(ChessPosition startPosition, ChessPosition endPosition, ChessPiece piece){
+        addPiece(endPosition, piece);
+        removePiece(startPosition);
     }
 
     /**
@@ -64,10 +70,14 @@ public class ChessBoard {
         int i = 0;
         for(ChessPiece.PieceType piece : firstRow){
             board[7][i] = new ChessPiece(ChessGame.TeamColor.BLACK, piece);
+            locations[7][i] = true;
             board[6][i] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN);
+            locations[6][i] = true;
             board[0][i] = new ChessPiece(ChessGame.TeamColor.WHITE, piece);
+            locations[0][i] = true;
             board[1][i] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
-            i++;
+            locations[1][i] = true;
+        i++;
 
 
         }
