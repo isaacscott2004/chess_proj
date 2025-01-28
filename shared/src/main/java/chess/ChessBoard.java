@@ -14,8 +14,9 @@ public class ChessBoard {
     private ChessPiece[][] board;
     private boolean[][] locations;
     public ChessBoard() {
-        board = new ChessPiece[8][8];
-        locations = new boolean[8][8];
+        this.board = new ChessPiece[8][8];
+        this.locations = new boolean[8][8];
+
     }
 
 
@@ -36,9 +37,18 @@ public class ChessBoard {
     }
 
     public void movePiece(ChessPosition startPosition, ChessPosition endPosition, ChessPiece piece){
+        if(getPiece(startPosition).getPieceType() == ChessPiece.PieceType.PAWN){
+            if((startPosition.getRow() == 7 && getPiece(startPosition).getTeamColor() == ChessGame.TeamColor.WHITE) ||
+                    (startPosition.getRow() == 2 && getPiece(startPosition).getTeamColor() == ChessGame.TeamColor.BLACK)){
+                piece = new ChessPiece(getPiece(startPosition).getTeamColor(), ChessPiece.PieceType.QUEEN);
+            }
+        }
+
+
         addPiece(endPosition, piece);
         removePiece(startPosition);
     }
+
 
     /**
      * Gets a chess piece on the chessboard

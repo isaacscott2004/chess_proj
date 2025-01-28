@@ -11,15 +11,12 @@ import java.util.Collection;
 public class ChessGame {
     private ChessBoard board;
     private ChessGame.TeamColor team;
-    private ChessPosition whiteKing;
-    private ChessPosition blackKing;
+
 
     public ChessGame() {
         this.team = TeamColor.WHITE;
         this.board = new ChessBoard();
         this.board.resetBoard();
-        this.whiteKing = new ChessPosition(1, 5);
-        this.blackKing = new ChessPosition(8, 5);
 
     }
 
@@ -59,7 +56,8 @@ public class ChessGame {
             return null;
         }
         ChessPiece piece = board.getPiece(startPosition);
-        return piece.pieceMoves(this.board, startPosition);
+        Collection<ChessMove> movesBeforeChecks = piece.pieceMoves(this.board, startPosition);
+        return movesBeforeChecks;
     }
 
     /**
@@ -71,18 +69,27 @@ public class ChessGame {
     public void makeMove(ChessMove move) throws InvalidMoveException {
         ChessPosition moveStartPosition = move.getStartPosition();
         ChessPosition moveEndPosition = move.getEndPosition();
+        ChessGame.TeamColor currentColor = getTeamTurn();
+        if(!(board.isPieceOnSquare(moveStartPosition.getRow(), moveStartPosition.getColumn()))){
+            throw new InvalidMoveException("This move is not a valid move.");
+        }
+        if(board.getPiece(moveStartPosition).getTeamColor() != currentColor){
+            throw new InvalidMoveException("This move is not a valid move.");
+        }
         Collection<ChessMove> validMoves = validMoves(moveStartPosition);
         if(!(validMoves.contains(move))){
             throw new InvalidMoveException("This move is not a valid move.");
         }
-        if(moveStartPosition.equals(this.whiteKing)){
-            this.board.movePiece(moveStartPosition, moveEndPosition, board.getPiece(moveStartPosition));
-            this.whiteKing = moveEndPosition;
-        } else if(moveStartPosition.equals(this.blackKing)){
-            this.board.movePiece(moveStartPosition, moveEndPosition, board.getPiece(moveStartPosition));
-            this.blackKing = moveEndPosition;
-        }
+
         this.board.movePiece(moveStartPosition, moveEndPosition, board.getPiece(moveStartPosition));
+
+
+        if(currentColor == TeamColor.BLACK){
+            setTeamTurn(TeamColor.WHITE);
+        } else{
+            setTeamTurn(TeamColor.BLACK);
+        }
+
     }
 
     /**
@@ -102,19 +109,6 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        ChessPosition king;
-        if(this.board.getPiece(this.blackKing).getTeamColor() == teamColor){
-            king = this.blackKing;
-        } else{
-            king = this.whiteKing;
-        }
-
-        if(!(isInCheck(teamColor))){
-            return false;
-        }
-        if(!(validMoves(king).isEmpty())){
-            return false;
-        }
         throw new RuntimeException("Not implemented");
     }
 
