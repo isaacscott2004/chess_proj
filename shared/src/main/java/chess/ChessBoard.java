@@ -12,14 +12,12 @@ import java.util.Objects;
  */
 public class ChessBoard {
     private ChessPiece[][] board;
-    private boolean[][] locations;
     private ArrayList<ChessPosition> whitePieces;
     private ArrayList<ChessPosition> blackPieces;
     private ChessPosition whiteKing;
     private ChessPosition blackKing;
     public ChessBoard() {
         this.board = new ChessPiece[8][8];
-        this.locations = new boolean[8][8];
         whitePieces = new ArrayList<>();
         blackPieces = new ArrayList<>();
         whiteKing = null;
@@ -36,6 +34,9 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
+        if(piece == null){
+            return;
+        }
         if(piece.getPieceType() == ChessPiece.PieceType.KING){
             if(piece.getTeamColor() == ChessGame.TeamColor.BLACK){
                 blackKing = position;
@@ -45,37 +46,40 @@ public class ChessBoard {
         }
         if(piece.getTeamColor() == ChessGame.TeamColor.BLACK){
             this.blackPieces.add(position);
-            if(piece.getTeamColor() != ChessGame.TeamColor.BLACK){
-                this.whitePieces.remove(position);
-            }
-
+            this.whitePieces.remove(position);
         } else{
             this.whitePieces.add(position);
-            if(piece.getTeamColor() != ChessGame.TeamColor.WHITE){
-                this.blackPieces.remove(position);
-            }
+            this.blackPieces.remove(position);
+
         }
         board[position.getRow() - 1][position.getColumn() - 1] = piece;
-        locations[position.getRow() - 1][position.getColumn() - 1] = true;
-
     }
 
     public void removePiece(ChessPosition position){
+        if(getPiece(position) == null){
+            return;
+        }
         if(getPiece(position).getTeamColor() == ChessGame.TeamColor.BLACK){
             this.blackPieces.remove(position);
+            if(getPiece(position).getPieceType() == ChessPiece.PieceType.KING){
+                blackKing = null;
+            }
         } else{
             this.whitePieces.remove(position);
+            if(getPiece(position).getPieceType() == ChessPiece.PieceType.KING){
+                whiteKing = null;
+            }
+
         }
         board[position.getRow()-1][position.getColumn()-1] = null;
-        locations[position.getRow()-1][position.getColumn()-1] = false;
-
     }
 
 
 
     public void movePiece(ChessPosition startPosition, ChessPosition endPosition, ChessPiece piece){
-        addPiece(endPosition, piece);
         removePiece(startPosition);
+        addPiece(endPosition, piece);
+
     }
 
 
@@ -96,7 +100,6 @@ public class ChessBoard {
      */
     public void resetBoard() {
         this.board = new ChessPiece[8][8];
-        this.locations = new boolean[8][8];
         this.whitePieces = new ArrayList<>();
         this.blackPieces = new ArrayList<>();
         this.blackKing = new ChessPosition(8, 5);
@@ -113,16 +116,12 @@ public class ChessBoard {
         int i = 0;
         for(ChessPiece.PieceType piece : firstRow){
             board[7][i] = new ChessPiece(ChessGame.TeamColor.BLACK, piece);
-            locations[7][i] = true;
             blackPieces.add(new ChessPosition(8, i + 1));
             board[6][i] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN);
-            locations[6][i] = true;
             blackPieces.add(new ChessPosition(7 , i + 1));
             board[0][i] = new ChessPiece(ChessGame.TeamColor.WHITE, piece);
-            locations[0][i] = true;
             whitePieces.add(new ChessPosition(1, i + 1));
             board[1][i] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
-            locations[1][i] = true;
             whitePieces.add(new ChessPosition(2, i + 1));
         i++;
 
@@ -138,11 +137,10 @@ public class ChessBoard {
      */
     public boolean isPieceOnSquare(int row, int col){
         try{
-            return locations[row - 1][col - 1];
+            return getPiece(new ChessPosition(row, col)) != null;
         } catch (IndexOutOfBoundsException e){
             return false;
         }
-
     }
 
     /**

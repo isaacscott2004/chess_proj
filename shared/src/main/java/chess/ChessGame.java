@@ -123,10 +123,13 @@ public class ChessGame {
     public boolean isInCheckmate(TeamColor teamColor) {
         if(!isInCheck(teamColor)){
             return false;
-        } if(getKingMoves(teamColor).isEmpty()){
+        } if(!(getKingMoves(teamColor).isEmpty())){
+            return false;
+        } if(!(getMovesToProtectKing(teamColor).isEmpty())){
             return false;
         }
-        throw new RuntimeException("Not implemented");
+        return true;
+
     }
 
     /**
@@ -216,7 +219,6 @@ public class ChessGame {
             ChessPosition newKingPosition = move.getEndPosition();
             ChessPiece otherPiece = board.getPiece(newKingPosition);
             getBoard().movePiece(king, newKingPosition, kingPiece);
-
             boolean stillInCheck =  !piecesWithKingInPath(currentTeam).isEmpty();
             if(!stillInCheck){
                 kingMoves.add(move);
@@ -225,6 +227,32 @@ public class ChessGame {
             getBoard().addPiece(newKingPosition, otherPiece);
         }
         return kingMoves;
+
+    }
+
+    private ArrayList<ChessMove> getMovesToProtectKing(TeamColor currentTeam){
+        ArrayList<ChessPosition> teamList;
+        ArrayList<ChessMove> savingMoves = new ArrayList<>();
+
+        if(currentTeam == TeamColor.BLACK){
+            teamList = getBlackPositions();
+        } else{
+            teamList = getWhitePositions();
+        }
+        ArrayList<ChessPosition> piecesWithKingInPath = piecesWithKingInPath(currentTeam);
+        for(ChessPosition piecePos: teamList){
+            ChessPiece piece = board.getPiece(piecePos);
+            ArrayList<ChessMove> currentPieceMoves = (ArrayList<ChessMove>) piece.pieceMoves(board, piecePos);
+
+            for(ChessMove currentMove : currentPieceMoves){
+                ChessPosition cMoveEndPos = currentMove.getEndPosition();
+
+                if(piecesWithKingInPath.contains(cMoveEndPos)){
+                    savingMoves.add(currentMove);
+                }
+            }
+        }
+        return savingMoves;
 
     }
 }
