@@ -1,5 +1,6 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -17,6 +18,8 @@ public class ChessGame {
         this.team = TeamColor.WHITE;
         this.board = new ChessBoard();
         this.board.resetBoard();
+
+
 
     }
 
@@ -70,6 +73,7 @@ public class ChessGame {
         ChessPosition moveStartPosition = move.getStartPosition();
         ChessPosition moveEndPosition = move.getEndPosition();
         ChessGame.TeamColor currentColor = getTeamTurn();
+        ChessPiece.PieceType promotionPiece = move.getPromotionPiece();
         if(!(board.isPieceOnSquare(moveStartPosition.getRow(), moveStartPosition.getColumn()))){
             throw new InvalidMoveException("This move is not a valid move.");
         }
@@ -80,10 +84,18 @@ public class ChessGame {
         if(!(validMoves.contains(move))){
             throw new InvalidMoveException("This move is not a valid move.");
         }
-
-        this.board.movePiece(moveStartPosition, moveEndPosition, board.getPiece(moveStartPosition));
-
-
+//        if(isInCheck(currentColor)){
+//            throw new InvalidMoveException("This move is not a valid move.");
+//        }
+        if(board.getPiece(moveStartPosition).getPieceType() == ChessPiece.PieceType.PAWN && promotionPiece != null ){
+            if (currentColor == TeamColor.BLACK && moveStartPosition.getRow() == 2 ||
+                    (currentColor == TeamColor.WHITE && moveStartPosition.getRow() == 7)) {
+                board.addPiece(moveEndPosition, new ChessPiece(currentColor, promotionPiece));
+                board.removePiece(moveStartPosition);
+            }
+        } else {
+            this.board.movePiece(moveStartPosition, moveEndPosition, board.getPiece(moveStartPosition));
+        }
         if(currentColor == TeamColor.BLACK){
             setTeamTurn(TeamColor.WHITE);
         } else{
@@ -140,5 +152,19 @@ public class ChessGame {
      */
     public ChessBoard getBoard() {
         return this.board;
+    }
+    public ArrayList<ChessPosition> getWhitePositions(){
+        return board.getWhitePieces();
+    }
+    public ArrayList<ChessPosition> getBlackPositions(){
+        return board.getBlackPieces();
+    }
+
+    public ChessPosition getWhiteKing(){
+        return board.getWhiteKing();
+    }
+
+    public ChessPosition getBlackKing(){
+        return board.getBlackKing();
     }
 }
