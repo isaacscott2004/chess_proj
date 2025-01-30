@@ -72,7 +72,7 @@ public class ChessGame {
             validMoves = allMovesToProtectKing;
         }
         validMoves.removeIf(move -> {
-           ChessBoard copyBoard = CopyBoard();
+           ChessBoard copyBoard = copyBoard();
            ChessPiece currentPiece = copyBoard.getPiece(startPosition);
            boolean inCheck;
 
@@ -194,6 +194,12 @@ public class ChessGame {
     }
 
 
+    /**
+     * @param currentTeam the team whose turn it is
+     * @param board the board to run the method on, could be actual board or a copy of the board
+     * @return all the ChessPositions of pieces on the other team whose potential move list intersects
+     *      * with the position of the currentTeam's king
+     */
     private ArrayList<ChessPosition> piecesWithKingInPath(ChessGame.TeamColor currentTeam, ChessBoard board) {
         ChessPosition king;
         ArrayList<ChessPosition> piecesInPath = new ArrayList<>();
@@ -223,10 +229,15 @@ public class ChessGame {
 
         return piecesInPath;
     }
+
+    /**
+     * @param currentTeam the team whose turn it is
+     * @return all the moves a king can make to get out of check
+     */
     private ArrayList<ChessMove> getKingMoves(TeamColor currentTeam){
         ChessPosition king;
         ArrayList<ChessMove> kingMoves = new ArrayList<>();
-        ChessBoard copyBoard = CopyBoard();
+        ChessBoard copyBoard = copyBoard();
         if(currentTeam == TeamColor.BLACK){
             king = copyBoard.getBlackKing();
         } else{
@@ -249,10 +260,15 @@ public class ChessGame {
 
     }
 
+    /**
+     * @param currentTeam the team whose turn it is
+     * @return all the moves other of pieces on the same team as the king in question where those moves put the
+     * king out of check
+     */
     private ArrayList<ChessMove> getMovesToProtectKing(TeamColor currentTeam) {
         ArrayList<ChessPosition> teamList;
         ArrayList<ChessMove> savingMoves = new ArrayList<>();
-        ChessBoard copyBoard = CopyBoard();
+        ChessBoard copyBoard = copyBoard();
         if(currentTeam == TeamColor.BLACK){
             teamList = copyBoard.getBlackPieces();
         } else{
@@ -279,6 +295,11 @@ public class ChessGame {
         }
         return savingMoves;
     }
+
+    /**
+     * @param currentTeam the team whose turn it is
+     * @return all the validMoves of all the pieces on the current team
+     */
     private ArrayList<ArrayList<ChessMove>> getAllValidMoves(TeamColor currentTeam){
         ArrayList<ArrayList<ChessMove>> allValidMoves = new ArrayList<>();
         ArrayList<ChessPosition> teamList;
@@ -294,7 +315,11 @@ public class ChessGame {
         return allValidMoves;
 
     }
-    private ChessBoard CopyBoard(){
+
+    /**
+     * @return a copy of the current board
+     */
+    private ChessBoard copyBoard(){
         ChessBoard copyBoard = new ChessBoard();
         for(int i = 1; i < 9; i++){
             for(int j = 1; j < 9; j++){
