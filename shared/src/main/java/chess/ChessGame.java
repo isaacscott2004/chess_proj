@@ -59,8 +59,32 @@ public class ChessGame {
             return null;
         }
         ChessPiece piece = board.getPiece(startPosition);
-        Collection<ChessMove> movesBeforeChecks = piece.pieceMoves(this.board, startPosition);
-        return movesBeforeChecks;
+        TeamColor currentTeam = piece.getTeamColor();
+        Collection<ChessMove> validMoves = piece.pieceMoves(this.board, startPosition);
+        if(isInCheck(currentTeam)){
+            ArrayList<ChessMove> allMovesToProtectKing;
+            if(board.getPiece(startPosition).getPieceType() != ChessPiece.PieceType.KING) {
+                allMovesToProtectKing = getMovesToProtectKing(currentTeam);
+            } else {
+                allMovesToProtectKing = getKingMoves(currentTeam);
+            }
+            allMovesToProtectKing.removeIf( move ->!(move.getStartPosition().equals(startPosition)));
+            validMoves = allMovesToProtectKing;
+        }
+        validMoves.removeIf(move -> {
+           ChessBoard copyBoard = CopyBoard();
+           ChessPiece currentPiece = copyBoard.getPiece(startPosition);
+           boolean inCheck;
+
+               ChessPosition newPosition = move.getEndPosition();
+               ChessPiece otherPiece = copyBoard.getPiece(newPosition);
+               copyBoard.movePiece(startPosition, newPosition, currentPiece);
+               inCheck =  !piecesWithKingInPath(currentTeam, copyBoard).isEmpty();
+               copyBoard.movePiece(newPosition, startPosition, currentPiece);
+               copyBoard.addPiece(newPosition, otherPiece);
+           return inCheck;
+        });
+        return validMoves;
     }
 
     /**
@@ -138,7 +162,12 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        if(isInCheck(teamColor)){
+            return false;
+        }else if(!getAllValidMoves(teamColor).isEmpty()){
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -245,6 +274,22 @@ public class ChessGame {
             }
         }
         return savingMoves;
+    }
+    private ArrayList<ArrayList<ChessMove>> getAllValidMoves(TeamColor currentTeam){
+        ArrayList<ArrayList<ChessMove>> allValidMoves = new ArrayList<>();
+        ArrayList<ChessPosition> teamList;
+        if(currentTeam == TeamColor.BLACK){
+            teamList = board.getBlackPieces();
+        } else{
+            teamList = board.getWhitePieces();
+        }
+        for(ChessPosition piecePos : teamList) {
+            ChessPiece piece = board.getPiece(piecePos);
+            ArrayList<ChessMove> validMoves = (ArrayList<ChessMove>) piece.pieceMoves(board, piecePos);
+            allValidMoves.add(validMoves);
+        }
+        return allValidMoves;
+
     }
     private ChessBoard CopyBoard(){
         ChessBoard copyBoard = new ChessBoard();
