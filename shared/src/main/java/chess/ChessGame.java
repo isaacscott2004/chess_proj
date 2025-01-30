@@ -111,7 +111,7 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        return !piecesWithKingInPath(teamColor).isEmpty();
+        return !piecesWithKingInPath(teamColor, getBoard()).isEmpty();
     }
 
     /**
@@ -125,10 +125,8 @@ public class ChessGame {
             return false;
         } if(!(getKingMoves(teamColor).isEmpty())){
             return false;
-        } if(!(getMovesToProtectKing(teamColor).isEmpty())){
-            return false;
         }
-        return true;
+        return getMovesToProtectKing(teamColor).isEmpty();
 
     }
 
@@ -161,28 +159,15 @@ public class ChessGame {
     public ChessBoard getBoard() {
         return this.board;
     }
-    public ArrayList<ChessPosition> getWhitePositions(){
-        return board.getWhitePieces();
-    }
-    public ArrayList<ChessPosition> getBlackPositions(){
-        return board.getBlackPieces();
-    }
 
-    public ChessPosition getWhiteKing(){
-        return board.getWhiteKing();
-    }
 
-    public ChessPosition getBlackKing(){
-        return board.getBlackKing();
-    }
-
-    private ArrayList<ChessPosition> piecesWithKingInPath(ChessGame.TeamColor currentTeam) {
+    private ArrayList<ChessPosition> piecesWithKingInPath(ChessGame.TeamColor currentTeam, ChessBoard board) {
         ChessPosition king;
         ArrayList<ChessPosition> piecesInPath = new ArrayList<>();
         if (currentTeam == ChessGame.TeamColor.BLACK) {
-            king = getBlackKing();
-            for (ChessPosition piecePos : getWhitePositions()) {
-                ArrayList<ChessMove> moves = (ArrayList<ChessMove>)getBoard().getPiece(piecePos).pieceMoves(getBoard(), piecePos);
+            king = board.getBlackKing();
+            for (ChessPosition piecePos : board.getWhitePieces()) {
+                ArrayList<ChessMove> moves = (ArrayList<ChessMove>)board.getPiece(piecePos).pieceMoves(board, piecePos);
                 for (ChessMove move : moves) {
                     if (move.getEndPosition().equals(king)) {
                         piecesInPath.add(piecePos);
@@ -191,9 +176,9 @@ public class ChessGame {
                 }
             }
         } else{
-            king = getWhiteKing();
-            for(ChessPosition piecePos : getBlackPositions()){
-                ArrayList<ChessMove> moves = (ArrayList<ChessMove>)getBoard().getPiece(piecePos).pieceMoves(getBoard(), piecePos);
+            king = board.getWhiteKing();
+            for(ChessPosition piecePos : board.getBlackPieces()){
+                ArrayList<ChessMove> moves = (ArrayList<ChessMove>)board.getPiece(piecePos).pieceMoves(board, piecePos);
                 for(ChessMove move : moves){
                     if(move.getEndPosition().equals(king)){
                         piecesInPath.add(piecePos);
@@ -210,22 +195,22 @@ public class ChessGame {
         ArrayList<ChessMove> kingMoves = new ArrayList<>();
         ChessBoard copyBoard = CopyBoard();
         if(currentTeam == TeamColor.BLACK){
-            king = getBlackKing();
+            king = copyBoard.getBlackKing();
         } else{
-            king = getWhiteKing();
+            king = copyBoard.getWhiteKing();
         }
         ChessPiece kingPiece = copyBoard.getPiece(king);
         ArrayList<ChessMove> allKingMoves = (ArrayList<ChessMove>) kingPiece.pieceMoves(copyBoard, king);
         for(ChessMove move : allKingMoves){
             ChessPosition newKingPosition = move.getEndPosition();
             ChessPiece otherPiece = copyBoard.getPiece(newKingPosition);
-            getBoard().movePiece(king, newKingPosition, kingPiece);
-            boolean stillInCheck =  !piecesWithKingInPath(currentTeam).isEmpty();
+            copyBoard.movePiece(king, newKingPosition, kingPiece);
+            boolean stillInCheck =  !piecesWithKingInPath(currentTeam, copyBoard).isEmpty();
             if(!stillInCheck){
                 kingMoves.add(move);
             }
-            getBoard().movePiece(newKingPosition, king, kingPiece);
-            getBoard().addPiece(newKingPosition, otherPiece);
+            copyBoard.movePiece(newKingPosition, king, kingPiece);
+            copyBoard.addPiece(newKingPosition, otherPiece);
         }
         return kingMoves;
 
@@ -236,41 +221,37 @@ public class ChessGame {
         ArrayList<ChessMove> savingMoves = new ArrayList<>();
         ChessBoard copyBoard = CopyBoard();
         if(currentTeam == TeamColor.BLACK){
-            teamList = getBlackPositions();
+            teamList = copyBoard.getBlackPieces();
         } else{
-            teamList = getWhitePositions();
+            teamList = copyBoard.getWhitePieces();
         }
-        ArrayList<ChessPosition> piecesWithKingInPath = piecesWithKingInPath(currentTeam);
-        for(ChessPosition piecePos: teamList){
+        for(ChessPosition piecePos: new ArrayList<>(teamList)) {
             ChessPiece piece = copyBoard.getPiece(piecePos);
-            ArrayList<ChessMove> currentPieceMoves = (ArrayList<ChessMove>) piece.pieceMoves(copyBoard, piecePos);
-
-            for(ChessMove currentMove : currentPieceMoves){
-                ChessPosition newPiecePosition = currentMove.getEndPosition();
-                ChessPosition oldPiecePosition = currentMove.getStartPosition();
-                ChessPiece thisPiece = copyBoard.getPiece(oldPiecePosition);
-                ChessPiece otherPiece = copyBoard.getPiece(newPiecePosition);
-                getBoard().movePiece(oldPiecePosition, newPiecePosition, thisPiece);
-                boolean stillInCheck = !piecesWithKingInPath(currentTeam).isEmpty();
-                if(piecesWithKingInPath.contains(newPiecePosition) || !stillInCheck){
-                    savingMoves.add(currentMove);
+            if (piece.getPieceType() != ChessPiece.PieceType.KING) {
+                ArrayList<ChessMove> currentPieceMoves = (ArrayList<ChessMove>) piece.pieceMoves(copyBoard, piecePos);
+                for (ChessMove currentMove : new ArrayList<>(currentPieceMoves)) {
+                    ChessPosition newPiecePosition = currentMove.getEndPosition();
+                    ChessPosition oldPiecePosition = currentMove.getStartPosition();
+                    ChessPiece thisPiece = copyBoard.getPiece(oldPiecePosition);
+                    ChessPiece otherPiece = copyBoard.getPiece(newPiecePosition);
+                    copyBoard.movePiece(oldPiecePosition, newPiecePosition, thisPiece);
+                    boolean stillInCheck = !piecesWithKingInPath(currentTeam, copyBoard).isEmpty();
+                    if (!stillInCheck) {
+                        savingMoves.add(currentMove);
+                    }
+                    copyBoard.movePiece(newPiecePosition, oldPiecePosition, thisPiece);
+                    copyBoard.addPiece(newPiecePosition, otherPiece);
                 }
-//                getBoard()
             }
         }
         return savingMoves;
     }
-
     private ChessBoard CopyBoard(){
         ChessBoard copyBoard = new ChessBoard();
-        ChessPiece[][] currentBoardArray = board.getBoard();
-        ChessPiece[][] copyBoardArray = copyBoard.getBoard();
-        for(int i = 0; i < copyBoardArray.length; i++){
-            for(int j = 0; j < copyBoardArray[0].length; j++){
-                if(currentBoardArray[i][j] != null) {
-                    copyBoardArray[i][j] = currentBoardArray[i][j].clone();
-                } else{
-                    copyBoardArray[i][j] = null;
+        for(int i = 1; i < 9; i++){
+            for(int j = 1; j < 9; j++){
+                if(board.getPiece(new ChessPosition(i, j)) != null) {
+                    copyBoard.addPiece(new ChessPosition(i, j), board.getPiece(new ChessPosition(i, j)));
                 }
             }
         }
