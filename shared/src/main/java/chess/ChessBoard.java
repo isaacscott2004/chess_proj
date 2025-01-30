@@ -16,6 +16,7 @@ public class ChessBoard {
     private ArrayList<ChessPosition> blackPieces;
     private ChessPosition whiteKing;
     private ChessPosition blackKing;
+
     public ChessBoard() {
         this.board = new ChessPiece[8][8];
         whitePieces = new ArrayList<>();
@@ -34,20 +35,20 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        if(piece == null){
+        if (piece == null) {
             return;
         }
-        if(piece.getPieceType() == ChessPiece.PieceType.KING){
-            if(piece.getTeamColor() == ChessGame.TeamColor.BLACK){
+        if (piece.getPieceType() == ChessPiece.PieceType.KING) {
+            if (piece.getTeamColor() == ChessGame.TeamColor.BLACK) {
                 blackKing = position;
-            } else{
+            } else {
                 whiteKing = position;
             }
         }
-        if(piece.getTeamColor() == ChessGame.TeamColor.BLACK){
+        if (piece.getTeamColor() == ChessGame.TeamColor.BLACK) {
             this.blackPieces.add(position);
             this.whitePieces.remove(position);
-        } else{
+        } else {
             this.whitePieces.add(position);
             this.blackPieces.remove(position);
 
@@ -55,28 +56,27 @@ public class ChessBoard {
         board[position.getRow() - 1][position.getColumn() - 1] = piece;
     }
 
-    public void removePiece(ChessPosition position){
-        if(getPiece(position) == null){
+    public void removePiece(ChessPosition position) {
+        if (getPiece(position) == null) {
             return;
         }
-        if(getPiece(position).getTeamColor() == ChessGame.TeamColor.BLACK){
+        if (getPiece(position).getTeamColor() == ChessGame.TeamColor.BLACK) {
             this.blackPieces.remove(position);
-            if(getPiece(position).getPieceType() == ChessPiece.PieceType.KING){
+            if (getPiece(position).getPieceType() == ChessPiece.PieceType.KING) {
                 blackKing = null;
             }
-        } else{
+        } else {
             this.whitePieces.remove(position);
-            if(getPiece(position).getPieceType() == ChessPiece.PieceType.KING){
+            if (getPiece(position).getPieceType() == ChessPiece.PieceType.KING) {
                 whiteKing = null;
             }
 
         }
-        board[position.getRow()-1][position.getColumn()-1] = null;
+        board[position.getRow() - 1][position.getColumn() - 1] = null;
     }
 
 
-
-    public void movePiece(ChessPosition startPosition, ChessPosition endPosition, ChessPiece piece){
+    public void movePiece(ChessPosition startPosition, ChessPosition endPosition, ChessPiece piece) {
         removePiece(startPosition);
         addPiece(endPosition, piece);
 
@@ -114,40 +114,42 @@ public class ChessBoard {
         firstRow.add(ChessPiece.PieceType.KNIGHT);
         firstRow.add(ChessPiece.PieceType.ROOK);
         int i = 0;
-        for(ChessPiece.PieceType piece : firstRow){
+        for (ChessPiece.PieceType piece : firstRow) {
             board[7][i] = new ChessPiece(ChessGame.TeamColor.BLACK, piece);
             blackPieces.add(new ChessPosition(8, i + 1));
             board[6][i] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN);
-            blackPieces.add(new ChessPosition(7 , i + 1));
+            blackPieces.add(new ChessPosition(7, i + 1));
             board[0][i] = new ChessPiece(ChessGame.TeamColor.WHITE, piece);
             whitePieces.add(new ChessPosition(1, i + 1));
             board[1][i] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
             whitePieces.add(new ChessPosition(2, i + 1));
-        i++;
+            i++;
 
         }
     }
 
     /**
      * checks if a piece is on a specific square
+     *
      * @param row The row of the piece to check
      * @param col The column of the piece to check
      * @return true if there is a piece on the square
      * false if there is not a piece on the square
      */
-    public boolean isPieceOnSquare(int row, int col){
-        try{
+    public boolean isPieceOnSquare(int row, int col) {
+        try {
             return getPiece(new ChessPosition(row, col)) != null;
-        } catch (IndexOutOfBoundsException e){
+        } catch (IndexOutOfBoundsException e) {
             return false;
         }
     }
 
     /**
      * a getter for the board instance variable
+     *
      * @return the board
      */
-    public ChessPiece[][] getBoard(){
+    public ChessPiece[][] getBoard() {
         return this.board;
     }
 
@@ -159,11 +161,11 @@ public class ChessBoard {
         return whitePieces;
     }
 
-    public ChessPosition getWhiteKing(){
+    public ChessPosition getWhiteKing() {
         return whiteKing;
     }
 
-    public ChessPosition getBlackKing(){
+    public ChessPosition getBlackKing() {
         return blackKing;
     }
 
@@ -187,5 +189,7 @@ public class ChessBoard {
                 '}';
     }
 }
+
+
 
 
