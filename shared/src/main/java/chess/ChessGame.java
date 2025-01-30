@@ -164,8 +164,12 @@ public class ChessGame {
     public boolean isInStalemate(TeamColor teamColor) {
         if(isInCheck(teamColor)){
             return false;
-        }else if(!getAllValidMoves(teamColor).isEmpty()){
-            return false;
+        }
+        ArrayList<ArrayList<ChessMove>> allMoves = getAllValidMoves(teamColor);
+        for(ArrayList<ChessMove> pieceList : allMoves ){
+            if(!pieceList.isEmpty()){
+                return false;
+            }
         }
         return true;
     }
@@ -284,8 +288,7 @@ public class ChessGame {
             teamList = board.getWhitePieces();
         }
         for(ChessPosition piecePos : teamList) {
-            ChessPiece piece = board.getPiece(piecePos);
-            ArrayList<ChessMove> validMoves = (ArrayList<ChessMove>) piece.pieceMoves(board, piecePos);
+            ArrayList<ChessMove> validMoves = (ArrayList<ChessMove>) validMoves(piecePos);
             allValidMoves.add(validMoves);
         }
         return allValidMoves;
