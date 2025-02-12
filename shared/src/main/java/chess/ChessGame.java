@@ -2,6 +2,7 @@ package chess;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Objects;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -38,6 +39,7 @@ public class ChessGame {
     public void setTeamTurn(TeamColor team) {
         this.team = team;
     }
+
 
     /**
      * Enum identifying the 2 possible teams in a chess game
@@ -193,6 +195,26 @@ public class ChessGame {
         return this.board;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof ChessGame chessGame)) {
+            return false;
+        }
+        return Objects.equals(board, chessGame.board) && team == chessGame.team;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(board, team);
+    }
+
+    @Override
+    public String toString() {
+        return "ChessGame{" +
+                "board=" + board +
+                ", team=" + team +
+                '}';
+    }
 
     /**
      * @param currentTeam the team whose turn it is
