@@ -5,14 +5,16 @@ import chess.ChessGame;
 import java.util.Objects;
 
 public class GameData {
-    private int gameID;
+    private final int gameID;
     private String whiteUsername;
     private String blackUsername;
     private String gameName;
     private ChessGame game;
 
-    public GameData(int gameID, String whiteUsername, String blackUsername, String gameName, ChessGame game){
-        this.gameID = gameID;
+    private static int gameIDCounter = 1;
+
+    public GameData(String whiteUsername, String blackUsername, String gameName, ChessGame game){
+        this.gameID = gameIDCounter++;
         this.whiteUsername = whiteUsername;
         this.blackUsername = blackUsername;
         this.gameName = gameName;
@@ -37,10 +39,6 @@ public class GameData {
 
     public ChessGame getGame() {
         return game;
-    }
-
-    public void setGameID(int gameID) {
-        this.gameID = gameID;
     }
 
     public void setWhiteUsername(String whiteUsername) {
