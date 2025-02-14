@@ -9,4 +9,6 @@ public interface UserDAO {
     public boolean authenticateUser(String username, String password);
 
     public void clearUserData();
+
+    public boolean containsUsername(String username);
 }

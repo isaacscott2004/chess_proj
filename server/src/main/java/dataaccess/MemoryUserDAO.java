@@ -6,11 +6,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 public class MemoryUserDAO implements UserDAO{
-    private Collection<UserData> userDataStorage;
-
-    public MemoryUserDAO(){
-        userDataStorage = new ArrayList<>();
-    }
+    private static final Collection<UserData> userDataStorage = new ArrayList<>();
 
     @Override
     public UserData getUser(String username) throws DataAccessException {
@@ -41,6 +37,17 @@ public class MemoryUserDAO implements UserDAO{
     @Override
     public void clearUserData() {
         userDataStorage.clear();
+
+    }
+
+    @Override
+    public boolean containsUsername(String username) {
+        for(UserData data : userDataStorage){
+            if(data.getUsername().equals(username)){
+                return true;
+            }
+        }
+        return false;
 
     }
 }

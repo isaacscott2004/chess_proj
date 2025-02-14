@@ -7,30 +7,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 public class MemoryGameDAO implements GameDAO{
-    private Collection<GameData> gameDataStorage;
+    private static final Collection<GameData> gameDataStorage = new ArrayList<>();
 
-    public  MemoryGameDAO(){
-        gameDataStorage = new ArrayList<>();
-    }
     @Override
-    public Collection<GameData> getListGames(String username) throws  DataAccessException{
-        Collection<GameData> allGames = new ArrayList<>();
-        for(GameData data: gameDataStorage){
-            if(data.getBlackUsername().equals(username) || data.getWhiteUsername().equals(username)){
-                allGames.add(data);
-            }
+    public Collection<GameData> getListGames()throws  DataAccessException{
+        if (gameDataStorage.isEmpty()){
+            throw new DataAccessException("There are no games");
         }
-        if (allGames.isEmpty()){
-            throw new DataAccessException("There are no games that match the username");
-        }
-        return allGames;
+        return gameDataStorage;
     }
-//    public Collection<GameData> getListGames()throws  DataAccessException{
-//        if (gameDataStorage.isEmpty()){
-//            throw new DataAccessException("There are no games");
-//        }
-//        return gameDataStorage;
-//    }
 
     @Override
     public GameData createGame(String gameName) {
@@ -60,11 +45,6 @@ public class MemoryGameDAO implements GameDAO{
     }
 
     @Override
-    public boolean checkIfColorAvailable(String playerColor, int gameID) {
-        return false;
-    }
-
-    @Override
     public void updateGame(String username, String playerColor, int gameID) throws DataAccessException, IllegalArgumentException {
         if(!(playerColor.equals(ChessGame.TeamColor.BLACK.toString()) || playerColor.equals(ChessGame.TeamColor.WHITE.toString()))){
             throw new IllegalArgumentException("playerColor must be BLACK or WHITE");
@@ -79,14 +59,10 @@ public class MemoryGameDAO implements GameDAO{
             }
             throw new DataAccessException("There is no game with the specified gameID");
         }
-
-
-
     }
 
     @Override
     public void clearGameData() {
         gameDataStorage.clear();
-
     }
 }

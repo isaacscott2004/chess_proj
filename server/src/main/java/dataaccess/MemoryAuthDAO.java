@@ -6,16 +6,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 public class MemoryAuthDAO implements AuthDAO{
-    private Collection<AuthData> authDataStorage;
-
-    public MemoryAuthDAO(){
-        this.authDataStorage = new ArrayList<>();
-    }
+    private static final Collection<AuthData> authDataStorage = new ArrayList<>();
 
     @Override
-    public void createAuth(AuthData data) throws DataAccessException {
-        data.setAuthToken(generateToken());
+    public String createAuth(AuthData data) {
+        String authToken = generateToken();
+        data.setAuthToken(authToken);
         authDataStorage.add(data);
+        return authToken;
     }
 
     @Override
@@ -29,7 +27,7 @@ public class MemoryAuthDAO implements AuthDAO{
     }
 
     @Override
-    public String getUsername(String authToken) throws DataAccessException {
+    public String getAuth(String authToken) throws DataAccessException {
         for(AuthData data: authDataStorage){
             if(data.getAuthToken().equals(authToken)){
                 return data.getUsername();
@@ -43,6 +41,17 @@ public class MemoryAuthDAO implements AuthDAO{
         authDataStorage.clear();
 
     }
+
+    @Override
+    public boolean validAuthToken(String authToken) {
+        for(AuthData data : authDataStorage){
+            if(data.getAuthToken().equals(authToken)){
+                return true;
+            }
+        }
+        return false;
+    }
+
     private String generateToken() {
         return UUID.randomUUID().toString();
     }
