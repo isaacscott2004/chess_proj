@@ -27,10 +27,10 @@ public class MemoryAuthDAO implements AuthDAO{
     }
 
     @Override
-    public String getAuth(String authToken) throws DataAccessException {
+    public void getAuth(String authToken) throws DataAccessException {
         for(AuthData data: authDataStorage){
             if(data.getAuthToken().equals(authToken)){
-                return data.getUsername();
+                return;
             }
         }
         throw new DataAccessException("There is no authData with the matching authToken");

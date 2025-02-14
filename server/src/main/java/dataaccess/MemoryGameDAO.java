@@ -18,10 +18,10 @@ public class MemoryGameDAO implements GameDAO{
     }
 
     @Override
-    public GameData createGame(String gameName) {
+    public int createGame(String gameName) {
         GameData data = new GameData(null, null, gameName, new ChessGame());
         gameDataStorage.add(data);
-        return data;
+        return data.getGameID();
     }
 
     @Override
@@ -45,13 +45,10 @@ public class MemoryGameDAO implements GameDAO{
     }
 
     @Override
-    public void updateGame(String username, String playerColor, int gameID) throws DataAccessException, IllegalArgumentException {
-        if(!(playerColor.equals(ChessGame.TeamColor.BLACK.toString()) || playerColor.equals(ChessGame.TeamColor.WHITE.toString()))){
-            throw new IllegalArgumentException("playerColor must be BLACK or WHITE");
-        }
+    public void updateGame(String username, ChessGame.TeamColor playerColor, int gameID) throws DataAccessException{
         for(GameData data : gameDataStorage){
             if(data.getGameID()==gameID){
-                if(playerColor.equals(ChessGame.TeamColor.WHITE.toString())){
+                if(playerColor.equals(ChessGame.TeamColor.WHITE)){
                     data.setWhiteUsername(username);
                 } else{
                     data.setBlackUsername(username);
