@@ -11,11 +11,9 @@ public interface GameDAO {
 
     public int createGame(String gameName);
 
-    public int getGameID(String gameName) throws DataAccessException;
+    public void checkGameID(int gameID) throws DataAccessException;
 
-    public GameData getGame(int gameID) throws DataAccessException;
-
-    public void updateGame(String username, ChessGame.TeamColor playerColor, int gameID) throws DataAccessException, IllegalArgumentException;
+    public void updateGame(String username, ChessGame.TeamColor playerColor, int gameID) throws DataAccessException;
 
     public void clearGameData();
 }

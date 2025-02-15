@@ -9,16 +9,6 @@ public class MemoryUserDAO implements UserDAO{
     private static final Collection<UserData> userDataStorage = new ArrayList<>();
 
     @Override
-    public UserData getUser(String username) throws DataAccessException {
-        for(UserData data : userDataStorage){
-            if(data.getUsername().equals(username)){
-                return data;
-            }
-        }
-        throw new DataAccessException("no user data with specified username");
-    }
-
-    @Override
     public void createUser(UserData user) {
         userDataStorage.add(user);
 

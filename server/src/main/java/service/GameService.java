@@ -48,25 +48,34 @@ public class GameService {
         return new CreateGameResult(gameID, null);
     }
 
-//    public static JoinGameResult joinGame(JoinGameRequest request){
-//        MemoryAuthDAO authAccessObject = new MemoryAuthDAO();
-//        MemoryGameDAO gameAccessObject = new MemoryGameDAO();
-//        if(request.authToken() == null || request.color() == null || request.gameID() == null){
-//            return new JoinGameResult("Error: (authToken and/or color and/or gameID cannot be empty)");
-//        }
-//        try{
-//            authAccessObject.getAuth(request.authToken());
-//        } catch (DataAccessException e) {
-//            return new JoinGameResult("Error: unauthorized");
-//        }
-//        try{
-//            gameAccessObject.getGame(request.gameID());
-//        } catch (DataAccessException e) {
-//            return new JoinGameResult("Error: (Invalid gameID)");
-//        }
-//
-//
-//    }
+    public static JoinGameResult joinGame(JoinGameRequest request){
+        MemoryAuthDAO authAccessObject = new MemoryAuthDAO();
+        MemoryGameDAO gameAccessObject = new MemoryGameDAO();
+        String username;
+        if(request.authToken() == null || request.color() == null || request.gameID() == null){
+            return new JoinGameResult("Error: (authToken and/or color and/or gameID cannot be empty)");
+        }
+        try{
+            username = authAccessObject.getUsername(request.authToken());
+        } catch (DataAccessException e) {
+            return new JoinGameResult("Error: unauthorized");
+        }
+        try{
+            gameAccessObject.checkGameID(request.gameID());
+        } catch (DataAccessException e) {
+            return new JoinGameResult("Error: (Invalid gameID)");
+        }
+        try{
+            gameAccessObject.updateGame(username, request.color(), request.gameID());
+        } catch (DataAccessException e){
+            return new JoinGameResult("Error: already taken");
+        }
+        return new JoinGameResult(null);
+
+
+
+
+    }
 
 
 

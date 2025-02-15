@@ -24,39 +24,38 @@ public class MemoryGameDAO implements GameDAO{
         return data.getGameID();
     }
 
-    @Override
-    public int getGameID(String gameName) throws DataAccessException {
-        for(GameData data: gameDataStorage){
-            if(data.getGameName().equals(gameName)){
-                return data.getGameID();
-            }
-        }
-        throw  new DataAccessException("There is no game with the specified game name");
-    }
 
     @Override
-    public GameData getGame(int gameID) throws DataAccessException {
+    public void checkGameID(int gameID) throws DataAccessException {
         for(GameData data: gameDataStorage){
             if(data.getGameID() == gameID){
-                return data;
+                return;
             }
         }
         throw new DataAccessException("There is no game with the specified gameID");
+
     }
 
     @Override
-    public void updateGame(String username, ChessGame.TeamColor playerColor, int gameID) throws DataAccessException{
+    public void updateGame(String username, ChessGame.TeamColor playerColor, int gameID) throws DataAccessException {
         for(GameData data : gameDataStorage){
             if(data.getGameID()==gameID){
                 if(playerColor.equals(ChessGame.TeamColor.WHITE)){
+                    if(data.getWhiteUsername() != null){
+                        throw new DataAccessException("White username already taken");
+                    }
                     data.setWhiteUsername(username);
                 } else{
+                    if(data.getBlackUsername() != null){
+                        throw new DataAccessException("Black username already taken");
+                    }
                     data.setBlackUsername(username);
                 }
             }
-            throw new DataAccessException("There is no game with the specified gameID");
         }
     }
+
+
 
     @Override
     public void clearGameData() {

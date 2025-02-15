@@ -8,9 +8,11 @@ public interface AuthDAO {
 
     public void getAuth(String authToken) throws DataAccessException;
 
+    public String getUsername(String authToken) throws DataAccessException;
+
     public void clearAuthdata();
 
-    public boolean validAuthToken(String authToken);
+
 
 
 }

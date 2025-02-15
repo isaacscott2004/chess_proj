@@ -18,12 +18,17 @@ public class MemoryAuthDAO implements AuthDAO{
 
     @Override
     public void deleteAuth(String authToken) throws DataAccessException {
+        boolean found = false;
         for(AuthData data : authDataStorage){
             if(data.getAuthToken().equals(authToken)){
-                data.setAuthToken(null);
+                authDataStorage.remove(data);
+                found = true;
+                break;
             }
         }
-        throw new DataAccessException("There is no authData with the matching authToken");
+        if(!(found)) {
+            throw new DataAccessException("There is no authData with the matching authToken");
+        }
     }
 
     @Override
@@ -37,19 +42,19 @@ public class MemoryAuthDAO implements AuthDAO{
     }
 
     @Override
-    public void clearAuthdata() {
-        authDataStorage.clear();
-
+    public String getUsername(String authToken) throws DataAccessException {
+        for(AuthData data: authDataStorage){
+            if(data.getAuthToken().equals(authToken)){
+                return data.getUsername();
+            }
+        }
+        throw new DataAccessException("There is no authData with the matching authToken");
     }
 
     @Override
-    public boolean validAuthToken(String authToken) {
-        for(AuthData data : authDataStorage){
-            if(data.getAuthToken().equals(authToken)){
-                return true;
-            }
-        }
-        return false;
+    public void clearAuthdata() {
+        authDataStorage.clear();
+
     }
 
     private String generateToken() {

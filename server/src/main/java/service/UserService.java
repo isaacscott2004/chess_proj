@@ -22,14 +22,14 @@ public class UserService {
         if(userAccessObject.containsUsername(request.username())){
             return new RegisterResult(null, null, "Error: already taken");
         }
-        UserData userModel = new UserData(request.username(), request.password(), request.username());
+        UserData userModel = new UserData(request.username(), request.password(), request.email());
         userAccessObject.createUser(userModel);
         AuthData authModel = new AuthData(null, request.username());
         String authToken = authAccessObject.createAuth(authModel);
         return new RegisterResult(request.username(), authToken, null);
     }
 
-    public static LoginResult login(LoginRequest request) throws  IllegalArgumentException, DataAccessException{
+    public static LoginResult login(LoginRequest request){
         MemoryUserDAO userAccessObject = new MemoryUserDAO();
         MemoryAuthDAO authAccessObject = new MemoryAuthDAO();
         if(request.username()== null || request.password()== null){
@@ -44,7 +44,7 @@ public class UserService {
 
     }
 
-    public static LogoutResult logout(LogoutRequest request) throws IllegalArgumentException{
+    public static LogoutResult logout(LogoutRequest request){
         MemoryAuthDAO authAccessObject = new MemoryAuthDAO();
         if(request.authToken() == null){
             return new LogoutResult("Error: (authToken cannot be empty)");
@@ -52,9 +52,9 @@ public class UserService {
         try {
             authAccessObject.deleteAuth(request.authToken());
         } catch (DataAccessException e){
-            return  new LogoutResult("Error: unauthorized");
+            return new LogoutResult("Error: unauthorized");
         }
-        return  new LogoutResult(null);
+        return new LogoutResult(null);
 
     }
 
