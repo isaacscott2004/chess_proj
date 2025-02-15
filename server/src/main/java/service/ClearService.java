@@ -7,13 +7,12 @@ import request.ClearRequest;
 import result.ClearResult;
 
 public class ClearService {
-    public static ClearResult clear(ClearRequest request){
+    public static void clear(ClearRequest request){
         MemoryAuthDAO authAccessObject = new MemoryAuthDAO();
         MemoryUserDAO userAccessObject = new MemoryUserDAO();
         MemoryGameDAO gameAccessObject = new MemoryGameDAO();
         authAccessObject.clearAuthdata();
         userAccessObject.clearUserData();
         gameAccessObject.clearGameData();
-        return new ClearResult(null);
     }
 }

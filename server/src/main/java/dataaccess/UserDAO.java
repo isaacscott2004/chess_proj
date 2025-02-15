@@ -3,11 +3,11 @@ import model.UserData;
 
 public interface UserDAO {
 
-    public void createUser(UserData user);
+    void createUser(UserData user);
 
-    public boolean authenticateUser(String username, String password);
+    boolean authenticateUser(String username, String password);
 
-    public void clearUserData();
+    void clearUserData();
 
-    public boolean containsUsername(String username);
+    boolean containsUsername(String username);
 }

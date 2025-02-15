@@ -60,4 +60,12 @@ public class MemoryAuthDAO implements AuthDAO{
     private String generateToken() {
         return UUID.randomUUID().toString();
     }
+
+    // for tests
+    public Collection<AuthData> getAuthDataStorage(){
+        return authDataStorage;
+    }
+    public void deleteAuthData(String username){
+        authDataStorage.removeIf(data -> data.getUsername().equals(username));
+    }
 }
