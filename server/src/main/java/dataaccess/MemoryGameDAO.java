@@ -10,10 +10,7 @@ public class MemoryGameDAO implements GameDAO{
     private static final Collection<GameData> gameDataStorage = new ArrayList<>();
 
     @Override
-    public Collection<GameData> getListGames()throws  DataAccessException{
-        if (gameDataStorage.isEmpty()){
-            throw new DataAccessException("There are no games");
-        }
+    public Collection<GameData> getListGames(){
         return gameDataStorage;
     }
 
@@ -55,10 +52,21 @@ public class MemoryGameDAO implements GameDAO{
         }
     }
 
+    @Override
+    public boolean isNameTaken(String gameName) {
+        for(GameData data : gameDataStorage){
+            if(data.getGameName().equals(gameName)){
+                return true;
+            }
+        }
+        return false;
+    }
 
 
     @Override
     public void clearGameData() {
         gameDataStorage.clear();
+        GameData.resetGameIDCounter();
+
     }
 }

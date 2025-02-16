@@ -51,21 +51,23 @@ public class MemoryAuthDAO implements AuthDAO{
         throw new DataAccessException("There is no authData with the matching authToken");
     }
 
+
     @Override
     public void clearAuthdata() {
         authDataStorage.clear();
 
     }
 
-    private String generateToken() {
-        return UUID.randomUUID().toString();
-    }
-
-    // for tests
+    @Override
     public Collection<AuthData> getAuthDataStorage(){
         return authDataStorage;
     }
+    @Override
     public void deleteAuthData(String username){
         authDataStorage.removeIf(data -> data.getUsername().equals(username));
+    }
+
+    private String generateToken() {
+        return UUID.randomUUID().toString();
     }
 }

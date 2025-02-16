@@ -1,8 +1,10 @@
 package dataaccess;
 import model.AuthData;
 
+import java.util.Collection;
+
 public interface AuthDAO {
-    String createAuth(AuthData data) throws DataAccessException;
+    String createAuth(AuthData data);
 
     void deleteAuth(String authToken)throws DataAccessException;
 
@@ -11,6 +13,12 @@ public interface AuthDAO {
     String getUsername(String authToken) throws DataAccessException;
 
     void clearAuthdata();
+
+    Collection<AuthData> getAuthDataStorage();
+
+    void deleteAuthData(String username);
+
+
 
 
 

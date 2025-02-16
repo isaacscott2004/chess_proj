@@ -1,8 +1,6 @@
 package service;
 
-import dataaccess.DataAccessException;
-import dataaccess.MemoryAuthDAO;
-import dataaccess.MemoryUserDAO;
+import dataaccess.*;
 import model.AuthData;
 import model.UserData;
 import request.LoginRequest;
@@ -13,9 +11,9 @@ import result.LogoutResult;
 import result.RegisterResult;
 
 public class UserService {
-    public static RegisterResult register(RegisterRequest request){
-        MemoryUserDAO userAccessObject = new MemoryUserDAO();
-        MemoryAuthDAO authAccessObject = new MemoryAuthDAO();
+    public static RegisterResult register(RegisterRequest request) {
+        UserDAO userAccessObject = DAOImplmentation.getUserDAO();
+        AuthDAO authAccessObject = DAOImplmentation.getAuthDAO();
         if(request.username()== null || request.password()== null || request.email()== null){
             return new RegisterResult(null, null, "Error: (username, password and/or email cannot be empty)");
         }
@@ -30,8 +28,8 @@ public class UserService {
     }
 
     public static LoginResult login(LoginRequest request){
-        MemoryUserDAO userAccessObject = new MemoryUserDAO();
-        MemoryAuthDAO authAccessObject = new MemoryAuthDAO();
+        UserDAO userAccessObject = DAOImplmentation.getUserDAO();
+        AuthDAO authAccessObject = DAOImplmentation.getAuthDAO();
         if(request.username()== null || request.password()== null){
             return new LoginResult(null, null, "Error: (username and/or password cannot be empty)");
         }
@@ -45,7 +43,7 @@ public class UserService {
     }
 
     public static LogoutResult logout(LogoutRequest request){
-        MemoryAuthDAO authAccessObject = new MemoryAuthDAO();
+        AuthDAO authAccessObject = DAOImplmentation.getAuthDAO();
         if(request.authToken() == null){
             return new LogoutResult("Error: (authToken cannot be empty)");
         }

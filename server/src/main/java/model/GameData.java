@@ -8,8 +8,8 @@ public class GameData {
     private final int gameID;
     private String whiteUsername;
     private String blackUsername;
-    private String gameName;
-    private ChessGame game;
+    private final String gameName;
+    private final ChessGame game;
 
     private static int gameIDCounter = 1;
 
@@ -19,6 +19,10 @@ public class GameData {
         this.blackUsername = blackUsername;
         this.gameName = gameName;
         this.game = game;
+    }
+
+    public static void resetGameIDCounter(){
+        gameIDCounter = 1;
     }
 
     public int getGameID() {
@@ -33,14 +37,6 @@ public class GameData {
         return blackUsername;
     }
 
-    public String getGameName() {
-        return gameName;
-    }
-
-    public ChessGame getGame() {
-        return game;
-    }
-
     public void setWhiteUsername(String whiteUsername) {
         this.whiteUsername = whiteUsername;
     }
@@ -49,12 +45,8 @@ public class GameData {
         this.blackUsername = blackUsername;
     }
 
-    public void setGameName(String gameName) {
-        this.gameName = gameName;
-    }
-
-    public void setGame(ChessGame game) {
-        this.game = game;
+    public String getGameName(){
+        return gameName;
     }
 
     @Override

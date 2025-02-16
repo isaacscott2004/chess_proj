@@ -1,8 +1,6 @@
 package service;
 
-import dataaccess.DataAccessException;
-import dataaccess.MemoryAuthDAO;
-import dataaccess.MemoryGameDAO;
+import dataaccess.*;
 import model.GameData;
 import request.CreateGameRequest;
 import request.JoinGameRequest;
@@ -14,9 +12,8 @@ import java.util.Collection;
 
 public class GameService {
     public static ListGamesResult listGames(ListGamesRequest request){
-        MemoryAuthDAO authAccessObject = new MemoryAuthDAO();
-        MemoryGameDAO gameAccessObject = new MemoryGameDAO();
-        Collection<GameData> games;
+        AuthDAO authAccessObject = DAOImplmentation.getAuthDAO();
+        GameDAO gameAccessObject = DAOImplmentation.getGameDAO();
         if(request.authToken() == null){
             return new ListGamesResult(null, "Error: (authToken cannot be empty)");
         }
@@ -25,19 +22,17 @@ public class GameService {
         } catch (DataAccessException e){
             return new ListGamesResult(null, "Error: unauthorized");
         }
-        try{
-            games = gameAccessObject.getListGames();
-        } catch (DataAccessException e){
-            return new ListGamesResult(null, "Error: (There are no games available)");
-        }
-        return new ListGamesResult(games, null);
+        return new ListGamesResult( gameAccessObject.getListGames(), null);
     }
 
     public static CreateGameResult createGame(CreateGameRequest request){
-        MemoryAuthDAO authAccessObject = new MemoryAuthDAO();
-        MemoryGameDAO gameAccessObject = new MemoryGameDAO();
+        AuthDAO authAccessObject = DAOImplmentation.getAuthDAO();
+        GameDAO gameAccessObject = DAOImplmentation.getGameDAO();
         if(request.gameName() == null || request.authToken() == null){
             return new CreateGameResult(null, "Error: (gameName and/or authToken must not be null)");
+        }
+        if(gameAccessObject.isNameTaken(request.gameName())){
+            return new CreateGameResult(null, "Error: (gameName already taken)");
         }
         try{
             authAccessObject.getAuth(request.authToken());
@@ -49,8 +44,8 @@ public class GameService {
     }
 
     public static JoinGameResult joinGame(JoinGameRequest request){
-        MemoryAuthDAO authAccessObject = new MemoryAuthDAO();
-        MemoryGameDAO gameAccessObject = new MemoryGameDAO();
+        AuthDAO authAccessObject = DAOImplmentation.getAuthDAO();
+        GameDAO gameAccessObject = DAOImplmentation.getGameDAO();
         String username;
         if(request.authToken() == null || request.color() == null || request.gameID() == null){
             return new JoinGameResult("Error: (authToken and/or color and/or gameID cannot be empty)");

@@ -1,9 +1,9 @@
 package service;
 
 
-import dataaccess.MemoryAuthDAO;
-import dataaccess.MemoryUserDAO;
+import dataaccess.*;
 import model.AuthData;
+import org.junit.jupiter.api.AfterAll;
 import request.LoginRequest;
 import request.LogoutRequest;
 import request.RegisterRequest;
@@ -17,15 +17,15 @@ import static org.junit.jupiter.api.Assertions.*;
 
 
 public class UserServiceTests {
-    private static MemoryUserDAO userDataAccessObject;
-    private static MemoryAuthDAO authDataAccessObject;
+    private static UserDAO userDataAccessObject;
+    private static AuthDAO authDataAccessObject;
     private static Collection<AuthData> authDataList;
     private static String currentAuthToken;
 
     @BeforeAll
     static void setUp(){
-        userDataAccessObject = new MemoryUserDAO();
-        authDataAccessObject = new MemoryAuthDAO();
+        userDataAccessObject = DAOImplmentation.getUserDAO();
+        authDataAccessObject = DAOImplmentation.getAuthDAO();
         authDataList =  authDataAccessObject.getAuthDataStorage();
         RegisterRequest registerRequest = new RegisterRequest("Isaac", "Soccer", "isaacscottirwin@gmail.com");
         RegisterResult registerResult = UserService.register(registerRequest);
@@ -128,6 +128,13 @@ public class UserServiceTests {
         assertEquals("Error: unauthorized", result.message());
         assertNull(result.authToken());
         assertNull(result.username());
+    }
+
+    @AfterAll
+    static void clear(){
+        userDataAccessObject.clearUserData();
+        authDataAccessObject.clearAuthdata();
+
     }
 
 

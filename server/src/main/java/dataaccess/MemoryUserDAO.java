@@ -38,13 +38,14 @@ public class MemoryUserDAO implements UserDAO{
             }
         }
         return false;
-
     }
     // for tests
+    @Override
     public Collection<UserData> getUserDataStorage(){
         return userDataStorage;
     }
 
+    @Override
     public void deleteUserData(String username){
         userDataStorage.removeIf(data -> data.getUsername().equals(username));
 
