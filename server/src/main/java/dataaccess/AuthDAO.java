@@ -3,6 +3,7 @@ import model.AuthData;
 
 import java.util.Collection;
 
+
 public interface AuthDAO {
     String createAuth(AuthData data);
 
