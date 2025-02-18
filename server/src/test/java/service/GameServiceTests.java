@@ -22,7 +22,7 @@ import java.util.Collection;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class GamerServiceTests {
+public class GameServiceTests {
     private static String authTokenOne;
     private static String authTokenTwo;
     private static String authTokenThree;
