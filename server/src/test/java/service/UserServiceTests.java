@@ -23,19 +23,19 @@ public class UserServiceTests {
     private static String currentAuthToken;
 
     @BeforeAll
-    static void setUp() throws OtherException {
+    static void setUp() throws BadRequestException {
         userDataAccessObject = new MemoryUserDAO();
         authDataAccessObject = new MemoryAuthDAO();
         authDataList =  authDataAccessObject.getAuthDataStorage();
-        RegisterRequest registerRequest = new RegisterRequest("Isaac", "Soccer", "isaacscottirwin@gmail.com",authDataAccessObject, userDataAccessObject);
-        RegisterResult registerResult = UserService.register(registerRequest);
+        RegisterRequest registerRequest = new RegisterRequest("Isaac", "Soccer", "isaacscottirwin@gmail.com");
+        RegisterResult registerResult = UserService.register(registerRequest, authDataAccessObject, userDataAccessObject);
         currentAuthToken = registerResult.authToken();
     }
 
     @Test
-    void testRegisterSuccess() throws OtherException {
-        RegisterRequest request = new RegisterRequest("Bob", "1234", "bob1234", authDataAccessObject, userDataAccessObject);
-        RegisterResult registerResult = UserService.register(request);
+    void testRegisterSuccess() throws BadRequestException {
+        RegisterRequest request = new RegisterRequest("Bob", "1234", "bob1234");
+        RegisterResult registerResult = UserService.register(request,authDataAccessObject, userDataAccessObject);
         assertEquals("Bob", registerResult.username());
         assertNotNull(registerResult.authToken());
         assertFalse(registerResult.authToken().isEmpty());
@@ -45,50 +45,41 @@ public class UserServiceTests {
 
     @Test
     void testRegisterErrorNullParameter(){
-        RegisterRequest request = new RegisterRequest("Billy", "1234", null, authDataAccessObject, userDataAccessObject);
-        assertThrows(OtherException.class, () -> UserService.register(request));
+        RegisterRequest request = new RegisterRequest("Billy", "1234", null);
+        assertThrows(BadRequestException.class, () -> UserService.register(request,authDataAccessObject, userDataAccessObject));
     }
 
     @Test
-    void testRegisterErrorSameUsername() throws OtherException {
-        RegisterRequest requestOne = new RegisterRequest("Joe", "1234", "bob1234", authDataAccessObject, userDataAccessObject);
-        RegisterRequest requestTwo = new RegisterRequest("Joe", "1235", "bo1234", authDataAccessObject, userDataAccessObject);
-        UserService.register(requestOne);
-        assertThrows(AlreadyTakenException.class, () -> UserService.register(requestTwo));
+    void testRegisterErrorSameUsername() throws BadRequestException {
+        RegisterRequest requestOne = new RegisterRequest("Joe", "1234", "bob1234");
+        RegisterRequest requestTwo = new RegisterRequest("Joe", "1235", "bo1234");
+        UserService.register(requestOne, authDataAccessObject, userDataAccessObject);
+        assertThrows(AlreadyTakenException.class, () -> UserService.register(requestTwo, authDataAccessObject, userDataAccessObject));
         userDataAccessObject.deleteUserData("Joe");
         authDataAccessObject.deleteAuthData("Joe");
 
     }
 
     @Test
-    void testLogoutSuccess() throws OtherException {
+    void testLogoutSuccess() throws BadRequestException {
         assertEquals(1, authDataList.size());
-        LogoutRequest request = new LogoutRequest(currentAuthToken, authDataAccessObject);
-        UserService.logout(request);
+        UserService.logout(currentAuthToken, authDataAccessObject);
         assertTrue(authDataList.isEmpty());
-
-    }
-    @Test
-    void testLogoutErrorNullParameter()  {
-        LogoutRequest request = new LogoutRequest(null, authDataAccessObject);
-        assertThrows(OtherException.class, () -> UserService.logout(request));
 
     }
 
     @Test
     void testLogoutErrorInvalidAuthToken()  {
-        LogoutRequest logoutRequest = new LogoutRequest("1234", authDataAccessObject);
-        assertThrows(UnauthorizedException.class, () -> UserService.logout(logoutRequest));
+        assertThrows(UnauthorizedException.class, () -> UserService.logout("1234", authDataAccessObject));
 
     }
 
     @Test
-    void testLoginSuccess() throws OtherException {
-        LogoutRequest logoutRequest = new LogoutRequest(currentAuthToken, authDataAccessObject);
-        UserService.logout(logoutRequest);
+    void testLoginSuccess() throws BadRequestException {
+        UserService.logout(currentAuthToken, authDataAccessObject);
         assertTrue(authDataList.isEmpty());
-        LoginRequest request = new LoginRequest("Isaac", "Soccer", authDataAccessObject, userDataAccessObject);
-        LoginResult result = UserService.login(request);
+        LoginRequest request = new LoginRequest("Isaac", "Soccer");
+        LoginResult result = UserService.login(request, authDataAccessObject, userDataAccessObject);
         currentAuthToken = result.authToken();
         assertEquals(1, authDataList.size());
         assertEquals("Isaac", request.username());
@@ -96,24 +87,22 @@ public class UserServiceTests {
     }
 
     @Test
-    void testLoginErrorNullParameter() throws OtherException {
-        RegisterRequest registerRequest = new RegisterRequest("James", "1234", "bob1234", authDataAccessObject, userDataAccessObject);
-        RegisterResult registerResult = UserService.register(registerRequest);
-        LogoutRequest logoutRequest = new LogoutRequest(registerResult.authToken(), authDataAccessObject);
-        UserService.logout(logoutRequest);
-        LoginRequest loginRequest =  new LoginRequest(null, "1234", authDataAccessObject, userDataAccessObject);
-        assertThrows(OtherException.class, () -> UserService.login(loginRequest));
+    void testLoginErrorNullParameter() throws BadRequestException {
+        RegisterRequest registerRequest = new RegisterRequest("James", "1234", "bob1234");
+        RegisterResult registerResult = UserService.register(registerRequest, authDataAccessObject, userDataAccessObject);
+        UserService.logout(registerResult.authToken(), authDataAccessObject);
+        LoginRequest loginRequest =  new LoginRequest(null, "1234");
+        assertThrows(BadRequestException.class, () -> UserService.login(loginRequest, authDataAccessObject, userDataAccessObject));
         userDataAccessObject.deleteUserData("James");
     }
 
     @Test
-    void testLoginErrorInvalidPassword() throws OtherException {
-        RegisterRequest registerRequest = new RegisterRequest("James", "1234", "bob1234", authDataAccessObject, userDataAccessObject);
-        RegisterResult registerResult = UserService.register(registerRequest);
-        LogoutRequest logoutRequest = new LogoutRequest(registerResult.authToken(), authDataAccessObject);
-        UserService.logout(logoutRequest);
-        LoginRequest loginRequest =  new LoginRequest("James", "1111", authDataAccessObject, userDataAccessObject);
-        assertThrows(UnauthorizedException.class, () -> UserService.login(loginRequest));
+    void testLoginErrorInvalidPassword() throws BadRequestException {
+        RegisterRequest registerRequest = new RegisterRequest("James", "1234", "bob1234");
+        RegisterResult registerResult = UserService.register(registerRequest, authDataAccessObject, userDataAccessObject);
+        UserService.logout(registerResult.authToken(), authDataAccessObject);
+        LoginRequest loginRequest =  new LoginRequest("James", "1111");
+        assertThrows(UnauthorizedException.class, () -> UserService.login(loginRequest,  authDataAccessObject, userDataAccessObject));
     }
 
     @AfterAll

@@ -7,7 +7,7 @@ import java.util.Collection;
 public interface AuthDAO {
     String createAuth(AuthData data);
 
-    void deleteAuth(String authToken)throws DataAccessException;
+    void deleteAuth(String authToken);
 
     void getAuth(String authToken) throws DataAccessException;
 
