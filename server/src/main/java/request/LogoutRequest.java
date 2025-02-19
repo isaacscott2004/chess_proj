@@ -1,4 +1,6 @@
 package request;
 
-public record LogoutRequest(String authToken) {
+import dataaccess.AuthDAO;
+
+public record LogoutRequest(String authToken, AuthDAO authAccessObject) {
 }

@@ -8,12 +8,12 @@ import request.LoginRequest;
 import request.LogoutRequest;
 import request.RegisterRequest;
 import result.LoginResult;
-import result.LogoutResult;
 import result.RegisterResult;
 import java.util.Collection;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
 public class UserServiceTests {
@@ -23,18 +23,18 @@ public class UserServiceTests {
     private static String currentAuthToken;
 
     @BeforeAll
-    static void setUp(){
-        userDataAccessObject = DAOImplmentation.getUserDAO();
-        authDataAccessObject = DAOImplmentation.getAuthDAO();
+    static void setUp() throws OtherException {
+        userDataAccessObject = new MemoryUserDAO();
+        authDataAccessObject = new MemoryAuthDAO();
         authDataList =  authDataAccessObject.getAuthDataStorage();
-        RegisterRequest registerRequest = new RegisterRequest("Isaac", "Soccer", "isaacscottirwin@gmail.com");
+        RegisterRequest registerRequest = new RegisterRequest("Isaac", "Soccer", "isaacscottirwin@gmail.com",authDataAccessObject, userDataAccessObject);
         RegisterResult registerResult = UserService.register(registerRequest);
         currentAuthToken = registerResult.authToken();
     }
 
     @Test
-    void testRegisterSuccess(){
-        RegisterRequest request = new RegisterRequest("Bob", "1234", "bob1234");
+    void testRegisterSuccess() throws OtherException {
+        RegisterRequest request = new RegisterRequest("Bob", "1234", "bob1234", authDataAccessObject, userDataAccessObject);
         RegisterResult registerResult = UserService.register(request);
         assertEquals("Bob", registerResult.username());
         assertNotNull(registerResult.authToken());
@@ -45,89 +45,75 @@ public class UserServiceTests {
 
     @Test
     void testRegisterErrorNullParameter(){
-        RegisterRequest request = new RegisterRequest("Billy", "1234", null);
-        RegisterResult registerResult = UserService.register(request);
-        assertNull(registerResult.username());
-        assertNull(registerResult.authToken());
-        assertEquals("Error: (username, password and/or email cannot be empty)", registerResult.message());
-
+        RegisterRequest request = new RegisterRequest("Billy", "1234", null, authDataAccessObject, userDataAccessObject);
+        assertThrows(OtherException.class, () -> UserService.register(request));
     }
 
     @Test
-    void testRegisterErrorSameUsername(){
-        RegisterRequest requestOne = new RegisterRequest("Joe", "1234", "bob1234");
-        RegisterRequest requestTwo = new RegisterRequest("Joe", "1235", "bo1234");
+    void testRegisterErrorSameUsername() throws OtherException {
+        RegisterRequest requestOne = new RegisterRequest("Joe", "1234", "bob1234", authDataAccessObject, userDataAccessObject);
+        RegisterRequest requestTwo = new RegisterRequest("Joe", "1235", "bo1234", authDataAccessObject, userDataAccessObject);
         UserService.register(requestOne);
-        RegisterResult registerResult = UserService.register(requestTwo);
-        assertNull(registerResult.username());
-        assertNull(registerResult.authToken());
-        assertEquals("Error: already taken", registerResult.message());
+        assertThrows(AlreadyTakenException.class, () -> UserService.register(requestTwo));
         userDataAccessObject.deleteUserData("Joe");
         authDataAccessObject.deleteAuthData("Joe");
 
     }
 
     @Test
-    void testLogoutSuccess(){
+    void testLogoutSuccess() throws OtherException {
         assertEquals(1, authDataList.size());
-        LogoutRequest request = new LogoutRequest(currentAuthToken);
-        LogoutResult result = UserService.logout(request);
+        LogoutRequest request = new LogoutRequest(currentAuthToken, authDataAccessObject);
+        UserService.logout(request);
         assertTrue(authDataList.isEmpty());
-        assertNull(result.message());
+
     }
     @Test
-    void testLogoutErrorNullParameter(){
-        LogoutRequest request = new LogoutRequest(null);
-        LogoutResult result = UserService.logout(request);
-        assertEquals("Error: (authToken cannot be empty)",result.message());
+    void testLogoutErrorNullParameter()  {
+        LogoutRequest request = new LogoutRequest(null, authDataAccessObject);
+        assertThrows(OtherException.class, () -> UserService.logout(request));
+
     }
 
     @Test
-    void testLogoutErrorInvalidAuthToken(){
-        LogoutRequest logoutRequest = new LogoutRequest("1234");
-        LogoutResult result = UserService.logout(logoutRequest);
-        assertEquals("Error: unauthorized",result.message());
+    void testLogoutErrorInvalidAuthToken()  {
+        LogoutRequest logoutRequest = new LogoutRequest("1234", authDataAccessObject);
+        assertThrows(UnauthorizedException.class, () -> UserService.logout(logoutRequest));
+
     }
 
     @Test
-    void testLoginSuccess(){
-        LogoutRequest logoutRequest = new LogoutRequest(currentAuthToken);
+    void testLoginSuccess() throws OtherException {
+        LogoutRequest logoutRequest = new LogoutRequest(currentAuthToken, authDataAccessObject);
         UserService.logout(logoutRequest);
         assertTrue(authDataList.isEmpty());
-        LoginRequest request = new LoginRequest("Isaac", "Soccer");
+        LoginRequest request = new LoginRequest("Isaac", "Soccer", authDataAccessObject, userDataAccessObject);
         LoginResult result = UserService.login(request);
         currentAuthToken = result.authToken();
         assertEquals(1, authDataList.size());
         assertEquals("Isaac", request.username());
         assertNotNull(result.authToken());
-        assertNull(result.message());
     }
 
     @Test
-    void testLoginErrorNullParameter(){
-        RegisterRequest registerRequest = new RegisterRequest("James", "1234", "bob1234");
+    void testLoginErrorNullParameter() throws OtherException {
+        RegisterRequest registerRequest = new RegisterRequest("James", "1234", "bob1234", authDataAccessObject, userDataAccessObject);
         RegisterResult registerResult = UserService.register(registerRequest);
-        LogoutRequest logoutRequest = new LogoutRequest(registerResult.authToken());
+        LogoutRequest logoutRequest = new LogoutRequest(registerResult.authToken(), authDataAccessObject);
         UserService.logout(logoutRequest);
-        LoginRequest loginRequest =  new LoginRequest(null, "1234");
-        LoginResult result = UserService.login(loginRequest);
-        assertEquals("Error: (username and/or password cannot be empty)", result.message());
-        assertNull(result.authToken());
-        assertNull(result.username());
+        LoginRequest loginRequest =  new LoginRequest(null, "1234", authDataAccessObject, userDataAccessObject);
+        assertThrows(OtherException.class, () -> UserService.login(loginRequest));
         userDataAccessObject.deleteUserData("James");
     }
 
     @Test
-    void testLoginErrorInvalidPassword(){
-        RegisterRequest registerRequest = new RegisterRequest("James", "1234", "bob1234");
+    void testLoginErrorInvalidPassword() throws OtherException {
+        RegisterRequest registerRequest = new RegisterRequest("James", "1234", "bob1234", authDataAccessObject, userDataAccessObject);
         RegisterResult registerResult = UserService.register(registerRequest);
-        LogoutRequest logoutRequest = new LogoutRequest(registerResult.authToken());
+        LogoutRequest logoutRequest = new LogoutRequest(registerResult.authToken(), authDataAccessObject);
         UserService.logout(logoutRequest);
-        LoginRequest loginRequest =  new LoginRequest("James", "1111");
-        LoginResult result = UserService.login(loginRequest);
-        assertEquals("Error: unauthorized", result.message());
-        assertNull(result.authToken());
-        assertNull(result.username());
+        LoginRequest loginRequest =  new LoginRequest("James", "1111", authDataAccessObject, userDataAccessObject);
+        assertThrows(UnauthorizedException.class, () -> UserService.login(loginRequest));
     }
 
     @AfterAll

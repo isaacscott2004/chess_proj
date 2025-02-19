@@ -1,4 +1,4 @@
 package result;
 
-public record CreateGameResult(Integer gameID, String message) {
+public record CreateGameResult(Integer gameID) {
 }

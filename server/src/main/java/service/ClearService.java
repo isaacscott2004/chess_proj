@@ -2,7 +2,6 @@ package service;
 
 import dataaccess.*;
 import request.ClearRequest;
-import result.ClearResult;
 
 public class ClearService {
     public static void clear(ClearRequest request){
