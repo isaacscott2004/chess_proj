@@ -3,7 +3,6 @@ package server;
 import com.google.gson.Gson;
 import dataaccess.AuthDAO;
 import dataaccess.GameDAO;
-import request.CreateGameRequest;
 import request.JoinGameRequest;
 import result.JoinGameResult;
 import service.AlreadyTakenException;
@@ -29,10 +28,10 @@ public class JoinGameHandler implements Route {
         JoinGameRequest joinGameRequest = gson.fromJson(request.body(), JoinGameRequest.class);
         String authToken = request.headers("Authorization");
         try{
-            GameService.joinGame(joinGameRequest, authToken, authDAO, gameDAO);
+            JoinGameResult joinGameResult = GameService.joinGame(joinGameRequest, authToken, authDAO, gameDAO);
             response.status(200);
             response.type("application/json");
-            return gson.toJson(new JoinGameResult("{}"));
+            return gson.toJson(joinGameResult);
         } catch (BadRequestException e){
             response.status(400);
             response.type("application/json");

@@ -3,7 +3,6 @@ package server;
 import com.google.gson.Gson;
 import dataaccess.AuthDAO;
 import result.LogoutResult;
-import service.BadRequestException;
 import service.UnauthorizedException;
 import service.UserService;
 import spark.Request;
@@ -23,10 +22,10 @@ public class LogoutHandler implements Route
     public Object handle(Request request, Response response){
         String authToken = request.headers("Authorization");
         try{
-            UserService.logout(authToken, authDAO);
+            LogoutResult logoutResult = UserService.logout(authToken, authDAO);
             response.status(200);
             response.type("application/json");
-            return gson.toJson(new LogoutResult("{}"));
+            return gson.toJson(logoutResult);
         } catch (UnauthorizedException e){
             response.status(401);
             response.type("application/json");

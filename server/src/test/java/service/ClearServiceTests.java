@@ -27,16 +27,13 @@ public class ClearServiceTests {
 
 
     @BeforeAll
-    static void setup() throws BadRequestException {
+    static void setup() throws BadRequestException, DataAccessException {
         authAccessObject = new MemoryAuthDAO();
         userAccessObject = new MemoryUserDAO();
         gameAccessObject = new MemoryGameDAO();
-        UserDAO userDataAccessObject = DAOImplmentation.getUserDAO();
-        AuthDAO authDataAccessObject = DAOImplmentation.getAuthDAO();
-        GameDAO gameDataAccessObject = DAOImplmentation.getGameDAO();
-        userDataList = userDataAccessObject.getUserDataStorage();
-        authDataList = authDataAccessObject.getAuthDataStorage();
-        gameDataList = gameDataAccessObject.getListGames();
+        userDataList = userAccessObject.getUserDataStorage();
+        authDataList = authAccessObject.getAuthDataStorage();
+        gameDataList = gameAccessObject.getListGames();
         RegisterRequest registerRequestOne = new RegisterRequest("Isaac", "Soccer", "isaacscottirwin@gmail.com");
         RegisterResult registerResultOne = UserService.register(registerRequestOne, authAccessObject, userAccessObject);
         String authTokenOne = registerResultOne.authToken();
@@ -50,30 +47,30 @@ public class ClearServiceTests {
         String authTokenThree = registerResultThree.authToken();
 
         CreateGameRequest createGameRequestOne = new CreateGameRequest("First game");
-        GameService.createGame(createGameRequestOne, authTokenOne, authDataAccessObject, gameDataAccessObject);
+        GameService.createGame(createGameRequestOne, authTokenOne, authAccessObject, gameAccessObject);
 
         CreateGameRequest createGameRequestTwo = new CreateGameRequest("Second game");
-        GameService.createGame(createGameRequestTwo, authTokenTwo, authDataAccessObject, gameDataAccessObject);
+        GameService.createGame(createGameRequestTwo, authTokenTwo, authAccessObject, gameAccessObject);
 
         CreateGameRequest createGameRequestThree = new CreateGameRequest("Third game");
-        GameService.createGame(createGameRequestThree, authTokenThree, authDataAccessObject, gameDataAccessObject);
+        GameService.createGame(createGameRequestThree, authTokenThree, authAccessObject, gameAccessObject);
 
         JoinGameRequest joinGameRequestOne = new JoinGameRequest(ChessGame.TeamColor.BLACK, 1);
-        GameService.joinGame(joinGameRequestOne, authTokenOne, authDataAccessObject, gameDataAccessObject);
+        GameService.joinGame(joinGameRequestOne, authTokenOne, authAccessObject, gameAccessObject);
 
         JoinGameRequest joinGameRequestTwo = new JoinGameRequest(ChessGame.TeamColor.WHITE, 1);
-        GameService.joinGame(joinGameRequestTwo, authTokenTwo, authDataAccessObject, gameDataAccessObject);
+        GameService.joinGame(joinGameRequestTwo, authTokenTwo, authAccessObject, gameAccessObject);
 
         JoinGameRequest joinGameRequestThree = new JoinGameRequest(ChessGame.TeamColor.BLACK, 2);
-        GameService.joinGame(joinGameRequestThree,authTokenTwo, authDataAccessObject, gameDataAccessObject);
+        GameService.joinGame(joinGameRequestThree,authTokenTwo, authAccessObject, gameAccessObject);
 
         JoinGameRequest joinGameRequestFour = new JoinGameRequest(ChessGame.TeamColor.WHITE, 2);
-        GameService.joinGame(joinGameRequestFour, authTokenThree, authDataAccessObject, gameDataAccessObject);
+        GameService.joinGame(joinGameRequestFour, authTokenThree, authAccessObject, gameAccessObject);
 
     }
 
     @Test
-    void testClear(){
+    void testClear() throws DataAccessException {
         assertEquals(3, userDataList.size());
         assertEquals(3, gameDataList.size());
         assertEquals(3, authDataList.size());

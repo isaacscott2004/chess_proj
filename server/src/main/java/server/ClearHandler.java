@@ -4,8 +4,6 @@ import com.google.gson.Gson;
 import dataaccess.AuthDAO;
 import dataaccess.GameDAO;
 import dataaccess.UserDAO;
-import request.ClearRequest;
-import request.LogoutRequest;
 import result.ClearResult;
 import service.ClearService;
 import spark.Request;
@@ -14,9 +12,9 @@ import spark.Route;
 
 public class ClearHandler implements Route {
     private final Gson gson = new Gson();
-    private AuthDAO authAccessObject;
-    private UserDAO userAccessObject;
-    private GameDAO gameAccessObject;
+    private final AuthDAO authAccessObject;
+    private final UserDAO userAccessObject;
+    private final GameDAO gameAccessObject;
 
     public ClearHandler(AuthDAO authAccessObject, UserDAO userAccessObject, GameDAO gameAccessObject){
         this.authAccessObject = authAccessObject;
@@ -26,16 +24,16 @@ public class ClearHandler implements Route {
 
 
     @Override
-    public Object handle(Request request, Response response) throws Exception {
+    public Object handle(Request request, Response response){
         try{
-            ClearService.clear(authAccessObject, userAccessObject, gameAccessObject);
+            ClearResult clearResult = ClearService.clear(authAccessObject, userAccessObject, gameAccessObject);
             response.status(200);
             response.type("application/json");
-            return gson.toJson(new ClearResult("{}"));
+            return gson.toJson(clearResult);
         } catch (Exception e){
             response.status(500);
             response.type("application/json");
-            return gson.toJson("Internal Server Error");
+            return gson.toJson(new ClearResult("Internal Server Error"));
         }
     }
 }

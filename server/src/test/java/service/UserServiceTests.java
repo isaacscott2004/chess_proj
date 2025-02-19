@@ -22,7 +22,7 @@ public class UserServiceTests {
     private static String currentAuthToken;
 
     @BeforeAll
-    static void setUp() throws BadRequestException {
+    static void setUp() throws BadRequestException, DataAccessException {
         userDataAccessObject = new MemoryUserDAO();
         authDataAccessObject = new MemoryAuthDAO();
         authDataList =  authDataAccessObject.getAuthDataStorage();
@@ -32,7 +32,7 @@ public class UserServiceTests {
     }
 
     @Test
-    void testRegisterSuccess() throws BadRequestException {
+    void testRegisterSuccess() throws BadRequestException, DataAccessException {
         RegisterRequest request = new RegisterRequest("Bob", "1234", "bob1234");
         RegisterResult registerResult = UserService.register(request,authDataAccessObject, userDataAccessObject);
         assertEquals("Bob", registerResult.username());
@@ -49,7 +49,7 @@ public class UserServiceTests {
     }
 
     @Test
-    void testRegisterErrorSameUsername() throws BadRequestException {
+    void testRegisterErrorSameUsername() throws BadRequestException, DataAccessException {
         RegisterRequest requestOne = new RegisterRequest("Joe", "1234", "bob1234");
         RegisterRequest requestTwo = new RegisterRequest("Joe", "1235", "bo1234");
         UserService.register(requestOne, authDataAccessObject, userDataAccessObject);
@@ -60,7 +60,7 @@ public class UserServiceTests {
     }
 
     @Test
-    void testLogoutSuccess() throws BadRequestException {
+    void testLogoutSuccess(){
         assertEquals(1, authDataList.size());
         UserService.logout(currentAuthToken, authDataAccessObject);
         assertTrue(authDataList.isEmpty());
@@ -74,7 +74,7 @@ public class UserServiceTests {
     }
 
     @Test
-    void testLoginSuccess() throws BadRequestException {
+    void testLoginSuccess() throws BadRequestException, DataAccessException {
         UserService.logout(currentAuthToken, authDataAccessObject);
         assertTrue(authDataList.isEmpty());
         LoginRequest request = new LoginRequest("Isaac", "Soccer");
@@ -86,7 +86,7 @@ public class UserServiceTests {
     }
 
     @Test
-    void testLoginErrorNullParameter() throws BadRequestException {
+    void testLoginErrorNullParameter() throws BadRequestException, DataAccessException {
         RegisterRequest registerRequest = new RegisterRequest("James", "1234", "bob1234");
         RegisterResult registerResult = UserService.register(registerRequest, authDataAccessObject, userDataAccessObject);
         UserService.logout(registerResult.authToken(), authDataAccessObject);
@@ -96,7 +96,7 @@ public class UserServiceTests {
     }
 
     @Test
-    void testLoginErrorInvalidPassword() throws BadRequestException {
+    void testLoginErrorInvalidPassword() throws BadRequestException, DataAccessException {
         RegisterRequest registerRequest = new RegisterRequest("James", "1234", "bob1234");
         RegisterResult registerResult = UserService.register(registerRequest, authDataAccessObject, userDataAccessObject);
         UserService.logout(registerResult.authToken(), authDataAccessObject);
@@ -105,7 +105,7 @@ public class UserServiceTests {
     }
 
     @AfterAll
-    static void clear(){
+    static void clear() throws DataAccessException {
         userDataAccessObject.clearUserData();
         authDataAccessObject.clearAuthdata();
 

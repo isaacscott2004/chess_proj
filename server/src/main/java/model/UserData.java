@@ -4,8 +4,8 @@ import java.util.Objects;
 
 public class UserData {
     private String username;
-    private String password;
-    private String email;
+    private final String password;
+    private final String email;
 
     public UserData(String username, String password, String email){
         this.username = username;
@@ -19,20 +19,8 @@ public class UserData {
     public String getPassword(){
         return password;
     }
-    public String getEmail() {
-        return email;
-    }
-
     public void setUsername(String username) {
         this.username = username;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public void setEmail(String email){
-        this.email = email;
     }
 
     @Override

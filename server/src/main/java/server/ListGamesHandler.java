@@ -3,9 +3,7 @@ package server;
 import com.google.gson.Gson;
 import dataaccess.AuthDAO;
 import dataaccess.GameDAO;
-import request.ListGamesRequest;
 import result.ListGamesResult;
-import service.BadRequestException;
 import service.GameService;
 import service.UnauthorizedException;
 import spark.Request;
@@ -24,10 +22,9 @@ public class ListGamesHandler implements Route {
 
     @Override
     public Object handle(Request request, Response response)  {
-        ListGamesRequest listGamesRequest = gson.fromJson(request.body(), ListGamesRequest.class);
         String authToken = request.headers("Authorization");
         try{
-            ListGamesResult result = GameService.listGames(listGamesRequest, authToken, authDAO, gameDAO);
+            ListGamesResult result = GameService.listGames( authToken, authDAO, gameDAO);
             response.status(200);
             response.type("application/json");
             return gson.toJson(result);
