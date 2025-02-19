@@ -5,7 +5,6 @@ import dataaccess.*;
 import model.AuthData;
 import org.junit.jupiter.api.AfterAll;
 import request.LoginRequest;
-import request.LogoutRequest;
 import request.RegisterRequest;
 import result.LoginResult;
 import result.RegisterResult;

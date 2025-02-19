@@ -27,10 +27,6 @@ public class LogoutHandler implements Route
             response.status(200);
             response.type("application/json");
             return gson.toJson(new LogoutResult("{}"));
-        } catch (BadRequestException e){
-            response.status(400);
-            response.type("application/json");
-            return gson.toJson(new LogoutResult(e.getMessage()));
         } catch (UnauthorizedException e){
             response.status(401);
             response.type("application/json");

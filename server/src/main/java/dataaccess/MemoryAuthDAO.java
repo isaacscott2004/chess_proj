@@ -17,12 +17,17 @@ public class MemoryAuthDAO implements AuthDAO{
     }
 
     @Override
-    public void deleteAuth(String authToken) {
+    public void deleteAuth(String authToken) throws DataAccessException {
+        boolean found = false;
         for(AuthData data : authDataStorage){
             if(data.getAuthToken().equals(authToken)){
                 authDataStorage.remove(data);
+                found = true;
                 break;
             }
+        }
+        if(!(found)) {
+            throw new DataAccessException("There is no authData with the matching authToken");
         }
     }
 

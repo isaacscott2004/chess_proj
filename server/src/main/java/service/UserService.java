@@ -8,7 +8,7 @@ import request.RegisterRequest;
 import result.LoginResult;
 import result.RegisterResult;
 
-public class UserService extends AuthenticateUser {
+public class UserService{
 
     public static RegisterResult register(RegisterRequest request, AuthDAO authAccessObject, UserDAO userAccessObject) throws BadRequestException, AlreadyTakenException {
         if(request.username()== null || request.password()== null || request.email()== null){
@@ -38,8 +38,11 @@ public class UserService extends AuthenticateUser {
     }
 
     public static void logout(String authToken, AuthDAO authAccessObject) throws BadRequestException, UnauthorizedException {
-        AuthenticateUser.Authenticate(authToken, authAccessObject);
-        authAccessObject.deleteAuth(authToken);
+        try {
+            authAccessObject.deleteAuth(authToken);
+        } catch (DataAccessException e){
+            throw new UnauthorizedException("Error: unauthorized");
+        }
     }
 
 

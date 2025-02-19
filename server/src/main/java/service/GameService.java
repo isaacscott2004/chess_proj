@@ -7,31 +7,35 @@ import request.ListGamesRequest;
 import result.CreateGameResult;
 import result.ListGamesResult;
 
-public class GameService extends AuthenticateUser {
-    public static ListGamesResult listGames(ListGamesRequest request, AuthDAO authAccessObject, GameDAO gameAccessObject) throws BadRequestException, UnauthorizedException{
-        if(request.authToken() == null){
-            throw new BadRequestException("Error: (authToken cannot be empty)");
-        }
+public class GameService {
+    public static ListGamesResult listGames(ListGamesRequest request, String authToken, AuthDAO authAccessObject, GameDAO gameAccessObject) throws UnauthorizedException{
         try{
-            authAccessObject.getAuth(request.authToken());
+            authAccessObject.getAuth(authToken);
         } catch (DataAccessException e){
             throw new UnauthorizedException("Error: unauthorized");
         }
-        return new ListGamesResult( gameAccessObject.getListGames());
+        return new ListGamesResult(gameAccessObject.getListGames(), null);
     }
 
     public static CreateGameResult createGame(CreateGameRequest request, String authToken, AuthDAO authAccessObject, GameDAO gameAccessObject) throws BadRequestException, UnauthorizedException, AlreadyTakenException {
-        if(request.gameName() == null || authToken == null){
+        if(request.gameName() == null){
             throw new BadRequestException("Error: (gameName and/or authToken must not be null)");
         }
-        AuthenticateUser.Authenticate(authToken, authAccessObject);
+        try{
+            authAccessObject.getAuth(authToken);
+        } catch (DataAccessException e) {
+            throw new UnauthorizedException("Error: unauthorized");
+        }
+        if(gameAccessObject.isNameTaken(request.gameName())){
+            throw new AlreadyTakenException("Error: (gameName already taken)");
+        }
         Integer gameID = gameAccessObject.createGame(request.gameName());
         return new CreateGameResult(gameID, null);
     }
 
     public static void joinGame(JoinGameRequest request, String authToken,  AuthDAO authAccessObject, GameDAO gameAccessObject) throws BadRequestException, UnauthorizedException, AlreadyTakenException{
         String username;
-        if(request.color() == null || request.gameID() == null){
+        if(request.playerColor() == null || request.gameID() == null){
             throw new BadRequestException("Error: (authToken and/or color and/or gameID cannot be empty)");
         }
         try{
@@ -45,7 +49,7 @@ public class GameService extends AuthenticateUser {
             throw new BadRequestException("Error: (Invalid gameID)");
         }
         try{
-            gameAccessObject.updateGame(username, request.color(), request.gameID());
+            gameAccessObject.updateGame(username, request.playerColor(), request.gameID());
         } catch (DataAccessException e){
             throw new AlreadyTakenException("Error: already taken");
         }
