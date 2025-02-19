@@ -228,28 +228,26 @@ public class ChessGame {
         if (currentTeam == ChessGame.TeamColor.BLACK) {
             king = board.getBlackKing();
             for (ChessPosition piecePos : board.getWhitePieces()) {
-                ArrayList<ChessMove> moves = (ArrayList<ChessMove>)board.getPiece(piecePos).pieceMoves(board, piecePos);
+                cycleThroughAllPieces(piecePos, king, piecesInPath, board);
+            }
+        } else{
+            king = board.getWhiteKing();
+            for(ChessPosition piecePos : board.getBlackPieces()){
+                cycleThroughAllPieces(piecePos, king, piecesInPath, board);
+            }
+        }
+
+        return piecesInPath;
+    }
+
+    private void cycleThroughAllPieces(ChessPosition piecePos, ChessPosition king, ArrayList<ChessPosition> piecesInPath, ChessBoard board){
+    ArrayList<ChessMove> moves = (ArrayList<ChessMove>)board.getPiece(piecePos).pieceMoves(board, piecePos);
                 for (ChessMove move : moves) {
                     if (move.getEndPosition().equals(king)) {
                         piecesInPath.add(piecePos);
                         break;
                     }
                 }
-            }
-        } else{
-            king = board.getWhiteKing();
-            for(ChessPosition piecePos : board.getBlackPieces()){
-                ArrayList<ChessMove> moves = (ArrayList<ChessMove>)board.getPiece(piecePos).pieceMoves(board, piecePos);
-                for(ChessMove move : moves){
-                    if(move.getEndPosition().equals(king)){
-                        piecesInPath.add(piecePos);
-                        break;
-                    }
-                }
-            }
-        }
-
-        return piecesInPath;
     }
 
     /**
@@ -352,6 +350,7 @@ public class ChessGame {
         }
         return copyBoard;
     }
+
 }
 
 
