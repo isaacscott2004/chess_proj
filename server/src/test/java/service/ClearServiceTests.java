@@ -7,7 +7,6 @@ import model.GameData;
 import model.UserData;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import request.ClearRequest;
 import request.CreateGameRequest;
 import request.JoinGameRequest;
 import request.RegisterRequest;
@@ -50,26 +49,26 @@ public class ClearServiceTests {
         RegisterResult registerResultThree = UserService.register(registerRequestThree, authAccessObject, userAccessObject);
         String authTokenThree = registerResultThree.authToken();
 
-        CreateGameRequest createGameRequestOne = new CreateGameRequest("First game", authTokenOne);
-        GameService.createGame(createGameRequestOne, authDataAccessObject, gameDataAccessObject);
+        CreateGameRequest createGameRequestOne = new CreateGameRequest("First game");
+        GameService.createGame(createGameRequestOne, authTokenOne, authDataAccessObject, gameDataAccessObject);
 
-        CreateGameRequest createGameRequestTwo = new CreateGameRequest("Second game", authTokenTwo);
-        GameService.createGame(createGameRequestTwo, authDataAccessObject, gameDataAccessObject);
+        CreateGameRequest createGameRequestTwo = new CreateGameRequest("Second game");
+        GameService.createGame(createGameRequestTwo, authTokenTwo, authDataAccessObject, gameDataAccessObject);
 
-        CreateGameRequest createGameRequestThree = new CreateGameRequest("Third game", authTokenThree);
-        GameService.createGame(createGameRequestThree, authDataAccessObject, gameDataAccessObject);
+        CreateGameRequest createGameRequestThree = new CreateGameRequest("Third game");
+        GameService.createGame(createGameRequestThree, authTokenThree, authDataAccessObject, gameDataAccessObject);
 
-        JoinGameRequest joinGameRequestOne = new JoinGameRequest(authTokenOne, ChessGame.TeamColor.BLACK, 1);
-        GameService.joinGame(joinGameRequestOne, authDataAccessObject, gameDataAccessObject);
+        JoinGameRequest joinGameRequestOne = new JoinGameRequest(ChessGame.TeamColor.BLACK, 1);
+        GameService.joinGame(joinGameRequestOne, authTokenOne, authDataAccessObject, gameDataAccessObject);
 
-        JoinGameRequest joinGameRequestTwo = new JoinGameRequest(authTokenTwo, ChessGame.TeamColor.WHITE, 1);
-        GameService.joinGame(joinGameRequestTwo, authDataAccessObject, gameDataAccessObject);
+        JoinGameRequest joinGameRequestTwo = new JoinGameRequest(ChessGame.TeamColor.WHITE, 1);
+        GameService.joinGame(joinGameRequestTwo, authTokenTwo, authDataAccessObject, gameDataAccessObject);
 
-        JoinGameRequest joinGameRequestThree = new JoinGameRequest(authTokenTwo, ChessGame.TeamColor.BLACK, 2);
-        GameService.joinGame(joinGameRequestThree, authDataAccessObject, gameDataAccessObject);
+        JoinGameRequest joinGameRequestThree = new JoinGameRequest(ChessGame.TeamColor.BLACK, 2);
+        GameService.joinGame(joinGameRequestThree,authTokenTwo, authDataAccessObject, gameDataAccessObject);
 
-        JoinGameRequest joinGameRequestFour = new JoinGameRequest(authTokenThree, ChessGame.TeamColor.WHITE, 2);
-        GameService.joinGame(joinGameRequestFour, authDataAccessObject, gameDataAccessObject);
+        JoinGameRequest joinGameRequestFour = new JoinGameRequest(ChessGame.TeamColor.WHITE, 2);
+        GameService.joinGame(joinGameRequestFour, authTokenThree, authDataAccessObject, gameDataAccessObject);
 
     }
 

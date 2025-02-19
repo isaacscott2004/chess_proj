@@ -60,17 +60,17 @@ public class GameServiceTests {
     }
     // helper methods
     void helperMethodOne() throws BadRequestException {
-        CreateGameRequest createGameRequestOne = new CreateGameRequest("First game", authTokenOne);
-        GameService.createGame(createGameRequestOne ,authDataAccessObject, gameDataAccessObject);
+        CreateGameRequest createGameRequestOne = new CreateGameRequest("First game");
+        GameService.createGame(createGameRequestOne ,authTokenOne, authDataAccessObject, gameDataAccessObject);
 
-        CreateGameRequest createGameRequestTwo = new CreateGameRequest("Second game", authTokenTwo);
-        GameService.createGame(createGameRequestTwo, authDataAccessObject, gameDataAccessObject);
+        CreateGameRequest createGameRequestTwo = new CreateGameRequest("Second game");
+        GameService.createGame(createGameRequestTwo,authTokenTwo, authDataAccessObject, gameDataAccessObject);
 
-        CreateGameRequest createGameRequestThree = new CreateGameRequest("Third game", authTokenThree);
-        GameService.createGame(createGameRequestThree, authDataAccessObject, gameDataAccessObject);
+        CreateGameRequest createGameRequestThree = new CreateGameRequest("Third game");
+        GameService.createGame(createGameRequestThree, authTokenThree, authDataAccessObject, gameDataAccessObject);
 
-        CreateGameRequest createGameRequestFour = new CreateGameRequest("Fourth game", authTokenFour);
-        GameService.createGame(createGameRequestFour, authDataAccessObject, gameDataAccessObject);
+        CreateGameRequest createGameRequestFour = new CreateGameRequest("Fourth game");
+        GameService.createGame(createGameRequestFour, authTokenFour, authDataAccessObject, gameDataAccessObject);
 
     }
     ArrayList<GameData> helperMethodTwo() throws BadRequestException {
@@ -87,19 +87,19 @@ public class GameServiceTests {
 
     @Test
     void createGameSuccess() throws BadRequestException {
-        CreateGameRequest createGameRequestOne = new CreateGameRequest("First game", authTokenOne);
-        CreateGameResult createGameResultOne = GameService.createGame(createGameRequestOne,authDataAccessObject, gameDataAccessObject);
+        CreateGameRequest createGameRequestOne = new CreateGameRequest("First game");
+        CreateGameResult createGameResultOne = GameService.createGame(createGameRequestOne,authTokenOne,authDataAccessObject, gameDataAccessObject);
         assertEquals(1, gameDataAccessObject.getListGames().size());
         assertEquals(1, createGameResultOne.gameID());
 
-        CreateGameRequest createGameRequestTwo = new CreateGameRequest("second game", authTokenTwo);
-        CreateGameResult createGameResultTwo = GameService.createGame(createGameRequestTwo, authDataAccessObject, gameDataAccessObject);
+        CreateGameRequest createGameRequestTwo = new CreateGameRequest("second game");
+        CreateGameResult createGameResultTwo = GameService.createGame(createGameRequestTwo, authTokenTwo, authDataAccessObject, gameDataAccessObject);
         assertEquals(2, gameDataAccessObject.getListGames().size());
         assertEquals(2, createGameResultTwo.gameID());
         gameDataAccessObject.clearGameData();
 
-        CreateGameRequest createGameRequestThree = new CreateGameRequest("First game after clear", authTokenThree);
-        CreateGameResult createGameResultThree = GameService.createGame(createGameRequestThree,authDataAccessObject, gameDataAccessObject);
+        CreateGameRequest createGameRequestThree = new CreateGameRequest("First game after clear");
+        CreateGameResult createGameResultThree = GameService.createGame(createGameRequestThree, authTokenThree, authDataAccessObject, gameDataAccessObject);
         assertEquals(1, gameDataAccessObject.getListGames().size());
         assertEquals(1, createGameResultThree.gameID());
         gameDataAccessObject.clearGameData();
@@ -108,25 +108,25 @@ public class GameServiceTests {
 
     @Test
     void createGameErrorNullParameters(){
-        CreateGameRequest createGameRequestOne = new CreateGameRequest(null, authTokenOne);
-        assertThrows(BadRequestException.class, () -> GameService.createGame(createGameRequestOne, authDataAccessObject, gameDataAccessObject));
+        CreateGameRequest createGameRequestOne = new CreateGameRequest(null);
+        assertThrows(BadRequestException.class, () -> GameService.createGame(createGameRequestOne, authTokenOne, authDataAccessObject, gameDataAccessObject));
         assertTrue(gameDataAccessObject.getListGames().isEmpty());
     }
 
     @Test
     void createGameErrorInvalidAuthToken(){
-        CreateGameRequest createGameRequestOne = new CreateGameRequest("test game", "1234");
-        assertThrows(UnauthorizedException.class, () -> GameService.createGame(createGameRequestOne, authDataAccessObject, gameDataAccessObject));
+        CreateGameRequest createGameRequestOne = new CreateGameRequest("test game");
+        assertThrows(UnauthorizedException.class, () -> GameService.createGame(createGameRequestOne,"1234", authDataAccessObject, gameDataAccessObject));
         assertTrue(gameDataAccessObject.getListGames().isEmpty());
     }
 
     @Test
     void createGameErrorGameNameTaken() throws BadRequestException {
-        CreateGameRequest createGameRequestOne = new CreateGameRequest("First game", authTokenOne);
-        GameService.createGame(createGameRequestOne, authDataAccessObject, gameDataAccessObject);
-        CreateGameRequest createGameRequestTwo = new CreateGameRequest("First game", authTokenTwo);
+        CreateGameRequest createGameRequestOne = new CreateGameRequest("First game");
+        GameService.createGame(createGameRequestOne, authTokenOne, authDataAccessObject, gameDataAccessObject);
+        CreateGameRequest createGameRequestTwo = new CreateGameRequest("First game");
         assertEquals(1, gameDataAccessObject.getListGames().size());
-        assertThrows(AlreadyTakenException.class, () -> GameService.createGame(createGameRequestTwo, authDataAccessObject, gameDataAccessObject));
+        assertThrows(AlreadyTakenException.class, () -> GameService.createGame(createGameRequestTwo, authTokenTwo, authDataAccessObject, gameDataAccessObject));
         assertEquals(1, gameDataAccessObject.getListGames().size());
         gameDataAccessObject.clearGameData();
         assertTrue(gameDataAccessObject.getListGames().isEmpty());
@@ -177,12 +177,12 @@ public class GameServiceTests {
         assertEquals(1, games.getFirst().getGameID());
         assertNull(games.getFirst().getBlackUsername());
         assertNull(games.getFirst().getWhiteUsername());
-        JoinGameRequest joinGameRequestOne = new JoinGameRequest(authTokenOne, ChessGame.TeamColor.BLACK, 1);
-        GameService.joinGame(joinGameRequestOne, authDataAccessObject, gameDataAccessObject);
+        JoinGameRequest joinGameRequestOne = new JoinGameRequest(ChessGame.TeamColor.BLACK, 1);
+        GameService.joinGame(joinGameRequestOne, authTokenOne,  authDataAccessObject, gameDataAccessObject);
         assertEquals("Isaac",games.getFirst().getBlackUsername());
         assertNull(games.getFirst().getWhiteUsername());
-        JoinGameRequest joinGameRequestTwo = new JoinGameRequest(authTokenTwo, ChessGame.TeamColor.WHITE, 1);
-        GameService.joinGame(joinGameRequestTwo, authDataAccessObject, gameDataAccessObject);
+        JoinGameRequest joinGameRequestTwo = new JoinGameRequest(ChessGame.TeamColor.WHITE, 1);
+        GameService.joinGame(joinGameRequestTwo, authTokenTwo, authDataAccessObject, gameDataAccessObject);
         assertEquals("Isaac",games.getFirst().getBlackUsername());
         assertEquals("Messi",games.getFirst().getWhiteUsername());
         gameDataAccessObject.clearGameData();
@@ -193,8 +193,8 @@ public class GameServiceTests {
     @Test
     void joinGameErrorNullParameters() throws BadRequestException {
         helperMethodOne();
-        JoinGameRequest joinGameRequestOne = new JoinGameRequest(authTokenOne, null, 1);
-        assertThrows(BadRequestException.class, () -> GameService.joinGame(joinGameRequestOne, authDataAccessObject, gameDataAccessObject));
+        JoinGameRequest joinGameRequestOne = new JoinGameRequest(null, 1);
+        assertThrows(BadRequestException.class, () -> GameService.joinGame(joinGameRequestOne, authTokenOne, authDataAccessObject, gameDataAccessObject));
         gameDataAccessObject.clearGameData();
         assertTrue(gameDataAccessObject.getListGames().isEmpty());
     }
@@ -202,8 +202,8 @@ public class GameServiceTests {
     @Test
     void joinGameErrorInvalidAuthToken() throws BadRequestException {
         helperMethodOne();
-        JoinGameRequest joinGameRequestOne = new JoinGameRequest("1234", ChessGame.TeamColor.BLACK, 1);
-        assertThrows(UnauthorizedException.class, () -> GameService.joinGame(joinGameRequestOne, authDataAccessObject, gameDataAccessObject));
+        JoinGameRequest joinGameRequestOne = new JoinGameRequest(ChessGame.TeamColor.BLACK, 1);
+        assertThrows(UnauthorizedException.class, () -> GameService.joinGame(joinGameRequestOne,"1234", authDataAccessObject, gameDataAccessObject));
         gameDataAccessObject.clearGameData();
         assertTrue(gameDataAccessObject.getListGames().isEmpty());
 
@@ -212,8 +212,8 @@ public class GameServiceTests {
     @Test
     void joinGameErrorInvalidGameID() throws BadRequestException {
         helperMethodOne();
-        JoinGameRequest joinGameRequestOne = new JoinGameRequest(authTokenTwo, ChessGame.TeamColor.BLACK, 400);
-        assertThrows(BadRequestException.class, () -> GameService.joinGame(joinGameRequestOne, authDataAccessObject, gameDataAccessObject));
+        JoinGameRequest joinGameRequestOne = new JoinGameRequest(ChessGame.TeamColor.BLACK, 400);
+        assertThrows(BadRequestException.class, () -> GameService.joinGame(joinGameRequestOne, authTokenTwo, authDataAccessObject, gameDataAccessObject));
         gameDataAccessObject.clearGameData();
         assertTrue(gameDataAccessObject.getListGames().isEmpty());
     }
@@ -221,10 +221,10 @@ public class GameServiceTests {
     @Test
     void joinGameColorAlreadyTaken() throws BadRequestException {
         helperMethodOne();
-        JoinGameRequest joinGameRequestOne = new JoinGameRequest(authTokenOne, ChessGame.TeamColor.BLACK, 1);
-        GameService.joinGame(joinGameRequestOne,authDataAccessObject, gameDataAccessObject);
-        JoinGameRequest joinGameRequestTwo = new JoinGameRequest(authTokenFour, ChessGame.TeamColor.BLACK, 1);
-        assertThrows(AlreadyTakenException.class, () -> GameService.joinGame(joinGameRequestTwo, authDataAccessObject, gameDataAccessObject));
+        JoinGameRequest joinGameRequestOne = new JoinGameRequest( ChessGame.TeamColor.BLACK, 1);
+        GameService.joinGame(joinGameRequestOne,authTokenOne, authDataAccessObject, gameDataAccessObject);
+        JoinGameRequest joinGameRequestTwo = new JoinGameRequest(ChessGame.TeamColor.BLACK, 1);
+        assertThrows(AlreadyTakenException.class, () -> GameService.joinGame(joinGameRequestTwo, authTokenFour,  authDataAccessObject, gameDataAccessObject));
         gameDataAccessObject.clearGameData();
         assertTrue(gameDataAccessObject.getListGames().isEmpty());
     }

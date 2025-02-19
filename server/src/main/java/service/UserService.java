@@ -37,7 +37,7 @@ public class UserService extends AuthenticateUser {
 
     }
 
-    public static void logout(String authToken, AuthDAO authAccessObject) throws BadRequestException {
+    public static void logout(String authToken, AuthDAO authAccessObject) throws BadRequestException, UnauthorizedException {
         AuthenticateUser.Authenticate(authToken, authAccessObject);
         authAccessObject.deleteAuth(authToken);
     }
