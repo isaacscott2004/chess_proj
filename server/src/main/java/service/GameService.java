@@ -16,7 +16,8 @@ public class GameService {
      * @return a ListGamesResult object with a message
      * @throws UnauthorizedException if the authToken is not authorized
      */
-    public static ListGamesResult listGames(String authToken, AuthDAO authAccessObject, GameDAO gameAccessObject) throws UnauthorizedException, DataAccessException {
+    public static ListGamesResult listGames(String authToken, AuthDAO authAccessObject, GameDAO gameAccessObject)
+            throws UnauthorizedException, DataAccessException {
         try{
             authAccessObject.getAuth(authToken);
         } catch (DataAccessException e){
@@ -35,7 +36,9 @@ public class GameService {
      * @throws BadRequestException if the gameName is null
      * @throws UnauthorizedException if the authToken is not authorized
      */
-    public static CreateGameResult createGame(CreateGameRequest request, String authToken, AuthDAO authAccessObject, GameDAO gameAccessObject) throws BadRequestException, UnauthorizedException, DataAccessException {
+    public static CreateGameResult createGame(CreateGameRequest request, String authToken,
+                                              AuthDAO authAccessObject, GameDAO gameAccessObject)
+            throws BadRequestException, UnauthorizedException, DataAccessException {
         if(request.gameName() == null){
             throw new BadRequestException("Error: (gameName must not be null)");
         }
@@ -59,7 +62,9 @@ public class GameService {
      * @throws UnauthorizedException if the authToken is not authorized
      * @throws AlreadyTakenException if the specified color is already taken
      */
-    public static JoinGameResult joinGame(JoinGameRequest request, String authToken, AuthDAO authAccessObject, GameDAO gameAccessObject) throws BadRequestException, UnauthorizedException, AlreadyTakenException{
+    public static JoinGameResult joinGame(JoinGameRequest request, String authToken,
+                                          AuthDAO authAccessObject, GameDAO gameAccessObject)
+            throws BadRequestException, UnauthorizedException, AlreadyTakenException{
         String username;
         if(request.playerColor() == null || request.gameID() == null){
             throw new BadRequestException("Error: (color and/or gameID cannot be empty)");

@@ -54,7 +54,10 @@ public class GameData {
         if (!(o instanceof GameData gameData)) {
             return false;
         }
-        return gameID == gameData.gameID && Objects.equals(whiteUsername, gameData.whiteUsername) && Objects.equals(blackUsername, gameData.blackUsername) && Objects.equals(gameName, gameData.gameName) && Objects.equals(game, gameData.game);
+        return gameID == gameData.gameID && Objects.equals(whiteUsername, gameData.whiteUsername) &&
+                Objects.equals(blackUsername, gameData.blackUsername) &&
+                Objects.equals(gameName, gameData.gameName) &&
+                Objects.equals(game, gameData.game);
     }
 
     @Override

@@ -6,14 +6,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 public class MemoryUserDAO implements UserDAO{
-    private static final Collection<UserData> userDataStorage = new ArrayList<>();
+    private static final Collection<UserData> USER_DATA_STORAGE = new ArrayList<>();
     /**
      * adds user to storage
      * @param user the user to be added
      */
     @Override
     public void addUser(UserData user) {
-        userDataStorage.add(user);
+        USER_DATA_STORAGE.add(user);
     }
 
     /**
@@ -24,7 +24,7 @@ public class MemoryUserDAO implements UserDAO{
      */
     @Override
     public boolean authenticateUser(String username, String password) {
-        for(UserData data : userDataStorage){
+        for(UserData data : USER_DATA_STORAGE){
             if(data.getUsername().equals(username) && data.getPassword().equals(password)){
                 return true;
             }
@@ -37,7 +37,7 @@ public class MemoryUserDAO implements UserDAO{
      */
     @Override
     public void clearUserData() {
-        userDataStorage.clear();
+        USER_DATA_STORAGE.clear();
 
     }
     /**
@@ -47,7 +47,7 @@ public class MemoryUserDAO implements UserDAO{
      */
     @Override
     public boolean containsUsername(String username) {
-        for(UserData data : userDataStorage){
+        for(UserData data : USER_DATA_STORAGE){
             if(data.getUsername().equals(username)){
                 return true;
             }
@@ -61,7 +61,7 @@ public class MemoryUserDAO implements UserDAO{
      */
     @Override
     public Collection<UserData> getUserDataStorage(){
-        return userDataStorage;
+        return USER_DATA_STORAGE;
     }
     /**
      * deletes a specific UserData object
@@ -69,7 +69,7 @@ public class MemoryUserDAO implements UserDAO{
      */
     @Override
     public void deleteUserData(String username){
-        userDataStorage.removeIf(data -> data.getUsername().equals(username));
+        USER_DATA_STORAGE.removeIf(data -> data.getUsername().equals(username));
 
     }
 }

@@ -7,16 +7,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 public class MemoryGameDAO implements GameDAO{
-    private static final Collection<GameData> gameDataStorage = new ArrayList<>();
+    private static final Collection<GameData> GAME_DATA_STORAGE = new ArrayList<>();
     /**
      * gets all the current active games
      * @return a Collection of all the active games
      */
     @Override
     public Collection<GameData> getListGames(){
-        return gameDataStorage;
+        return GAME_DATA_STORAGE;
     }
-
     /**
      * Creates a game where the name is gameName and both of the usernames are initially null
      * @param gameName The name of the game to create
@@ -25,7 +24,7 @@ public class MemoryGameDAO implements GameDAO{
     @Override
     public int createGame(String gameName) {
         GameData data = new GameData(null, null, gameName, new ChessGame());
-        gameDataStorage.add(data);
+        GAME_DATA_STORAGE.add(data);
         return data.getGameID();
     }
 
@@ -36,7 +35,7 @@ public class MemoryGameDAO implements GameDAO{
      */
     @Override
     public void checkGameID(int gameID) throws DataAccessException {
-        for(GameData data: gameDataStorage){
+        for(GameData data: GAME_DATA_STORAGE){
             if(data.getGameID() == gameID){
                 return;
             }
@@ -54,7 +53,7 @@ public class MemoryGameDAO implements GameDAO{
      */
     @Override
     public void updateGame(String username, ChessGame.TeamColor playerColor, int gameID) throws DataAccessException {
-        for(GameData data : gameDataStorage){
+        for(GameData data : GAME_DATA_STORAGE){
             if(data.getGameID()==gameID){
                 if(playerColor.equals(ChessGame.TeamColor.WHITE)){
                     if(data.getWhiteUsername() != null){
@@ -76,7 +75,7 @@ public class MemoryGameDAO implements GameDAO{
      */
     @Override
     public void clearGameData() {
-        gameDataStorage.clear();
+        GAME_DATA_STORAGE.clear();
         GameData.resetGameIDCounter();
 
     }

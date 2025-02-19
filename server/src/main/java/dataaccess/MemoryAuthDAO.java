@@ -6,9 +6,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 public class MemoryAuthDAO extends AuthDAO{
-    private static final Collection<AuthData> authDataStorage = new ArrayList<>();
+    private static final Collection<AuthData> AUTH_DATA_STORAGE = new ArrayList<>();
     /**
      * creates and adds an authToken to data
+     *
      * @param data the AuthData object for which the authToken will be added to
      * @return the authToken
      */
@@ -16,7 +17,7 @@ public class MemoryAuthDAO extends AuthDAO{
     public String createAuth(AuthData data) {
         String authToken = AuthDAO.generateToken();
         data.setAuthToken(authToken);
-        authDataStorage.add(data);
+        AUTH_DATA_STORAGE.add(data);
         return authToken;
     }
     /**
@@ -27,9 +28,9 @@ public class MemoryAuthDAO extends AuthDAO{
     @Override
     public void deleteAuth(String authToken) throws DataAccessException {
         boolean found = false;
-        for(AuthData data : authDataStorage){
+        for(AuthData data : AUTH_DATA_STORAGE){
             if(data.getAuthToken().equals(authToken)){
-                authDataStorage.remove(data);
+                AUTH_DATA_STORAGE.remove(data);
                 found = true;
                 break;
             }
@@ -45,7 +46,7 @@ public class MemoryAuthDAO extends AuthDAO{
      */
     @Override
     public void getAuth(String authToken) throws DataAccessException {
-        for(AuthData data: authDataStorage){
+        for(AuthData data: AUTH_DATA_STORAGE){
             if(data.getAuthToken().equals(authToken)){
                 return;
             }
@@ -60,7 +61,7 @@ public class MemoryAuthDAO extends AuthDAO{
      */
     @Override
     public String getUsername(String authToken) throws DataAccessException {
-        for(AuthData data: authDataStorage){
+        for(AuthData data: AUTH_DATA_STORAGE){
             if(data.getAuthToken().equals(authToken)){
                 return data.getUsername();
             }
@@ -73,7 +74,7 @@ public class MemoryAuthDAO extends AuthDAO{
      */
     @Override
     public void clearAuthdata() {
-        authDataStorage.clear();
+        AUTH_DATA_STORAGE.clear();
 
     }
     // for testing
@@ -83,7 +84,7 @@ public class MemoryAuthDAO extends AuthDAO{
      */
     @Override
     public Collection<AuthData> getAuthDataStorage(){
-        return authDataStorage;
+        return AUTH_DATA_STORAGE;
     }
     /**
      * deletes a specific AuthData object
@@ -91,6 +92,6 @@ public class MemoryAuthDAO extends AuthDAO{
      */
     @Override
     public void deleteAuthData(String username){
-        authDataStorage.removeIf(data -> data.getUsername().equals(username));
+        AUTH_DATA_STORAGE.removeIf(data -> data.getUsername().equals(username));
     }
 }

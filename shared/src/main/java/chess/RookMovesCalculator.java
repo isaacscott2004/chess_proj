@@ -14,7 +14,8 @@ public class RookMovesCalculator implements PieceMovesCalculator{
             ChessPosition currentPosition = myPosition;
             while(true){
                 currentPosition = new ChessPosition(currentPosition.getRow() + row, currentPosition.getColumn() + col);
-                if ((currentPosition.getRow() > 8) || (currentPosition.getRow() < 1) || (currentPosition.getColumn() > 8) || (currentPosition.getColumn() < 1)){
+                if ((currentPosition.getRow() > 8) || (currentPosition.getRow() < 1) ||
+                        (currentPosition.getColumn() > 8) || (currentPosition.getColumn() < 1)){
                     break;
                 }
                 ChessPiece current = board.getPiece(myPosition);
