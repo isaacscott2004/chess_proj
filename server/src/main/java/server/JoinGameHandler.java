@@ -30,23 +30,18 @@ public class JoinGameHandler implements Route {
         try{
             JoinGameResult joinGameResult = GameService.joinGame(joinGameRequest, authToken, authDAO, gameDAO);
             response.status(200);
-            response.type("application/json");
             return gson.toJson(joinGameResult);
         } catch (BadRequestException e){
             response.status(400);
-            response.type("application/json");
             return gson.toJson(new JoinGameResult(e.getMessage()));
         } catch(UnauthorizedException e){
             response.status(401);
-            response.type("application/json");
             return gson.toJson(new JoinGameResult(e.getMessage()));
         } catch (AlreadyTakenException e){
             response.status(403);
-            response.type("application/json");
             return gson.toJson(new JoinGameResult(e.getMessage()));
         } catch (Exception e){
             response.status(500);
-            response.type("application/json");
             return gson.toJson(new JoinGameResult("Internal Server Error"));
         }
     }

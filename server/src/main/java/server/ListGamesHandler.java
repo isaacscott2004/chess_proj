@@ -26,15 +26,12 @@ public class ListGamesHandler implements Route {
         try{
             ListGamesResult result = GameService.listGames( authToken, authDAO, gameDAO);
             response.status(200);
-            response.type("application/json");
             return gson.toJson(result);
         } catch (UnauthorizedException e){
             response.status(401);
-            response.type("application/json");
             return gson.toJson(new ListGamesResult(null, e.getMessage()));
         } catch (Exception e){
             response.status(500);
-            response.type("application/json");
             return gson.toJson(new ListGamesResult(null, e.getMessage()));
         }
     }

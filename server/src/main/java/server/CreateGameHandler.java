@@ -30,19 +30,15 @@ public class CreateGameHandler implements Route {
         try{
             CreateGameResult result = GameService.createGame(createGameRequest, authToken, authDAO, gameDAO);
             response.status(200);
-            response.type("application/json");
             return gson.toJson(result);
         } catch (BadRequestException e){
             response.status(400);
-            response.type("application/json");
             return gson.toJson(new CreateGameResult(null, e.getMessage()));
         } catch (UnauthorizedException e){
             response.status(401);
-            response.type("application/json");
             return gson.toJson(new CreateGameResult(null, e.getMessage()));
         } catch (Exception e){
             response.status(500);
-            response.type("application/json");
             return gson.toJson(new CreateGameResult(null, e.getMessage()));
         }
 

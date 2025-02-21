@@ -28,11 +28,9 @@ public class ClearHandler implements Route {
         try{
             ClearResult clearResult = ClearService.clear(authAccessObject, userAccessObject, gameAccessObject);
             response.status(200);
-            response.type("application/json");
             return gson.toJson(clearResult);
         } catch (Exception e){
             response.status(500);
-            response.type("application/json");
             return gson.toJson(new ClearResult("Internal Server Error"));
         }
     }

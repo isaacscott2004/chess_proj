@@ -27,19 +27,15 @@ public class LoginHandler implements Route {
         try{
             LoginResult result = UserService.login(loginRequest, authDAO, userDAO);
             response.status(200);
-            response.type("application/json");
             return gson.toJson(result);
         } catch (BadRequestException e){
             response.status(400);
-            response.type("application/json");
             return gson.toJson(new LoginResult(null, null, e.getMessage()));
         } catch (UnauthorizedException e){
             response.status(401);
-            response.type("application/json");
             return gson.toJson(new LoginResult(null, null, e.getMessage()));
         } catch (Exception e){
             response.status(500);
-            response.type("application/json");
             return gson.toJson(new LoginResult(null, null, "Internal Server Error"));
 
         }

@@ -60,7 +60,7 @@ public class UserServiceTests {
     }
 
     @Test
-    void testLogoutSuccess(){
+    void testLogoutSuccess() {
         assertEquals(1, authDataList.size());
         UserService.logout(currentAuthToken, authDataAccessObject);
         assertTrue(authDataList.isEmpty());

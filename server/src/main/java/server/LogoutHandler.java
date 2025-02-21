@@ -24,15 +24,12 @@ public class LogoutHandler implements Route
         try{
             LogoutResult logoutResult = UserService.logout(authToken, authDAO);
             response.status(200);
-            response.type("application/json");
             return gson.toJson(logoutResult);
         } catch (UnauthorizedException e){
             response.status(401);
-            response.type("application/json");
             return gson.toJson(new LogoutResult(e.getMessage()));
         } catch (Exception e){
             response.status(500);
-            response.type("application/json");
             return gson.toJson(new LogoutResult("Internal Server Error"));
         }
     }

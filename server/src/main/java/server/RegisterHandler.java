@@ -27,19 +27,15 @@ public class RegisterHandler implements Route {
         try{
             RegisterResult result = UserService.register(registerRequest, authDAO, userDAO);
             response.status(200);
-            response.type("application/json");
             return gson.toJson(result);
         } catch (BadRequestException e){
             response.status(400);
-            response.type("application/json");
             return gson.toJson(new RegisterResult(null, null, e.getMessage()));
         } catch (AlreadyTakenException e){
             response.status(403);
-            response.type("application/json");
             return gson.toJson(new RegisterResult(null, null, e.getMessage()));
         } catch (Exception e){
             response.status(500);
-            response.type("application/json");
             return gson.toJson(new RegisterResult(null, null, "Internal Server Error"));
         }
     }
