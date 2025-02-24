@@ -16,7 +16,7 @@ public class ClearHandler implements Route {
     private final UserDAO userAccessObject;
     private final GameDAO gameAccessObject;
 
-    public ClearHandler(AuthDAO authAccessObject, UserDAO userAccessObject, GameDAO gameAccessObject){
+    public ClearHandler(AuthDAO authAccessObject, UserDAO userAccessObject, GameDAO gameAccessObject) {
         this.authAccessObject = authAccessObject;
         this.userAccessObject = userAccessObject;
         this.gameAccessObject = gameAccessObject;
@@ -24,12 +24,12 @@ public class ClearHandler implements Route {
 
 
     @Override
-    public Object handle(Request request, Response response){
-        try{
+    public Object handle(Request request, Response response) {
+        try {
             ClearResult clearResult = ClearService.clear(authAccessObject, userAccessObject, gameAccessObject);
             response.status(200);
             return gson.toJson(clearResult);
-        } catch (Exception e){
+        } catch (Exception e) {
             response.status(500);
             return gson.toJson(new ClearResult("Internal Server Error"));
         }

@@ -8,9 +8,12 @@ import request.LoginRequest;
 import request.RegisterRequest;
 import result.LoginResult;
 import result.RegisterResult;
+
 import java.util.Collection;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -25,7 +28,7 @@ public class UserServiceTests {
     static void setUp() throws BadRequestException, DataAccessException {
         userDataAccessObject = new MemoryUserDAO();
         authDataAccessObject = new MemoryAuthDAO();
-        authDataList =  authDataAccessObject.getAuthDataStorage();
+        authDataList = authDataAccessObject.getAuthDataStorage();
         RegisterRequest registerRequest = new RegisterRequest("Isaac", "Soccer", "isaacscottirwin@gmail.com");
         RegisterResult registerResult = UserService.register(registerRequest, authDataAccessObject, userDataAccessObject);
         currentAuthToken = registerResult.authToken();
@@ -34,7 +37,7 @@ public class UserServiceTests {
     @Test
     void testRegisterSuccess() throws BadRequestException, DataAccessException {
         RegisterRequest request = new RegisterRequest("Bob", "1234", "bob1234");
-        RegisterResult registerResult = UserService.register(request,authDataAccessObject, userDataAccessObject);
+        RegisterResult registerResult = UserService.register(request, authDataAccessObject, userDataAccessObject);
         assertEquals("Bob", registerResult.username());
         assertNotNull(registerResult.authToken());
         assertFalse(registerResult.authToken().isEmpty());
@@ -43,9 +46,9 @@ public class UserServiceTests {
     }
 
     @Test
-    void testRegisterErrorNullParameter(){
+    void testRegisterErrorNullParameter() {
         RegisterRequest request = new RegisterRequest("Billy", "1234", null);
-        assertThrows(BadRequestException.class, () -> UserService.register(request,authDataAccessObject, userDataAccessObject));
+        assertThrows(BadRequestException.class, () -> UserService.register(request, authDataAccessObject, userDataAccessObject));
     }
 
     @Test
@@ -68,7 +71,7 @@ public class UserServiceTests {
     }
 
     @Test
-    void testLogoutErrorInvalidAuthToken()  {
+    void testLogoutErrorInvalidAuthToken() {
         assertThrows(UnauthorizedException.class, () -> UserService.logout("1234", authDataAccessObject));
 
     }
@@ -90,7 +93,7 @@ public class UserServiceTests {
         RegisterRequest registerRequest = new RegisterRequest("James", "1234", "bob1234");
         RegisterResult registerResult = UserService.register(registerRequest, authDataAccessObject, userDataAccessObject);
         UserService.logout(registerResult.authToken(), authDataAccessObject);
-        LoginRequest loginRequest =  new LoginRequest(null, "1234");
+        LoginRequest loginRequest = new LoginRequest(null, "1234");
         assertThrows(BadRequestException.class, () -> UserService.login(loginRequest, authDataAccessObject, userDataAccessObject));
         userDataAccessObject.deleteUserData("James");
     }
@@ -100,8 +103,8 @@ public class UserServiceTests {
         RegisterRequest registerRequest = new RegisterRequest("James", "1234", "bob1234");
         RegisterResult registerResult = UserService.register(registerRequest, authDataAccessObject, userDataAccessObject);
         UserService.logout(registerResult.authToken(), authDataAccessObject);
-        LoginRequest loginRequest =  new LoginRequest("James", "1111");
-        assertThrows(UnauthorizedException.class, () -> UserService.login(loginRequest,  authDataAccessObject, userDataAccessObject));
+        LoginRequest loginRequest = new LoginRequest("James", "1111");
+        assertThrows(UnauthorizedException.class, () -> UserService.login(loginRequest, authDataAccessObject, userDataAccessObject));
     }
 
     @AfterAll
@@ -110,7 +113,6 @@ public class UserServiceTests {
         authDataAccessObject.clearAuthdata();
 
     }
-
 
 
 }

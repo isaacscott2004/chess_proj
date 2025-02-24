@@ -18,29 +18,29 @@ public class JoinGameHandler implements Route {
     private final GameDAO gameDAO;
     private final Gson gson = new Gson();
 
-    public JoinGameHandler(AuthDAO authDAO, GameDAO gameDAO){
+    public JoinGameHandler(AuthDAO authDAO, GameDAO gameDAO) {
         this.authDAO = authDAO;
         this.gameDAO = gameDAO;
     }
 
     @Override
-    public Object handle(Request request, Response response){
+    public Object handle(Request request, Response response) {
         JoinGameRequest joinGameRequest = gson.fromJson(request.body(), JoinGameRequest.class);
         String authToken = request.headers("Authorization");
-        try{
+        try {
             JoinGameResult joinGameResult = GameService.joinGame(joinGameRequest, authToken, authDAO, gameDAO);
             response.status(200);
             return gson.toJson(joinGameResult);
-        } catch (BadRequestException e){
+        } catch (BadRequestException e) {
             response.status(400);
             return gson.toJson(new JoinGameResult(e.getMessage()));
-        } catch(UnauthorizedException e){
+        } catch (UnauthorizedException e) {
             response.status(401);
             return gson.toJson(new JoinGameResult(e.getMessage()));
-        } catch (AlreadyTakenException e){
+        } catch (AlreadyTakenException e) {
             response.status(403);
             return gson.toJson(new JoinGameResult(e.getMessage()));
-        } catch (Exception e){
+        } catch (Exception e) {
             response.status(500);
             return gson.toJson(new JoinGameResult("Internal Server Error"));
         }

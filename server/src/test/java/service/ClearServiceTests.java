@@ -11,6 +11,7 @@ import request.CreateGameRequest;
 import request.JoinGameRequest;
 import request.RegisterRequest;
 import result.RegisterResult;
+
 import java.util.Collection;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -23,7 +24,6 @@ public class ClearServiceTests {
     private static AuthDAO authAccessObject;
     private static UserDAO userAccessObject;
     private static GameDAO gameAccessObject;
-
 
 
     @BeforeAll
@@ -62,7 +62,7 @@ public class ClearServiceTests {
         GameService.joinGame(joinGameRequestTwo, authTokenTwo, authAccessObject, gameAccessObject);
 
         JoinGameRequest joinGameRequestThree = new JoinGameRequest(ChessGame.TeamColor.BLACK, 2);
-        GameService.joinGame(joinGameRequestThree,authTokenTwo, authAccessObject, gameAccessObject);
+        GameService.joinGame(joinGameRequestThree, authTokenTwo, authAccessObject, gameAccessObject);
 
         JoinGameRequest joinGameRequestFour = new JoinGameRequest(ChessGame.TeamColor.WHITE, 2);
         GameService.joinGame(joinGameRequestFour, authTokenThree, authAccessObject, gameAccessObject);
@@ -78,9 +78,6 @@ public class ClearServiceTests {
         assertTrue(userDataList.isEmpty());
         assertTrue(gameDataList.isEmpty());
         assertTrue(authDataList.isEmpty());
-
-
-
 
 
     }

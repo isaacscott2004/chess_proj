@@ -13,7 +13,7 @@ public class GameData {
 
     private static int gameIDCounter = 1;
 
-    public GameData(String whiteUsername, String blackUsername, String gameName, ChessGame game){
+    public GameData(String whiteUsername, String blackUsername, String gameName, ChessGame game) {
         this.gameID = gameIDCounter++;
         this.whiteUsername = whiteUsername;
         this.blackUsername = blackUsername;
@@ -21,7 +21,7 @@ public class GameData {
         this.game = game;
     }
 
-    public static void resetGameIDCounter(){
+    public static void resetGameIDCounter() {
         gameIDCounter = 1;
     }
 
@@ -45,7 +45,7 @@ public class GameData {
         this.blackUsername = blackUsername;
     }
 
-    public String getGameName(){
+    public String getGameName() {
         return gameName;
     }
 

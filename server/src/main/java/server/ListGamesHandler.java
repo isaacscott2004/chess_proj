@@ -15,22 +15,22 @@ public class ListGamesHandler implements Route {
     private final GameDAO gameDAO;
     private final Gson gson = new Gson();
 
-    public ListGamesHandler(AuthDAO authDAO, GameDAO gameDAO){
+    public ListGamesHandler(AuthDAO authDAO, GameDAO gameDAO) {
         this.authDAO = authDAO;
         this.gameDAO = gameDAO;
     }
 
     @Override
-    public Object handle(Request request, Response response)  {
+    public Object handle(Request request, Response response) {
         String authToken = request.headers("Authorization");
-        try{
-            ListGamesResult result = GameService.listGames( authToken, authDAO, gameDAO);
+        try {
+            ListGamesResult result = GameService.listGames(authToken, authDAO, gameDAO);
             response.status(200);
             return gson.toJson(result);
-        } catch (UnauthorizedException e){
+        } catch (UnauthorizedException e) {
             response.status(401);
             return gson.toJson(new ListGamesResult(null, e.getMessage()));
-        } catch (Exception e){
+        } catch (Exception e) {
             response.status(500);
             return gson.toJson(new ListGamesResult(null, e.getMessage()));
         }

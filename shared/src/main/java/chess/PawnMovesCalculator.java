@@ -9,7 +9,7 @@ public class PawnMovesCalculator implements PieceMovesCalculator {
         ArrayList<ChessMove> potentialMoves = new ArrayList<>();
         if (board.getPiece(myPosition).getTeamColor() == ChessGame.TeamColor.BLACK) {
             if (myPosition.getRow() == 7) {
-                initialPosition(potentialMoves,-1, myPosition, board);
+                initialPosition(potentialMoves, -1, myPosition, board);
                 capture(potentialMoves, -1, -1, myPosition, board, false);
                 capture(potentialMoves, -1, 1, myPosition, board, false);
             } else if (myPosition.getRow() == 2) {
@@ -17,13 +17,13 @@ public class PawnMovesCalculator implements PieceMovesCalculator {
                 capture(potentialMoves, -1, -1, myPosition, board, true);
                 capture(potentialMoves, -1, 1, myPosition, board, true);
             } else {
-                middlePosition(potentialMoves,-1, myPosition, board);
+                middlePosition(potentialMoves, -1, myPosition, board);
                 capture(potentialMoves, -1, -1, myPosition, board, false);
                 capture(potentialMoves, -1, 1, myPosition, board, false);
             }
         } else {
             if (myPosition.getRow() == 2) {
-                initialPosition(potentialMoves,1, myPosition, board);
+                initialPosition(potentialMoves, 1, myPosition, board);
                 capture(potentialMoves, 1, 1, myPosition, board, false);
                 capture(potentialMoves, 1, -1, myPosition, board, false);
             } else if (myPosition.getRow() == 7) {
@@ -31,7 +31,7 @@ public class PawnMovesCalculator implements PieceMovesCalculator {
                 capture(potentialMoves, 1, 1, myPosition, board, true);
                 capture(potentialMoves, 1, -1, myPosition, board, true);
             } else {
-                middlePosition(potentialMoves,1, myPosition, board);
+                middlePosition(potentialMoves, 1, myPosition, board);
                 capture(potentialMoves, 1, 1, myPosition, board, false);
                 capture(potentialMoves, 1, -1, myPosition, board, false);
             }
@@ -46,20 +46,20 @@ public class PawnMovesCalculator implements PieceMovesCalculator {
             if (!(board.isPieceOnSquare(myPosition.getRow() + (rowDirection * 2), myPosition.getColumn()))) {
                 potentialMoves.add(new ChessMove(myPosition, new ChessPosition(myPosition.getRow() + (rowDirection * 2),
                         myPosition.getColumn()), null));
-                }
             }
+        }
     }
 
     private void middlePosition(ArrayList<ChessMove> potentialMoves, int rowDirection,
-                                ChessPosition myPosition, ChessBoard board){
-        if(!(board.isPieceOnSquare(myPosition.getRow() + rowDirection, myPosition.getColumn()))) {
+                                ChessPosition myPosition, ChessBoard board) {
+        if (!(board.isPieceOnSquare(myPosition.getRow() + rowDirection, myPosition.getColumn()))) {
             potentialMoves.add(new ChessMove(myPosition, new ChessPosition(myPosition.getRow() +
                     rowDirection, myPosition.getColumn()), null));
         }
     }
 
-    private void endPosition(ArrayList<ChessMove> potentialMoves, int rowDirection, ChessPosition myPosition, ChessBoard board){
-        if(!(board.isPieceOnSquare(myPosition.getRow() + rowDirection, myPosition.getColumn()))) {
+    private void endPosition(ArrayList<ChessMove> potentialMoves, int rowDirection, ChessPosition myPosition, ChessBoard board) {
+        if (!(board.isPieceOnSquare(myPosition.getRow() + rowDirection, myPosition.getColumn()))) {
             promotion(potentialMoves, rowDirection, 0, myPosition);
         }
     }

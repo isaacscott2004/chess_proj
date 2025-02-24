@@ -17,27 +17,27 @@ public class CreateGameHandler implements Route {
     private final GameDAO gameDAO;
     private final Gson gson = new Gson();
 
-    public CreateGameHandler(AuthDAO authDAO, GameDAO gameDAO){
+    public CreateGameHandler(AuthDAO authDAO, GameDAO gameDAO) {
         this.authDAO = authDAO;
         this.gameDAO = gameDAO;
     }
 
 
     @Override
-    public Object handle(Request request, Response response){
+    public Object handle(Request request, Response response) {
         CreateGameRequest createGameRequest = gson.fromJson(request.body(), CreateGameRequest.class);
         String authToken = request.headers("Authorization");
-        try{
+        try {
             CreateGameResult result = GameService.createGame(createGameRequest, authToken, authDAO, gameDAO);
             response.status(200);
             return gson.toJson(result);
-        } catch (BadRequestException e){
+        } catch (BadRequestException e) {
             response.status(400);
             return gson.toJson(new CreateGameResult(null, e.getMessage()));
-        } catch (UnauthorizedException e){
+        } catch (UnauthorizedException e) {
             response.status(401);
             return gson.toJson(new CreateGameResult(null, e.getMessage()));
-        } catch (Exception e){
+        } catch (Exception e) {
             response.status(500);
             return gson.toJson(new CreateGameResult(null, e.getMessage()));
         }

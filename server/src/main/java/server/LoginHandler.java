@@ -17,24 +17,25 @@ public class LoginHandler implements Route {
     private final UserDAO userDAO;
     private final Gson gson = new Gson();
 
-    public LoginHandler(AuthDAO authDAO, UserDAO userDAO){
+    public LoginHandler(AuthDAO authDAO, UserDAO userDAO) {
         this.authDAO = authDAO;
         this.userDAO = userDAO;
     }
+
     @Override
     public Object handle(Request request, Response response) {
         LoginRequest loginRequest = gson.fromJson(request.body(), LoginRequest.class);
-        try{
+        try {
             LoginResult result = UserService.login(loginRequest, authDAO, userDAO);
             response.status(200);
             return gson.toJson(result);
-        } catch (BadRequestException e){
+        } catch (BadRequestException e) {
             response.status(400);
             return gson.toJson(new LoginResult(null, null, e.getMessage()));
-        } catch (UnauthorizedException e){
+        } catch (UnauthorizedException e) {
             response.status(401);
             return gson.toJson(new LoginResult(null, null, e.getMessage()));
-        } catch (Exception e){
+        } catch (Exception e) {
             response.status(500);
             return gson.toJson(new LoginResult(null, null, "Internal Server Error"));
 

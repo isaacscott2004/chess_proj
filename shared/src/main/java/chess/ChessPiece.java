@@ -1,6 +1,5 @@
 package chess;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Objects;
 
@@ -11,8 +10,8 @@ import java.util.Objects;
  * signature of the existing methods.
  */
 public class ChessPiece {
-    private ChessGame.TeamColor pieceColor;
-    private PieceType type;
+    private final ChessGame.TeamColor pieceColor;
+    private final PieceType type;
 
     public ChessPiece(ChessGame.TeamColor pieceColor, PieceType type) {
         this.pieceColor = pieceColor;
@@ -54,27 +53,14 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        PieceMovesCalculator calculator = null;
-        switch (type) {
-            case KING:
-                calculator = new KingMovesCalculator();
-                break;
-            case QUEEN:
-                calculator = new QueenMovesCalculator();
-                break;
-            case BISHOP:
-                calculator = new BishopMovesCalculator();
-                break;
-            case KNIGHT:
-                calculator = new KnightMovesCalculator();
-                break;
-            case ROOK:
-                calculator = new RookMovesCalculator();
-                break;
-            case PAWN:
-                calculator = new PawnMovesCalculator();
-                break;
-        }
+        PieceMovesCalculator calculator = switch (type) {
+            case KING -> new KingMovesCalculator();
+            case QUEEN -> new QueenMovesCalculator();
+            case BISHOP -> new BishopMovesCalculator();
+            case KNIGHT -> new KnightMovesCalculator();
+            case ROOK -> new RookMovesCalculator();
+            case PAWN -> new PawnMovesCalculator();
+        };
         return calculator.pieceMoves(board, myPosition);
 
     }

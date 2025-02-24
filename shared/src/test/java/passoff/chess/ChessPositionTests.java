@@ -13,6 +13,7 @@ public class ChessPositionTests {
     private ChessPosition original;
     private ChessPosition equal;
     private ChessPosition different;
+
     @BeforeEach
     public void setUp() {
         original = new ChessPosition(3, 7);
