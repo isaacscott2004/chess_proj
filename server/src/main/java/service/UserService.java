@@ -21,7 +21,7 @@ public class UserService {
      * @throws AlreadyTakenException if the username is already taken
      */
     public static RegisterResult register(RegisterRequest request, AuthDAO authAccessObject, UserDAO userAccessObject)
-            throws BadRequestException, AlreadyTakenException, DataAccessException {
+            throws Exception {
         if (request.username() == null || request.password() == null || request.email() == null) {
             throw new BadRequestException("Error: (username and/or password and/or email cannot be empty)");
         }
@@ -46,7 +46,7 @@ public class UserService {
      * @throws UnauthorizedException if the authToken is not authorized
      */
     public static LoginResult login(LoginRequest request, AuthDAO authAccessObject, UserDAO userAccessObject)
-            throws BadRequestException, UnauthorizedException, DataAccessException {
+            throws Exception {
         if (request.username() == null || request.password() == null) {
             throw new BadRequestException("Error: (username and/or password cannot be empty)");
         }

@@ -2,6 +2,7 @@ package dataaccess;
 
 import model.AuthData;
 
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.UUID;
 
@@ -13,7 +14,7 @@ public abstract class AuthDAO {
      * @param data the AuthData object for which the authToken will be added to
      * @return the authToken
      */
-    public abstract String createAuth(AuthData data);
+    public abstract String createAuth(AuthData data) throws Exception;
 
     /**
      * deletes teh AuthData object that contains the authToken

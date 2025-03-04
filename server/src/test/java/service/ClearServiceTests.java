@@ -27,7 +27,7 @@ public class ClearServiceTests {
 
 
     @BeforeAll
-    static void setup() throws BadRequestException, DataAccessException {
+    static void setup() throws Exception {
         authAccessObject = new MemoryAuthDAO();
         userAccessObject = new MemoryUserDAO();
         gameAccessObject = new MemoryGameDAO();

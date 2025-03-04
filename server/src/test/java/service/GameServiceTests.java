@@ -33,7 +33,7 @@ public class GameServiceTests {
 
 
     @BeforeAll
-    public static void setUp() throws BadRequestException, DataAccessException {
+    public static void setUp() throws Exception {
         userDataAccessObject = new MemoryUserDAO();
         authDataAccessObject = new MemoryAuthDAO();
         gameDataAccessObject = new MemoryGameDAO();
