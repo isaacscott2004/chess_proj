@@ -12,7 +12,7 @@ public class Server {
         new MySqlDAO();
         this.authDAO = new MySqlAuthDAO();
         this.userDAO = new MySqlUserDAO();
-        this.gameDAO = new MemoryGameDAO();
+        this.gameDAO = new MySqlGameDAO();
 
     }
 

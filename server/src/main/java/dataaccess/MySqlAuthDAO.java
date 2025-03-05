@@ -69,7 +69,7 @@ public class MySqlAuthDAO extends MySqlDAO implements AuthDAO{
         try (Connection conn = DatabaseManager.getConnection()) {
             try (PreparedStatement ps = conn.prepareStatement(statement)) {
                 ResultSet rs = ps.executeQuery();
-                if (rs.next()) {
+                while (rs.next()) {
                     AuthData data = new AuthData();
                     data.setAuthToken(rs.getString("username"));
                     data.setAuthToken(rs.getString("auth_token"));

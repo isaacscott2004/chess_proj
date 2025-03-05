@@ -46,10 +46,10 @@ public class MySqlUserDAO extends MySqlDAO implements UserDAO {
         try(Connection conn = DatabaseManager.getConnection()){
             try(PreparedStatement ps = conn.prepareStatement(statement)){
                 ResultSet rs = ps.executeQuery();
-                if(rs.next()){
+                while(rs.next()){
                     UserData data = new UserData();
                     data.setUsername(rs.getString("username"));
-                    data.setPassword(rs.getString("auth_token"));
+                    data.setPassword(rs.getString("password"));
                     data.setEmail(rs.getString("email"));
                     allData.add(data);
                 }

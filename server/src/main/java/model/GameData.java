@@ -5,11 +5,11 @@ import chess.ChessGame;
 import java.util.Objects;
 
 public class GameData {
-    private final int gameID;
+    private int gameID;
     private String whiteUsername;
     private String blackUsername;
-    private final String gameName;
-    private final ChessGame game;
+    private String gameName;
+    private ChessGame game;
 
     private static int gameIDCounter = 1;
 
@@ -19,6 +19,14 @@ public class GameData {
         this.blackUsername = blackUsername;
         this.gameName = gameName;
         this.game = game;
+    }
+
+    public GameData(){
+        this.gameID = 0;
+        this.whiteUsername = null;
+        this.blackUsername = null;
+        this.gameName = null;
+        this.game = null;
     }
 
     public static void resetGameIDCounter() {
@@ -37,6 +45,12 @@ public class GameData {
         return blackUsername;
     }
 
+    public String getGameName() {
+        return gameName;
+    }
+
+    public ChessGame getGame(){ return game;}
+
     public void setWhiteUsername(String whiteUsername) {
         this.whiteUsername = whiteUsername;
     }
@@ -45,9 +59,12 @@ public class GameData {
         this.blackUsername = blackUsername;
     }
 
-    public String getGameName() {
-        return gameName;
-    }
+    public void setGameID(int id){ this.gameID = id; }
+
+    public void setGame(ChessGame game){ this.game = game; }
+
+    public void setGameName(String gameName){ this.gameName = gameName; };
+
 
     @Override
     public boolean equals(Object o) {
