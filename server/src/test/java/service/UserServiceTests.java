@@ -27,9 +27,11 @@ public class UserServiceTests {
     @BeforeAll
     static void setUp() throws Exception {
         UserServiceTests.chooseMemoryType(false);
-        authDataList = authDataAccessObject.getAuthDataStorage();
+        authDataAccessObject.clearAuthdata();
+        userDataAccessObject.clearUserData();
         RegisterRequest registerRequest = new RegisterRequest("Isaac", "Soccer", "isaacscottirwin@gmail.com");
         RegisterResult registerResult = UserService.register(registerRequest, authDataAccessObject, userDataAccessObject);
+        authDataList = authDataAccessObject.getAuthDataStorage();
         currentAuthToken = registerResult.authToken();
     }
 
@@ -62,9 +64,10 @@ public class UserServiceTests {
     }
 
     @Test
-    void testLogoutSuccess() {
+    void testLogoutSuccess() throws DataAccessException {
         assertEquals(1, authDataList.size());
         UserService.logout(currentAuthToken, authDataAccessObject);
+        authDataList = authDataAccessObject.getAuthDataStorage();
         assertTrue(authDataList.isEmpty());
 
     }
@@ -78,6 +81,7 @@ public class UserServiceTests {
     @Test
     void testLoginSuccess() throws Exception {
         UserService.logout(currentAuthToken, authDataAccessObject);
+        authDataList = authDataAccessObject.getAuthDataStorage();
         assertTrue(authDataList.isEmpty());
         LoginRequest request = new LoginRequest("Isaac", "Soccer");
         LoginResult result = UserService.login(request, authDataAccessObject, userDataAccessObject);

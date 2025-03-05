@@ -32,9 +32,13 @@ public class GameServiceTests {
     private static Collection<UserData> userDataList;
 
 
+
     @BeforeAll
     public static void setUp() throws Exception {
         GameServiceTests.chooseMemoryType(false);
+        authDataAccessObject.clearAuthdata();
+        userDataAccessObject.clearUserData();
+        gameDataAccessObject.clearGameData();
         userDataList = userDataAccessObject.getUserDataStorage();
         authDataList = authDataAccessObject.getAuthDataStorage();
         RegisterRequest registerRequestOne = new RegisterRequest("Isaac", "Soccer", "isaacscottirwin@gmail.com");
@@ -78,7 +82,9 @@ public class GameServiceTests {
     }
 
     @Test
-    void preTest() {
+    void preTest() throws DataAccessException {
+        userDataList = userDataAccessObject.getUserDataStorage();
+        authDataList = authDataAccessObject.getAuthDataStorage();
         assertEquals(4, userDataList.size());
         assertEquals(4, authDataList.size());
     }
@@ -164,10 +170,12 @@ public class GameServiceTests {
         assertNull(games.getFirst().getWhiteUsername());
         JoinGameRequest joinGameRequestOne = new JoinGameRequest(ChessGame.TeamColor.BLACK, 1);
         GameService.joinGame(joinGameRequestOne, authTokenOne, authDataAccessObject, gameDataAccessObject);
+        games = (ArrayList<GameData>) gameDataAccessObject.getListGames();
         assertEquals("Isaac", games.getFirst().getBlackUsername());
         assertNull(games.getFirst().getWhiteUsername());
         JoinGameRequest joinGameRequestTwo = new JoinGameRequest(ChessGame.TeamColor.WHITE, 1);
         GameService.joinGame(joinGameRequestTwo, authTokenTwo, authDataAccessObject, gameDataAccessObject);
+        games = (ArrayList<GameData>) gameDataAccessObject.getListGames();
         assertEquals("Isaac", games.getFirst().getBlackUsername());
         assertEquals("Messi", games.getFirst().getWhiteUsername());
         gameDataAccessObject.clearGameData();
