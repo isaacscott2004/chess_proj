@@ -20,7 +20,12 @@ public class MySqlUserDAO extends MySqlDAO implements UserDAO {
 
     @Override
     public boolean authenticateUser(String username, String password) throws DataAccessException {
-        String hashedPassword = getHashPassword(username);
+        String hashedPassword = "";
+        try{
+            hashedPassword = getHashPassword(username);
+        } catch (DataAccessException e){
+            return false;
+        }
         Boolean passwordsMatch = BCrypt.checkpw(password, hashedPassword);
         Boolean usernamesMatch = containsUsername(username);
         return passwordsMatch && usernamesMatch;
