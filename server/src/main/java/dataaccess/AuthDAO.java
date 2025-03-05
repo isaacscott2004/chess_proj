@@ -44,7 +44,7 @@ public abstract class AuthDAO {
     /**
      * clears all of the AuthData
      */
-    public abstract void clearAuthdata();
+    public abstract void clearAuthdata() throws DataAccessException;
 
     /**
      * gets the data structure of the storage of the AuthData objects

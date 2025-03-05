@@ -4,7 +4,8 @@ import dataaccess.*;
 import spark.*;
 
 public class Server {
-    private final AuthDAO authDAO = new MemoryAuthDAO();
+
+    private final AuthDAO authDAO = new MySqlAuthDAO();
     private final UserDAO userDAO = new MemoryUserDAO();
     private final GameDAO gameDAO = new MemoryGameDAO();
 
