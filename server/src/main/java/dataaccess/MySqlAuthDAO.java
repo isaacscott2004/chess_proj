@@ -11,15 +11,9 @@ public class MySqlAuthDAO extends MySqlDAO implements AuthDAO{
     public String createAuth(AuthData data) throws DataAccessException {
         String authToken = generateToken();
         data.setAuthToken(authToken);
-        if(!isNameInAuthData(data.getUsername())) {
             String statementOne = "INSERT INTO auth_data (auth_token, username) VALUES (?, ?)";
             executeUpdate(statementOne, data.getAuthToken(), data.getUsername());
-        } else{
-            String statementTwo = "UPDATE auth_data SET auth_token=? WHERE username=?";
-            executeUpdate(statementTwo, data.getAuthToken(), data.getUsername());
-        }
             return authToken;
-
     }
 
     @Override

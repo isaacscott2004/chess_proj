@@ -76,10 +76,9 @@ public class MySqlDAO {
     private final String[] createStatements = {
 """
 CREATE TABLE IF NOT EXISTS auth_data (
-    `auth_token` varchar(256) DEFAULT NULL,
+    `auth_token` varchar(256) UNIQUE,
     `username` varchar(256) NOT NULL,
-    PRIMARY KEY (`username`),
-    INDEX(auth_token)
+    INDEX(username)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
 """,
 """
