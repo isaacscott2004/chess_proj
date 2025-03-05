@@ -31,7 +31,7 @@ public class ClearHandler implements Route {
             return gson.toJson(clearResult);
         } catch (Exception e) {
             response.status(500);
-            return gson.toJson(new ClearResult("Internal Server Error"));
+            return gson.toJson(new ClearResult(e.getMessage()));
         }
     }
 }

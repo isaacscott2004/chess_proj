@@ -4,13 +4,18 @@ import java.util.Objects;
 
 public class UserData {
     private String username;
-    private final String password;
-    private final String email;
+    private String password;
+    private String email;
 
     public UserData(String username, String password, String email) {
         this.username = username;
         this.password = password;
         this.email = email;
+    }
+    public UserData(){
+        this.username = null;
+        this.password = null;
+        this.email = null;
     }
 
     public String getUsername() {
@@ -21,9 +26,15 @@ public class UserData {
         return password;
     }
 
+    public String getEmail(){ return email;}
+
     public void setUsername(String username) {
         this.username = username;
     }
+
+    public void setPassword(String password) { this.password = password; }
+
+    public void setEmail(String email) { this.email = email; }
 
     @Override
     public boolean equals(Object o) {

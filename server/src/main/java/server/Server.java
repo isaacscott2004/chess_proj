@@ -4,10 +4,19 @@ import dataaccess.*;
 import spark.*;
 
 public class Server {
+    private final AuthDAO authDAO;
+    private final UserDAO userDAO;
+    private final GameDAO gameDAO;
 
-    private final AuthDAO authDAO = new MySqlAuthDAO();
-    private final UserDAO userDAO = new MemoryUserDAO();
-    private final GameDAO gameDAO = new MemoryGameDAO();
+    public Server(){
+        new MySqlDAO();
+        this.authDAO = new MySqlAuthDAO();
+        this.userDAO = new MySqlUserDAO();
+        this.gameDAO = new MemoryGameDAO();
+
+    }
+
+
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);

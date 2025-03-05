@@ -4,8 +4,9 @@ import model.AuthData;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.UUID;
 
-public class MemoryAuthDAO extends AuthDAO {
+public class MemoryAuthDAO implements AuthDAO {
     private static final Collection<AuthData> AUTH_DATA_STORAGE = new ArrayList<>();
 
     /**
@@ -16,7 +17,7 @@ public class MemoryAuthDAO extends AuthDAO {
      */
     @Override
     public String createAuth(AuthData data) {
-        String authToken = AuthDAO.generateToken();
+        String authToken = generateToken();
         data.setAuthToken(authToken);
         AUTH_DATA_STORAGE.add(data);
         return authToken;
@@ -105,4 +106,14 @@ public class MemoryAuthDAO extends AuthDAO {
     public void deleteAuthData(String username) {
         AUTH_DATA_STORAGE.removeIf(data -> data.getUsername().equals(username));
     }
+
+    /**
+     * generates an authToken
+     *
+     * @return the authToken
+     */
+    private static String generateToken() {
+        return UUID.randomUUID().toString();
+    }
+
 }

@@ -42,7 +42,7 @@ public class JoinGameHandler implements Route {
             return gson.toJson(new JoinGameResult(e.getMessage()));
         } catch (Exception e) {
             response.status(500);
-            return gson.toJson(new JoinGameResult("Internal Server Error"));
+            return gson.toJson(new JoinGameResult(e.getMessage()));
         }
     }
 }

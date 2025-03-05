@@ -3,16 +3,13 @@ import model.AuthData;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.sql.*;
-import static java.sql.Types.NULL;
+import java.util.UUID;
 
-public class MySqlAuthDAO extends AuthDAO{
+public class MySqlAuthDAO extends MySqlDAO implements AuthDAO{
 
-    public MySqlAuthDAO() {
-            configureDatabase();
-    }
     @Override
     public String createAuth(AuthData data) throws DataAccessException {
-        String authToken = AuthDAO.generateToken();
+        String authToken = generateToken();
         data.setAuthToken(authToken);
         String statement = "INSERT INTO auth_data (auth_token, username) VALUES (?, ?)";
         executeUpdate(statement, data.getAuthToken(), data.getUsername());
@@ -22,7 +19,7 @@ public class MySqlAuthDAO extends AuthDAO{
     @Override
     public void deleteAuth(String authToken) throws DataAccessException {
         String statement = "DELETE FROM auth_data WHERE auth_token=?";
-        int affectedRows = executeUpdate(statement);
+        int affectedRows = executeUpdate(statement, authToken);
         if(affectedRows == 0){
             throw new DataAccessException("There There is no authData with the matching authToken");
         }
@@ -32,7 +29,7 @@ public class MySqlAuthDAO extends AuthDAO{
     @Override
     public void getAuth(String authToken) throws DataAccessException {
         String statement = "SELECT EXISTS(SELECT 1 FROM auth_data WHERE auth_token=?)";
-        boolean authExists = executeQuery(statement);
+        boolean authExists = booleanQuery(statement, authToken);
         if(!(authExists)){
             throw new DataAccessException("There There is no authData with the matching authToken");
         }
@@ -59,9 +56,9 @@ public class MySqlAuthDAO extends AuthDAO{
 
     @Override
     public void clearAuthdata() throws DataAccessException {
-        String statement = "DELETE FROM auth_data";
+//        String statement = "DELETE FROM auth_data";
 //        String statement = "DROP TABLE auth_data";
-//        String statement = "TRUNCATE TABLE auth_data";
+        String statement = "TRUNCATE TABLE auth_data";
         executeUpdate(statement);
 
     }
@@ -72,94 +69,38 @@ public class MySqlAuthDAO extends AuthDAO{
     public Collection<AuthData> getAuthDataStorage() throws DataAccessException {
         ArrayList<AuthData> allData = new ArrayList<>();
         String statement = "SELECT username, auth_token FROM auth_data";
-        try(Connection conn = DatabaseManager.getConnection()){
-            try(PreparedStatement ps = conn.prepareStatement(statement)){
+        try (Connection conn = DatabaseManager.getConnection()) {
+            try (PreparedStatement ps = conn.prepareStatement(statement)) {
                 ResultSet rs = ps.executeQuery();
-                if(rs.next()){
+                if (rs.next()) {
                     AuthData data = new AuthData();
                     data.setAuthToken(rs.getString("username"));
                     data.setAuthToken(rs.getString("auth_token"));
                     allData.add(data);
-                } else{
-                    throw new DataAccessException("There is no username with the matching authToken");
                 }
             }
-        } catch (SQLException e){
+            return allData;
+        } catch (SQLException e) {
             throw new DataBaseException(String.format("unable to execute query: %s, %s", statement, e.getMessage()));
         }
-        return allData;
     }
 
     @Override
     public void deleteAuthData(String username) throws DataAccessException {
         String statement = "DELETE FROM auth_data WHERE username=?";
-        int affectedRows = executeUpdate(statement);
+        int affectedRows = executeUpdate(statement, username);
         if(affectedRows == 0) {
             throw new DataAccessException("There There is no authData with the matching username");
         }
     }
 
-    private int executeUpdate(String statement, Object... params) throws DataBaseException, DataAccessException {
-        try (Connection conn = DatabaseManager.getConnection()) {
-            try(PreparedStatement ps = conn.prepareStatement(statement)){
-                for(int i = 0; i < params.length; i++){
-                    var param = params[i];
-                    if(param instanceof String p) ps.setString(i + 1, p);
-                    else if (param == null) ps.setNull(i + 1, NULL);
-                }
-                 return ps.executeUpdate();
-
-            }
-    } catch (SQLException e){
-            throw new DataBaseException(String.format("unable to execute update: %s, %s", statement, e.getMessage()));
-        }
+    /**
+     * generates an authToken
+     *
+     * @return the authToken
+     */
+    protected static String generateToken() {
+        return UUID.randomUUID().toString();
     }
 
-    private boolean executeQuery(String statement, Object... params) throws DataBaseException, DataAccessException{
-        try (Connection conn = DatabaseManager.getConnection()) {
-            try(PreparedStatement ps = conn.prepareStatement(statement)){
-                for(int i = 0; i < params.length; i++){
-                    var param = params[i];
-                    if(param instanceof String p) ps.setString(i + 1, p);
-                    else if (param == null) ps.setNull(i + 1, NULL);
-                }
-                ResultSet rs = ps.executeQuery();
-
-                if(rs.next()) {
-                    return rs.getBoolean(1);
-                }
-            }
-        } catch (SQLException e){
-            throw new DataBaseException(String.format("unable to execute query: %s, %s", statement, e.getMessage()));
-        }
-        return false;
-    }
-
-
-    private final String[] createStatements = {
-    """
-    CREATE TABLE IF NOT EXISTS auth_data (
-    `auth_token` varchar(256) DEFAULT NULL,
-    `username` varchar(256) NOT NULL,
-    PRIMARY KEY (`username`),
-    INDEX(auth_token)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
-    """
-    };
-
-
-    private void configureDatabase() throws DataBaseException {
-        try {
-            DatabaseManager.createDatabase();
-        try (var conn = DatabaseManager.getConnection()) {
-            for (var statement : createStatements) {
-                try (var preparedStatement = conn.prepareStatement(statement)) {
-                    preparedStatement.executeUpdate();
-                }
-            }
-        }
-    } catch (SQLException | DataAccessException e) {
-            throw new DataBaseException(String.format("Unable to configure database: %s", e.getMessage()));
-        }
-    }
 }

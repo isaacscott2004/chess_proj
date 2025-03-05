@@ -37,7 +37,7 @@ public class LoginHandler implements Route {
             return gson.toJson(new LoginResult(null, null, e.getMessage()));
         } catch (Exception e) {
             response.status(500);
-            return gson.toJson(new LoginResult(null, null, "Internal Server Error"));
+            return gson.toJson(new LoginResult(null, null, e.getMessage()));
 
         }
     }

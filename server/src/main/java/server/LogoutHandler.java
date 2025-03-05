@@ -29,7 +29,7 @@ public class LogoutHandler implements Route {
             return gson.toJson(new LogoutResult(e.getMessage()));
         } catch (Exception e) {
             response.status(500);
-            return gson.toJson(new LogoutResult("Internal Server Error"));
+            return gson.toJson(new LogoutResult(e.getMessage()));
         }
     }
 }
