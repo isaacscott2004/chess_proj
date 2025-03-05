@@ -13,10 +13,9 @@ public class MySqlUserDAO extends MySqlDAO implements UserDAO {
 
     @Override
     public void addUser(UserData user) throws DataAccessException {
-        String statement = "INSERT INTO user_data (username, password, email) VALUES (?, ?, ?)";
-        String hashedPassword = storeUserPassword(user.getPassword());
-        executeUpdate(statement, user.getUsername(), hashedPassword, user.getEmail());
-
+            String statementONE = "INSERT INTO user_data (username, password, email) VALUES (?, ?, ?)";
+            String hashedPassword = storeUserPassword(user.getPassword());
+            executeUpdate(statementONE, user.getUsername(), hashedPassword, user.getEmail());
     }
 
     @Override

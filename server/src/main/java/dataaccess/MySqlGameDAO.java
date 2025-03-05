@@ -91,16 +91,7 @@ public class MySqlGameDAO extends MySqlDAO implements GameDAO{
                 selectedData.setBlackUsername(username);
             }
             String statementTwo = "UPDATE game_data SET white_username=?, black_username=? WHERE gameID=?";
-            try(Connection connTwo = DatabaseManager.getConnection()){
-                try(PreparedStatement psTwo = connTwo.prepareStatement(statementTwo)){
-                    psTwo.setString(1, selectedData.getWhiteUsername());
-                    psTwo.setString(2, selectedData.getBlackUsername());
-                    psTwo.setInt(3, selectedData.getGameID());
-                    psTwo.executeUpdate();
-                }
-            }
-            catch (SQLException e){
-                throw new DataBaseException(String.format("unable to execute query: %s, %s", statementOne, e.getMessage()));            }
+            executeUpdate(statementTwo, selectedData.getWhiteUsername(), selectedData.getBlackUsername(), selectedData.getGameID());
     }
 
 //    public void updateGame(int gameID) throws DataAccessException{
