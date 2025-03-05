@@ -22,12 +22,13 @@ public class MySqlUserDAO extends MySqlDAO implements UserDAO {
     @Override
     public boolean authenticateUser(String username, String password) throws DataAccessException {
         String hashedPassword = getHashPassword(username);
-        return BCrypt.checkpw(password, hashedPassword);
+        Boolean passwordsMatch = BCrypt.checkpw(password, hashedPassword);
+        Boolean usernamesMatch = containsUsername(username);
+        return passwordsMatch && usernamesMatch;
     }
 
     @Override
     public void clearUserData() throws DataAccessException {
-//        String statement = "DELETE FROM user_data";
         String statement = "TRUNCATE TABLE user_data";
         executeUpdate(statement);
     }
@@ -83,7 +84,7 @@ public class MySqlUserDAO extends MySqlDAO implements UserDAO {
                 ps.setString(1, username);
                 ResultSet rs = ps.executeQuery();
                 if(rs.next()){
-                    return rs.getString("username");
+                    return rs.getString("password");
                 } else{
                     throw new DataAccessException("There is no username with the matching authToken");
                 }

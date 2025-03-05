@@ -56,11 +56,8 @@ public class MySqlAuthDAO extends MySqlDAO implements AuthDAO{
 
     @Override
     public void clearAuthdata() throws DataAccessException {
-//        String statement = "DELETE FROM auth_data";
-//        String statement = "DROP TABLE auth_data";
         String statement = "TRUNCATE TABLE auth_data";
         executeUpdate(statement);
-
     }
 
     // for tests

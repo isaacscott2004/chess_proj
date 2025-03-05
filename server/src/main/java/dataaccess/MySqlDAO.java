@@ -13,7 +13,7 @@ public class MySqlDAO {
     }
 
 
-    protected int executeUpdate(String statement, Object... params) throws DataBaseException, DataAccessException {
+    protected int executeUpdate(String statement, Object... params) throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
             try(PreparedStatement ps = conn.prepareStatement(statement)){
                 for(int i = 0; i < params.length; i++){
@@ -25,7 +25,7 @@ public class MySqlDAO {
 
             }
         } catch (SQLException e){
-            throw new DataBaseException(String.format("unable to execute update: %s, %s", statement, e.getMessage()));
+            throw new DataAccessException(String.format("unable to execute update: %s, %s", statement, e.getMessage()));
         }
     }
 
