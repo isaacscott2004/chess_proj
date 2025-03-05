@@ -4,16 +4,12 @@ import dataaccess.*;
 import spark.*;
 
 public class Server {
-    private final AuthDAO authDAO;
-    private final UserDAO userDAO;
-    private final GameDAO gameDAO;
+    private AuthDAO authDAO;
+    private UserDAO userDAO;
+    private GameDAO gameDAO;
 
     public Server(){
-        new MySqlDAO();
-        this.authDAO = new MySqlAuthDAO();
-        this.userDAO = new MySqlUserDAO();
-        this.gameDAO = new MySqlGameDAO();
-
+        chooseMemoryType(false);
     }
 
 
@@ -41,5 +37,18 @@ public class Server {
     public void stop() {
         Spark.stop();
         Spark.awaitStop();
+    }
+    private  void chooseMemoryType(boolean inMemory){
+        if(inMemory){
+            this.authDAO = new MemoryAuthDAO();
+            this.userDAO = new MemoryUserDAO();
+            this.gameDAO = new MemoryGameDAO();
+        }
+        else {
+            new MySqlDAO();
+            this.authDAO = new MySqlAuthDAO();
+            this.userDAO = new MySqlUserDAO();
+            this.gameDAO = new MySqlGameDAO();
+        }
     }
 }

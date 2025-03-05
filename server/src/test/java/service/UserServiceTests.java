@@ -26,8 +26,7 @@ public class UserServiceTests {
 
     @BeforeAll
     static void setUp() throws Exception {
-        userDataAccessObject = new MemoryUserDAO();
-        authDataAccessObject = new MemoryAuthDAO();
+        UserServiceTests.chooseMemoryType(false);
         authDataList = authDataAccessObject.getAuthDataStorage();
         RegisterRequest registerRequest = new RegisterRequest("Isaac", "Soccer", "isaacscottirwin@gmail.com");
         RegisterResult registerResult = UserService.register(registerRequest, authDataAccessObject, userDataAccessObject);
@@ -83,6 +82,7 @@ public class UserServiceTests {
         LoginRequest request = new LoginRequest("Isaac", "Soccer");
         LoginResult result = UserService.login(request, authDataAccessObject, userDataAccessObject);
         currentAuthToken = result.authToken();
+        authDataList = authDataAccessObject.getAuthDataStorage();
         assertEquals(1, authDataList.size());
         assertEquals("Isaac", request.username());
         assertNotNull(result.authToken());
@@ -111,6 +111,18 @@ public class UserServiceTests {
     static void clear() throws DataAccessException {
         userDataAccessObject.clearUserData();
         authDataAccessObject.clearAuthdata();
+
+    }
+
+    private static void chooseMemoryType(boolean inMemory){
+        if(inMemory){
+            userDataAccessObject = new MemoryUserDAO();
+            authDataAccessObject = new MemoryAuthDAO();
+        }
+        else{
+            userDataAccessObject = new MySqlUserDAO();
+            authDataAccessObject = new MySqlAuthDAO();
+        }
 
     }
 

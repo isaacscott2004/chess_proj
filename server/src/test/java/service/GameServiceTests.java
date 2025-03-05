@@ -34,9 +34,7 @@ public class GameServiceTests {
 
     @BeforeAll
     public static void setUp() throws Exception {
-        userDataAccessObject = new MemoryUserDAO();
-        authDataAccessObject = new MemoryAuthDAO();
-        gameDataAccessObject = new MemoryGameDAO();
+        GameServiceTests.chooseMemoryType(false);
         userDataList = userDataAccessObject.getUserDataStorage();
         authDataList = authDataAccessObject.getAuthDataStorage();
         RegisterRequest registerRequestOne = new RegisterRequest("Isaac", "Soccer", "isaacscottirwin@gmail.com");
@@ -225,6 +223,20 @@ public class GameServiceTests {
         userDataAccessObject.clearUserData();
         authDataAccessObject.clearAuthdata();
         gameDataAccessObject.clearGameData();
+
+    }
+
+    private static void chooseMemoryType(boolean inMemory){
+        if(inMemory){
+            userDataAccessObject = new MemoryUserDAO();
+            authDataAccessObject = new MemoryAuthDAO();
+            gameDataAccessObject = new MemoryGameDAO();
+        }
+        else{
+            userDataAccessObject = new MySqlUserDAO();
+            authDataAccessObject = new MySqlAuthDAO();
+            gameDataAccessObject = new MySqlGameDAO();
+        }
 
     }
 
