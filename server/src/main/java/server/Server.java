@@ -9,7 +9,7 @@ public class Server {
     private GameDAO gameDAO;
 
     public Server(){
-        chooseMemoryType(false);
+        chooseMemoryType(MemoryType.SQL_MEMORY);
     }
 
 
@@ -38,13 +38,17 @@ public class Server {
         Spark.stop();
         Spark.awaitStop();
     }
-    private  void chooseMemoryType(boolean inMemory){
-        if(inMemory){
+    public enum MemoryType {
+        IN_MEMORY,
+        SQL_MEMORY
+    }
+    private  void chooseMemoryType(MemoryType memoryType){
+        if(memoryType == MemoryType.IN_MEMORY){
             this.authDAO = new MemoryAuthDAO();
             this.userDAO = new MemoryUserDAO();
             this.gameDAO = new MemoryGameDAO();
         }
-        else {
+        else if(memoryType == MemoryType.SQL_MEMORY) {
             new MySqlDAO();
             this.authDAO = new MySqlAuthDAO();
             this.userDAO = new MySqlUserDAO();

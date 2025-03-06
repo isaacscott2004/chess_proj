@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import static java.sql.Types.NULL;
 
 public class MySqlDAO {
+
     public MySqlDAO(){
         configureDatabase();
     }
@@ -73,6 +74,7 @@ public class MySqlDAO {
             throw new DataBaseException(String.format("Unable to configure database: %s", e.getMessage()));
         }
     }
+
     private final String[] createStatements = {
 """
 CREATE TABLE IF NOT EXISTS auth_data (

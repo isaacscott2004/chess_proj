@@ -96,12 +96,8 @@ public class MySqlAuthDAO extends MySqlDAO implements AuthDAO{
      *
      * @return the authToken
      */
-    protected static String generateToken() {
+    private static String generateToken() {
         return UUID.randomUUID().toString();
-    }
-    private boolean isNameInAuthData(String username) throws DataAccessException {
-        String statement = "SELECT EXISTS(SELECT 1 FROM auth_data WHERE username=?)";
-        return booleanQuery(statement, username);
     }
 
 }
