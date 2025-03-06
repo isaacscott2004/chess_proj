@@ -69,5 +69,16 @@ public class DAOTestUtilities {
         daos.put("game", chooseGameMemoryType(memoryType));
         return daos;
     }
+    protected static String[] dropStatements = new String[]{
+            """
+            DROP TABLE IF EXISTS auth_data
+            """,
+            """
+            DROP TABLE IF EXISTS game_data
+            """,
+            """
+            DROP TABLE IF EXISTS user_data
+            """
+    };
 
 }

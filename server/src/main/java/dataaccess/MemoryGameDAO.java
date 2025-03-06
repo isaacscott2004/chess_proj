@@ -26,7 +26,10 @@ public class MemoryGameDAO implements GameDAO {
      * @return the id of the game, id's start at 1
      */
     @Override
-    public int createGame(String gameName) {
+    public int createGame(String gameName) throws DataAccessException {
+        if(gameName == null){
+            throw new DataAccessException("gameName cannot be null");
+        }
         GameData data = new GameData(null, null, gameName, new ChessGame());
         GAME_DATA_STORAGE.add(data);
         return data.getGameID();

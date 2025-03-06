@@ -24,17 +24,7 @@ public class MySqlAuthDAOTests {
         memoryType = Server.MemoryType.SQL_MEMORY;
         HashMap<String, Object> daos = DAOTestUtilities.chooseMemoryType(memoryType);
         authAccessObject = (AuthDAO) daos.get("auth");
-        dropStatements = new String[]{
-                """
-            DROP TABLE IF EXISTS auth_data
-            """,
-                """
-            DROP TABLE IF EXISTS game_data
-            """,
-                """
-            DROP TABLE IF EXISTS user_data
-            """
-        };
+        dropStatements = DAOTestUtilities.dropStatements;
 
 
     }

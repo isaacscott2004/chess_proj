@@ -25,19 +25,7 @@ public class MySqlUserDAOTests {
         memoryType = Server.MemoryType.SQL_MEMORY;
         HashMap<String, Object> daos = DAOTestUtilities.chooseMemoryType(memoryType);
         userAccessObject = (UserDAO) daos.get("user");
-        dropStatements = new String[]{
-                """
-            DROP TABLE IF EXISTS auth_data
-            """,
-                """
-            DROP TABLE IF EXISTS game_data
-            """,
-                """
-            DROP TABLE IF EXISTS user_data
-            """
-        };
-
-
+        dropStatements = DAOTestUtilities.dropStatements;
     }
     @BeforeEach
     void setup() throws DataAccessException {

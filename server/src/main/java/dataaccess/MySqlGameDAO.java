@@ -94,11 +94,6 @@ public class MySqlGameDAO extends MySqlDAO implements GameDAO{
             executeUpdate(statementTwo, selectedData.getWhiteUsername(), selectedData.getBlackUsername(), selectedData.getGameID());
     }
 
-//    public void updateGame(int gameID) throws DataAccessException{
-//
-//    }
-
-
     @Override
     public void clearGameData() throws DataAccessException {
         String statement = "TRUNCATE TABLE game_data";
