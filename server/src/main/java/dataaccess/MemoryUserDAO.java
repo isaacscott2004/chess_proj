@@ -14,8 +14,12 @@ public class MemoryUserDAO implements UserDAO {
      * @param user the user to be added
      */
     @Override
-    public void addUser(UserData user) {
+    public void addUser(UserData user) throws DataAccessException {
+        if(user.getUsername() == null || user.getPassword() == null || user.getEmail() == null){
+            throw new DataAccessException("There can be no null values");
+        }
         USER_DATA_STORAGE.add(user);
+
     }
 
     /**
@@ -77,8 +81,11 @@ public class MemoryUserDAO implements UserDAO {
      * @param username the username of the UserData object to be deleted
      */
     @Override
-    public void deleteUserData(String username) {
-        USER_DATA_STORAGE.removeIf(data -> data.getUsername().equals(username));
+    public void deleteUserData(String username) throws DataAccessException {
+        boolean removed = USER_DATA_STORAGE.removeIf(data -> data.getUsername().equals(username));
+        if(!removed){
+            throw new DataAccessException("There is no userData with the specified username");
+        }
 
     }
 }

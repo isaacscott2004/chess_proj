@@ -16,7 +16,10 @@ public class MemoryAuthDAO implements AuthDAO {
      * @return the authToken
      */
     @Override
-    public String createAuth(AuthData data) {
+    public String createAuth(AuthData data) throws DataAccessException {
+        if(data.getUsername() == null){
+            throw new DataAccessException("Username can't be null");
+        }
         String authToken = generateToken();
         data.setAuthToken(authToken);
         AUTH_DATA_STORAGE.add(data);
@@ -103,8 +106,12 @@ public class MemoryAuthDAO implements AuthDAO {
      * @param username the username that is stored in the to be deleted AuthData object
      */
     @Override
-    public void deleteAuthData(String username) {
-        AUTH_DATA_STORAGE.removeIf(data -> data.getUsername().equals(username));
+    public void deleteAuthData(String username) throws DataAccessException {
+        boolean removed = AUTH_DATA_STORAGE.removeIf(data -> data.getUsername().equals(username));
+        if(!removed){
+            throw new DataAccessException("there is no authData with the specified username");
+        }
+
     }
 
     /**

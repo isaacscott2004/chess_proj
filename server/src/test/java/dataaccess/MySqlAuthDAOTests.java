@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import server.Server;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import static org.junit.jupiter.api.Assertions.*;
 public class MySqlAuthDAOTests {
@@ -21,7 +22,8 @@ public class MySqlAuthDAOTests {
     @BeforeAll
     static void setupOnce(){
         memoryType = Server.MemoryType.SQL_MEMORY;
-        chooseMemoryType(memoryType);
+        HashMap<String, Object> daos = DAOTestUtilities.chooseMemoryType(memoryType);
+        authAccessObject = (AuthDAO) daos.get("auth");
         dropStatements = new String[]{
                 """
             DROP TABLE IF EXISTS auth_data
@@ -60,11 +62,12 @@ public class MySqlAuthDAOTests {
     }
     @Test
     void testCreateAuthNullObject() throws Exception {
-        assertTrue(authAccessObject.getAuthDataStorage().isEmpty());
-        assertThrows(DataAccessException.class, () ->
-                authAccessObject.createAuth(nullAuthData));
-        assertTrue(authAccessObject.getAuthDataStorage().isEmpty());
+            assertTrue(authAccessObject.getAuthDataStorage().isEmpty());
+            assertThrows(DataAccessException.class, () ->
+                    authAccessObject.createAuth(nullAuthData));
+            assertTrue(authAccessObject.getAuthDataStorage().isEmpty());
     }
+
     @Test
     void testDeleteAuthSuccess() throws Exception {
         authAccessObject.createAuth(authDataOne);
@@ -142,6 +145,7 @@ public class MySqlAuthDAOTests {
 
     @Test
     void testDeleteAuthDataSuccess() throws Exception {
+
         authAccessObject.createAuth(authDataOne);
         assertEquals(1, authAccessObject.getAuthDataStorage().size());
         authAccessObject.deleteAuthData(authDataOne.getUsername());
@@ -150,27 +154,10 @@ public class MySqlAuthDAOTests {
 
     @Test
     void testDeleteAuthDataThrowsDataAccessException() throws Exception {
-        authAccessObject.createAuth(authDataOne);
-        assertEquals(1, authAccessObject.getAuthDataStorage().size());
-        assertThrows(DataAccessException.class, () ->
-                authAccessObject.deleteAuthData("Bob"));
-        assertEquals(1, authAccessObject.getAuthDataStorage().size());
+            authAccessObject.createAuth(authDataOne);
+            assertEquals(1, authAccessObject.getAuthDataStorage().size());
+            assertThrows(DataAccessException.class, () ->
+                    authAccessObject.deleteAuthData("Bob"));
+            assertEquals(1, authAccessObject.getAuthDataStorage().size());
     }
-
-
-
-
-
-        private static  void chooseMemoryType(Server.MemoryType memoryType){
-        if(memoryType == Server.MemoryType.IN_MEMORY){
-            authAccessObject = new MemoryAuthDAO();
-
-        }
-        else{
-            authAccessObject = new MySqlAuthDAO();
-
-        }
-
-    }
-
 }
