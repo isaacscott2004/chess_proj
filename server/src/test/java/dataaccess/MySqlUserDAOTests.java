@@ -114,7 +114,7 @@ public class MySqlUserDAOTests {
     }
 
     @Test
-    void DeleteUserDataThrowsDataAccessException() throws DataAccessException {
+    void deleteUserDataThrowsDataAccessException() throws DataAccessException {
         userAccessObject.addUser(userDataOne);
         userAccessObject.addUser(userDataTwo);
         assertEquals(2, userAccessObject.getUserDataStorage().size());

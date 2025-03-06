@@ -17,16 +17,7 @@ public class MySqlDAO {
     protected int executeUpdate(String statement, Object... params) throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
             try(PreparedStatement ps = conn.prepareStatement(statement)){
-                for(int i = 0; i < params.length; i++){
-                    var param = params[i];
-                    switch (param) {
-                        case String p -> ps.setString(i + 1, p);
-                        case Integer p -> ps.setInt(i + 1, p);
-                        case null -> ps.setNull(i + 1, NULL);
-                        default -> {
-                        }
-                    }
-                }
+                preparedStatementParameters(ps, params);
                 return ps.executeUpdate();
 
             }
@@ -38,16 +29,7 @@ public class MySqlDAO {
     protected boolean booleanQuery(String statement, Object... params) throws DataBaseException, DataAccessException{
         try (Connection conn = DatabaseManager.getConnection()) {
             try(PreparedStatement ps = conn.prepareStatement(statement)){
-                for(int i = 0; i < params.length; i++){
-                    var param = params[i];
-                    switch (param) {
-                        case String p -> ps.setString(i + 1, p);
-                        case Integer p -> ps.setInt(i + 1, p);
-                        case null -> ps.setNull(i + 1, NULL);
-                        default -> {
-                        }
-                    }
-                }
+                preparedStatementParameters(ps, params);
                 ResultSet rs = ps.executeQuery();
 
                 if(rs.next()) {
@@ -73,6 +55,20 @@ public class MySqlDAO {
         } catch (SQLException | DataAccessException e) {
             throw new DataBaseException(String.format("Unable to configure database: %s", e.getMessage()));
         }
+    }
+
+    private void preparedStatementParameters(PreparedStatement ps, Object[] params) throws SQLException {
+        for(int i = 0; i < params.length; i++){
+            var param = params[i];
+            switch (param) {
+                case String p -> ps.setString(i + 1, p);
+                case Integer p -> ps.setInt(i + 1, p);
+                case null -> ps.setNull(i + 1, NULL);
+                default -> {
+                }
+            }
+        }
+
     }
 
     private final String[] createStatements = {

@@ -14,9 +14,11 @@ import request.RegisterRequest;
 import result.CreateGameResult;
 import result.ListGamesResult;
 import result.RegisterResult;
+import server.Server;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -35,7 +37,10 @@ public class GameServiceTests {
 
     @BeforeAll
     public static void setUp() throws Exception {
-        GameServiceTests.chooseMemoryType(false);
+        HashMap<String, Object> daos = ServiceTestUtilities.chooseMemoryType(Server.MemoryType.SQL_MEMORY);
+        gameDataAccessObject = (GameDAO) daos.get("game");
+        userDataAccessObject = (UserDAO) daos.get("user");
+        authDataAccessObject = (AuthDAO) daos.get("auth");
         authDataAccessObject.clearAuthdata();
         userDataAccessObject.clearUserData();
         gameDataAccessObject.clearGameData();
@@ -234,19 +239,7 @@ public class GameServiceTests {
 
     }
 
-    private static void chooseMemoryType(boolean inMemory){
-        if(inMemory){
-            userDataAccessObject = new MemoryUserDAO();
-            authDataAccessObject = new MemoryAuthDAO();
-            gameDataAccessObject = new MemoryGameDAO();
-        }
-        else{
-            userDataAccessObject = new MySqlUserDAO();
-            authDataAccessObject = new MySqlAuthDAO();
-            gameDataAccessObject = new MySqlGameDAO();
-        }
 
-    }
 
 
 }

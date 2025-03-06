@@ -10,9 +10,11 @@ import result.LoginResult;
 import result.RegisterResult;
 
 import java.util.Collection;
+import java.util.HashMap;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import server.Server;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -26,9 +28,9 @@ public class UserServiceTests {
 
     @BeforeAll
     static void setUp() throws Exception {
-        UserServiceTests.chooseMemoryType(false);
-        authDataAccessObject.clearAuthdata();
-        userDataAccessObject.clearUserData();
+        HashMap<String, Object> daos = ServiceTestUtilities.chooseMemoryType(Server.MemoryType.SQL_MEMORY);
+        userDataAccessObject = (UserDAO) daos.get("user");
+        authDataAccessObject = (AuthDAO) daos.get("auth");
         RegisterRequest registerRequest = new RegisterRequest("Isaac", "Soccer", "isaacscottirwin@gmail.com");
         RegisterResult registerResult = UserService.register(registerRequest, authDataAccessObject, userDataAccessObject);
         authDataList = authDataAccessObject.getAuthDataStorage();
@@ -118,17 +120,17 @@ public class UserServiceTests {
 
     }
 
-    private static void chooseMemoryType(boolean inMemory){
-        if(inMemory){
-            userDataAccessObject = new MemoryUserDAO();
-            authDataAccessObject = new MemoryAuthDAO();
-        }
-        else{
-            userDataAccessObject = new MySqlUserDAO();
-            authDataAccessObject = new MySqlAuthDAO();
-        }
-
-    }
+//    private static void chooseMemoryType(boolean inMemory){
+//        if(inMemory){
+//            userDataAccessObject = new MemoryUserDAO();
+//            authDataAccessObject = new MemoryAuthDAO();
+//        }
+//        else{
+//            userDataAccessObject = new MySqlUserDAO();
+//            authDataAccessObject = new MySqlAuthDAO();
+//        }
+//
+//    }
 
 
 }
