@@ -119,18 +119,5 @@ public class UserServiceTests {
         authDataAccessObject.clearAuthdata();
 
     }
-
-//    private static void chooseMemoryType(boolean inMemory){
-//        if(inMemory){
-//            userDataAccessObject = new MemoryUserDAO();
-//            authDataAccessObject = new MemoryAuthDAO();
-//        }
-//        else{
-//            userDataAccessObject = new MySqlUserDAO();
-//            authDataAccessObject = new MySqlAuthDAO();
-//        }
-//
-//    }
-
-
+    
 }
