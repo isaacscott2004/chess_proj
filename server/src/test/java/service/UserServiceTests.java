@@ -119,5 +119,5 @@ public class UserServiceTests {
         authDataAccessObject.clearAuthdata();
 
     }
-    
+
 }
