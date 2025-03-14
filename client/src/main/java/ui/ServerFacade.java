@@ -23,7 +23,7 @@ public class ServerFacade {
     private final String serverURL;
 
 
-    ServerFacade(String serverURL){
+    public ServerFacade(String serverURL){
         this.serverURL = serverURL;
     }
 
