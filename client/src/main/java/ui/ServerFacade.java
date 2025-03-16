@@ -27,23 +27,23 @@ public class ServerFacade {
         this.serverURL = serverURL;
     }
 
-    public RegisterResult register(RegisterRequest request) throws DataAccessException {
+    public void register(RegisterRequest request) throws DataAccessException {
        String path = "/user";
        logger.info("request to register a user: " + request.username());
-       return makeRequest("POST", path, request, RegisterResult.class);
+       makeRequest("POST", path, request, RegisterResult.class);
     }
 
-    public LoginResult login(LoginRequest request) throws DataAccessException {
+    public void login(LoginRequest request) throws DataAccessException {
         String path = "/session";
         logger.info("request to login a user: " + request.username());
-        return makeRequest("POST", path, request, LoginResult.class);
+        makeRequest("POST", path, request, LoginResult.class);
 
     }
 
-    public LogoutResult logout() throws DataAccessException {
+    public void logout() throws DataAccessException {
         String path = "/session";
         logger.info("request to logout a user");
-        return makeRequest("DELETE", path, null, LogoutResult.class);
+        makeRequest("DELETE", path, null, LogoutResult.class);
     }
 
     public CreateGameResult createGame(CreateGameRequest request) throws DataAccessException {
@@ -59,7 +59,7 @@ public class ServerFacade {
     }
     public JoinGameResult playGame(JoinGameRequest request) throws DataAccessException {
         String path = "/game";
-        logger.info("request to joing an existing game: " + request.gameID());
+        logger.info("request to join an existing game: " + request.gameID());
         return makeRequest("PUT", path, request, JoinGameResult.class);
     }
 
@@ -74,9 +74,18 @@ public class ServerFacade {
             writeBody(request, http);
             http.connect();
             throwIfNotSuccessful(http);
-            T response =  readBody(http, responseClass);
+            T response = readBody(http, responseClass);
             logger.info(method + " request was successful to " + url + ", Response: " + response);
             return response;
+        } catch (NullPointerException e){
+
+            logger.severe("Request failed " + method + " " + path + ", Error: " + e.getMessage());
+            String errorMessage = switch (responseClass.getSimpleName()) {
+                case "RegisterResult" -> "This username already exists please choose a different one";
+                case "LoginResult" -> "Please register before you login";
+                default -> throw new IllegalStateException("Unexpected value: " + responseClass.getSimpleName());
+            };
+                throw new DataAccessException(errorMessage);
         } catch (Exception ex) {
             logger.severe("Request failed " + method + " " + path + ", Error: " + ex.getMessage());
             throw new DataAccessException(500, ex.getMessage());
@@ -123,6 +132,7 @@ public class ServerFacade {
     private boolean isSuccessful(int status) {
         return status / 100 == 2;
     }
+
 
 
 }

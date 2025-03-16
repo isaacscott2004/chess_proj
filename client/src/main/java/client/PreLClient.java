@@ -2,12 +2,14 @@ package client;
 import dataaccess.DataAccessException;
 import request.LoginRequest;
 import request.RegisterRequest;
+import ui.Repl;
 import ui.ServerFacade;
 
 import java.util.Arrays;
 
 public class PreLClient extends Client {
     private final ServerFacade server;
+    private static final String SERVERURL = "http://localhost:8080";
 
     public PreLClient(String serverURL){
         this.server = new ServerFacade(serverURL);
@@ -31,21 +33,26 @@ public class PreLClient extends Client {
     @Override
     public String login(String... params) throws DataAccessException {
         if(params.length != 2){
-            return "You must enter your username and password. Expected: login <username password>";
+            return "You must enter a username and password. Expected: login <username password>";
         }
             LoginRequest loginRequest = new LoginRequest(params[0], params[1]);
             this.server.login(loginRequest);
+            new Repl(SERVERURL, ClientType.POSTL).run();
             return params[0] + ", you have logged in successfully";
+
     }
     @Override
     public String register(String... params) throws DataAccessException {
         if(params.length != 3){
-            return "You must enter your username, password, and email. Expected: register <username password email>";
+            return "You must enter a username, password, and email. Expected: register <username password email>";
         }
 
             RegisterRequest registerRequest = new RegisterRequest(params[0], params[1], params[2]);
             this.server.register(registerRequest);
+            new Repl(SERVERURL, ClientType.POSTL).run();
             return params[0] + ", you have registered successfully";
+
+
 
     }
     @Override
@@ -57,24 +64,6 @@ public class PreLClient extends Client {
         """;
 
     }
-//    public String eval(String input) {
-//        try {
-//            var tokens = input.toLowerCase().split(" ");
-//            var cmd = (tokens.length > 0) ? tokens[0] : "help";
-//            var params = Arrays.copyOfRange(tokens, 1, tokens.length);
-//            return switch (cmd) {
-//                case "signin" -> signIn(params);
-//                case "rescue" -> rescuePet(params);
-//                case "list" -> listPets();
-//                case "signout" -> signOut();
-//                case "adopt" -> adoptPet(params);
-//                case "adoptall" -> adoptAllPets();
-//                case "quit" -> "quit";
-//                default -> help();
-//            };
-//        } catch (ResponseException ex) {
-//            return ex.getMessage();
-//        }
-//    }
+
 
 }

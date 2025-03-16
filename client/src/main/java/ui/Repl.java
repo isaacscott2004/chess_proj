@@ -1,5 +1,6 @@
 package ui;
 import client.*;
+
 import java.util.Scanner;
 
 import static ui.EscapeSequences.*;
@@ -15,13 +16,14 @@ public class Repl {
     }
     public void run() {
         if(type == ClientType.PREL){
-            System.out.println("Welcome to the Chess server. Sign in to start...");
+            System.out.println("Welcome to the Chess server. Register or sign in to start...");
             System.out.println(client.help());
             Scanner scanner = new Scanner(System.in);
             String result = "";
             while (!result.equals("quit")) {
                 printPrompt();
                 String line = scanner.nextLine();
+                System.out.println(RESET_TEXT_COLOR);
                 try {
                     result = client.eval(line);
                     System.out.print(SET_TEXT_COLOR_BLUE + result);
@@ -31,11 +33,28 @@ public class Repl {
                 }
             }
             System.out.println();
+        } else if(type == ClientType.POSTL){
+            System.out.println(client.help());
+            Scanner scanner = new Scanner(System.in);
+            String result = "";
+            while (!result.equals("logout")) {
+                printPrompt();
+                String line = scanner.nextLine();
+                System.out.println(RESET_TEXT_COLOR);
+                try {
+                    result = client.eval(line);
+                    System.out.print(SET_TEXT_COLOR_BLUE + result);
+                } catch (Throwable e){
+                    var msg = e.toString();
+                    System.out.print(msg);
+                }
 
             }
-
-
+            System.out.println();
         }
+
+
+    }
 
 
     private Client createClient(String serverURL, ClientType type){
@@ -43,7 +62,7 @@ public class Repl {
         switch (type){
 //            case GAME -> client = new GameClient(serverURL, this);
             case PREL -> client = new PreLClient(serverURL);
-//            case POSTL -> client = new PostLClient(serverURL, this);
+            case POSTL -> client = new PostLClient(serverURL);
         }
         return client;
 
@@ -58,39 +77,3 @@ public class Repl {
 
 
 }
-//public class Repl implements NotificationHandler {
-//    private final PetClient client;
-//
-//    public Repl(String serverUrl) {
-//        client = new PetClient(serverUrl, this);
-//    }
-//
-//    public void run() {
-//        System.out.println("\uD83D\uDC36 Welcome to the pet store. Sign in to start.");
-//        System.out.print(client.help());
-//
-//        Scanner scanner = new Scanner(System.in);
-//        var result = "";
-//        while (!result.equals("quit")) {
-//            printPrompt();
-//            String line = scanner.nextLine();
-//
-//            try {
-//                result = client.eval(line);
-//                System.out.print(BLUE + result);
-//            } catch (Throwable e) {
-//                var msg = e.toString();
-//                System.out.print(msg);
-//            }
-//        }
-//        System.out.println();
-//    }
-//
-//    public void notify(Notification notification) {
-//        System.out.println(RED + notification.message());
-//        printPrompt();
-//    }
-//
-//    private void printPrompt() {
-//        System.out.print("\n" + RESET + ">>> " + GREEN);
-//    }
