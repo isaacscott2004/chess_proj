@@ -1,6 +1,7 @@
 package client;
 
 import dataaccess.DataAccessException;
+import result.LogoutResult;
 import ui.Repl;
 import ui.ServerFacade;
 
@@ -47,7 +48,13 @@ public class PostLClient extends Client{
 
     @Override
     public String logout()throws DataAccessException {
-        this.server.logout();
+        String authToken = AuthTokenManager.getAuthToken();
+        if(authToken == null){
+            return "You have not logged in or registered";
+        }
+        this.server.logout(authToken);
+
+        AuthTokenManager.clearAuthToken();
         new Repl(SERVERURL, ClientType.PREL).run();
         return "You have logged out successfully";
     }

@@ -16,7 +16,6 @@ public class Repl {
     }
     public void run() {
         if(type == ClientType.PREL){
-            System.out.println("Welcome to the Chess server. Register or sign in to start...");
             System.out.println(client.help());
             Scanner scanner = new Scanner(System.in);
             String result = "";

@@ -2,6 +2,8 @@ package client;
 import dataaccess.DataAccessException;
 import request.LoginRequest;
 import request.RegisterRequest;
+import result.LoginResult;
+import result.RegisterResult;
 import ui.Repl;
 import ui.ServerFacade;
 
@@ -35,10 +37,11 @@ public class PreLClient extends Client {
         if(params.length != 2){
             return "You must enter a username and password. Expected: login <username password>";
         }
-            LoginRequest loginRequest = new LoginRequest(params[0], params[1]);
-            this.server.login(loginRequest);
-            new Repl(SERVERURL, ClientType.POSTL).run();
-            return params[0] + ", you have logged in successfully";
+        LoginRequest loginRequest = new LoginRequest(params[0], params[1]);
+        LoginResult loginResult = this.server.login(loginRequest);
+        AuthTokenManager.setAuthToken(loginResult.authToken());
+        new Repl(SERVERURL, ClientType.POSTL).run();
+        return params[0] + ", you have logged in successfully";
 
     }
     @Override
@@ -47,10 +50,11 @@ public class PreLClient extends Client {
             return "You must enter a username, password, and email. Expected: register <username password email>";
         }
 
-            RegisterRequest registerRequest = new RegisterRequest(params[0], params[1], params[2]);
-            this.server.register(registerRequest);
-            new Repl(SERVERURL, ClientType.POSTL).run();
-            return params[0] + ", you have registered successfully";
+        RegisterRequest registerRequest = new RegisterRequest(params[0], params[1], params[2]);
+        RegisterResult registerResult = this.server.register(registerRequest);
+        AuthTokenManager.setAuthToken(registerResult.authToken());
+        new Repl(SERVERURL, ClientType.POSTL).run();
+        return params[0] + ", you have registered successfully";
 
 
 
