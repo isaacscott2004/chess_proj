@@ -84,9 +84,10 @@ public class ServerFacade {
 
 //            logger.severe("Request failed " + method + " " + path + ", Error: " + e.getMessage());
             String errorMessage = switch (responseClass.getSimpleName()) {
-                case "RegisterResult" -> "This username already exists please choose a different one";
-                case "LoginResult" -> "Please register before you login";
-                default -> throw new IllegalStateException("Unexpected value: " + responseClass.getSimpleName());
+                case "RegisterResult" -> "Error: This username already exists please choose a different one.";
+                case "LoginResult" -> "Error: Your username or password is incorrect. Please try again or register to create a " +
+                        "new user.";
+                default -> throw new IllegalStateException("Error: Unexpected value: " + responseClass.getSimpleName());
             };
                 throw new DataAccessException(errorMessage);
         } catch (Exception ex) {

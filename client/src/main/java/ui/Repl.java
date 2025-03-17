@@ -25,11 +25,22 @@ public class Repl {
                 while (true) {
                     printPrompt();
                     String line = scanner.nextLine();
+                    System.out.println(RESET_TEXT_COLOR);
                     try {
                         result = client.eval(line);
-                        System.out.print(SET_TEXT_COLOR_BLUE + result);
+                        if(result.contains("Error")){
+                            System.out.print(SET_TEXT_COLOR_RED + result);
+                        }
+                        else if(Client.calledHelp){
+                            System.out.println(SET_TEXT_BOLD + result);
+                            System.out.println(RESET_TEXT_BOLD_FAINT);
+                            Client.calledHelp = false;
+                        }
+                        else {
+                            System.out.print(SET_TEXT_COLOR_BLUE + result);
+                        }
                         System.out.println(RESET_TEXT_COLOR);
-                        if (line.contains("login") || line.contains("register")) {
+                        if ((line.toLowerCase().contains("login") || line.toLowerCase().contains("register")) && !result.contains("Error")) {
                             type = ClientType.POSTL;
                             break;
                         }
@@ -56,9 +67,19 @@ public class Repl {
                     System.out.println(RESET_TEXT_COLOR);
                     try {
                         result = client.eval(line);
-                        System.out.print(SET_TEXT_COLOR_BLUE + result);
+                        if(result.contains("Error")){
+                            System.out.print(SET_TEXT_COLOR_RED + result);
+                        }
+                        else if(Client.calledHelp){
+                            System.out.println(SET_TEXT_BOLD + result);
+                            System.out.println(RESET_TEXT_BOLD_FAINT);
+                            Client.calledHelp = false;
+                        }
+                        else {
+                            System.out.print(SET_TEXT_COLOR_BLUE + result);
+                        }
                         System.out.println(RESET_TEXT_COLOR);
-                        if (line.contains("logout")) {
+                        if (line.toLowerCase().contains("logout")) {
                             type = ClientType.PREL;
                             break;
                         }
@@ -88,7 +109,7 @@ public class Repl {
 
     }
     private void printPrompt() {
-        System.out.print("\n" + RESET + ">>> " + SET_TEXT_COLOR_GREEN);
+        System.out.print("\n" + RESET + ">>> ");
     }
 
 

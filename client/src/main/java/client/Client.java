@@ -3,6 +3,7 @@ package client;
 import dataaccess.DataAccessException;
 
 public abstract class Client {
+    public static boolean calledHelp = false;
     public abstract String help();
     public abstract String eval(String input);
     public String login(String ... params) throws DataAccessException { return "";}

@@ -16,14 +16,17 @@ public class PreLClient extends Client {
     @Override
     public String eval(String input){
         try {
-            String[] tokens = input.toLowerCase().split(" ");
-            String command = (tokens.length > 0) ? tokens[0] : "help";
+            String[] tokens = input.split(" ");
+            String command = (tokens.length > 0) ? tokens[0].toLowerCase() : "help";
             String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
-            return switch(command.toLowerCase()){
+            return switch(command){
                 case "quit" -> "You have quit the program, bye.";
                 case "login" -> login(params);
                 case "register" -> register(params);
-                default -> help();
+                default -> {
+                    Client.calledHelp = true;
+                    yield help();
+                }
             };
         } catch (DataAccessException e){
             return e.getMessage();
@@ -32,7 +35,7 @@ public class PreLClient extends Client {
     @Override
     public String login(String... params) throws DataAccessException {
         if(params.length != 2){
-            return "You must enter a username and password. Expected: login <username password>";
+            return "Error: you must enter a username and password. Expected: login <username password>";
         }
         LoginRequest loginRequest = new LoginRequest(params[0], params[1]);
         LoginResult loginResult = this.server.login(loginRequest);
@@ -43,7 +46,7 @@ public class PreLClient extends Client {
     @Override
     public String register(String... params) throws DataAccessException {
         if(params.length != 3){
-            return "You must enter a username, password, and email. Expected: register <username password email>";
+            return "Error: you must enter a username, password, and email. Expected: register <username password email>";
         }
 
         RegisterRequest registerRequest = new RegisterRequest(params[0], params[1], params[2]);
@@ -57,9 +60,11 @@ public class PreLClient extends Client {
     @Override
     public String help(){
         return """
+        help
         register <username password email>
         login <username password>
         quit
+        
         """;
 
     }
