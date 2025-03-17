@@ -6,50 +6,71 @@ import java.util.Scanner;
 import static ui.EscapeSequences.*;
 
 public class Repl {
-    private final Client client;
-    private final ClientType type;
+    private ClientType type;
+    private final String serverURL;
 
-    public Repl(String serverUrl, ClientType type){
+    public Repl(String serverURL, ClientType type){
         this.type = type;
-        this.client = createClient(serverUrl, type);
+        this.serverURL = serverURL;
 
     }
     public void run() {
-        if(type == ClientType.PREL){
-            System.out.println(client.help());
-            Scanner scanner = new Scanner(System.in);
-            String result = "";
-            while (!result.equals("quit")) {
-                printPrompt();
-                String line = scanner.nextLine();
-                System.out.println(RESET_TEXT_COLOR);
-                try {
-                    result = client.eval(line);
-                    System.out.print(SET_TEXT_COLOR_BLUE + result);
-                } catch (Throwable e) {
-                    var msg = e.toString();
-                    System.out.print(msg);
+        Scanner scanner = new Scanner(System.in);
+        while(true) {
+            Client client;
+            if (type == ClientType.PREL) {
+                client = createClient(serverURL, ClientType.PREL);
+                System.out.println(client.help());
+                String result;
+                while (true) {
+                    printPrompt();
+                    String line = scanner.nextLine();
+                    try {
+                        result = client.eval(line);
+                        System.out.print(SET_TEXT_COLOR_BLUE + result);
+                        System.out.println(RESET_TEXT_COLOR);
+                        if (line.contains("login") || line.contains("register")) {
+                            type = ClientType.POSTL;
+                            break;
+                        }
+                        else if(line.contains("quit")){
+                            break;
+                        }
+                    } catch (Throwable e) {
+                        var msg = e.toString();
+                        System.out.print(msg);
+                    }
                 }
+                if (result.equals("You have quit the program, bye.")) {
+                    break;
+                }
+                System.out.println();
             }
-            System.out.println();
-        } else if(type == ClientType.POSTL){
-            System.out.println(client.help());
-            Scanner scanner = new Scanner(System.in);
-            String result = "";
-            while (!result.equals("logout")) {
-                printPrompt();
-                String line = scanner.nextLine();
-                System.out.println(RESET_TEXT_COLOR);
-                try {
-                    result = client.eval(line);
-                    System.out.print(SET_TEXT_COLOR_BLUE + result);
-                } catch (Throwable e){
-                    var msg = e.toString();
-                    System.out.print(msg);
+            if (type == ClientType.POSTL) {
+                client = createClient(serverURL, ClientType.POSTL);
+                System.out.println(client.help());
+                String result;
+                while (true) {
+                    printPrompt();
+                    String line = scanner.nextLine();
+                    System.out.println(RESET_TEXT_COLOR);
+                    try {
+                        result = client.eval(line);
+                        System.out.print(SET_TEXT_COLOR_BLUE + result);
+                        System.out.println(RESET_TEXT_COLOR);
+                        if (line.contains("logout")) {
+                            type = ClientType.PREL;
+                            break;
+                        }
+                    } catch (Throwable e) {
+                        var msg = e.toString();
+                        System.out.print(msg);
+                    }
+
                 }
 
+                System.out.println();
             }
-            System.out.println();
         }
 
 

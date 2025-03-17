@@ -1,15 +1,12 @@
 package client;
 
 import dataaccess.DataAccessException;
-import result.LogoutResult;
-import ui.Repl;
 import ui.ServerFacade;
 
 import java.util.Arrays;
 
 public class PostLClient extends Client{
     private final ServerFacade  server;
-    private static final String SERVERURL = "http://localhost:8080";
     public PostLClient(String serverURL){
         this.server = new ServerFacade(serverURL);
     }
@@ -55,7 +52,6 @@ public class PostLClient extends Client{
         this.server.logout(authToken);
 
         AuthTokenManager.clearAuthToken();
-        new Repl(SERVERURL, ClientType.PREL).run();
         return "You have logged out successfully";
     }
 

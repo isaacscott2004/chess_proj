@@ -4,15 +4,12 @@ import request.LoginRequest;
 import request.RegisterRequest;
 import result.LoginResult;
 import result.RegisterResult;
-import ui.Repl;
 import ui.ServerFacade;
 
 import java.util.Arrays;
 
 public class PreLClient extends Client {
     private final ServerFacade server;
-    private static final String SERVERURL = "http://localhost:8080";
-
     public PreLClient(String serverURL){
         this.server = new ServerFacade(serverURL);
     }
@@ -23,7 +20,7 @@ public class PreLClient extends Client {
             String command = (tokens.length > 0) ? tokens[0] : "help";
             String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
             return switch(command.toLowerCase()){
-                case "quit" -> "quit";
+                case "quit" -> "You have quit the program, bye.";
                 case "login" -> login(params);
                 case "register" -> register(params);
                 default -> help();
@@ -40,7 +37,6 @@ public class PreLClient extends Client {
         LoginRequest loginRequest = new LoginRequest(params[0], params[1]);
         LoginResult loginResult = this.server.login(loginRequest);
         AuthTokenManager.setAuthToken(loginResult.authToken());
-        new Repl(SERVERURL, ClientType.POSTL).run();
         return params[0] + ", you have logged in successfully";
 
     }
@@ -53,7 +49,6 @@ public class PreLClient extends Client {
         RegisterRequest registerRequest = new RegisterRequest(params[0], params[1], params[2]);
         RegisterResult registerResult = this.server.register(registerRequest);
         AuthTokenManager.setAuthToken(registerResult.authToken());
-        new Repl(SERVERURL, ClientType.POSTL).run();
         return params[0] + ", you have registered successfully";
 
 
@@ -68,6 +63,7 @@ public class PreLClient extends Client {
         """;
 
     }
+
 
 
 }
