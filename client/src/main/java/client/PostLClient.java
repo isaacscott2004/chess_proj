@@ -5,8 +5,6 @@ import dataaccess.DataAccessException;
 import model.GameData;
 import request.CreateGameRequest;
 import request.JoinGameRequest;
-import result.CreateGameResult;
-import result.JoinGameResult;
 import result.ListGamesResult;
 import ui.ServerFacade;
 
@@ -14,6 +12,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
+
+import static ui.EscapeSequences.*;
 
 public class PostLClient extends Client{
 //    private static HashMap<Integer, Integer> numberToGameId = new HashMap<>();
@@ -139,7 +139,10 @@ public class PostLClient extends Client{
         ChessGame.TeamColor color = ChessGame.TeamColor.valueOf(params[0].toUpperCase());
         JoinGameRequest joinGameRequest = new JoinGameRequest(color, gameId);
         this.server.playGame(joinGameRequest, authToken);
-        return "You have successfully joined " + chosenGame.getGameName() + " as: " + color;
+        if(color == ChessGame.TeamColor.WHITE){
+            return drawBoardWhite();
+        }
+        return drawBoardBlack();
 
 
 
@@ -149,6 +152,80 @@ public class PostLClient extends Client{
         ListGamesResult listGamesResult = this.server.listGames(authToken);
         return new ArrayList<>(listGamesResult.games());
 
+    }
+
+    private String drawBoardWhite(){
+      return SET_BG_COLOR_BLUE+SET_TEXT_COLOR_BLACK+ "   "+" a "+" b "+" c "+" d "+" e "+" f "+" g "+" h "+"   "+RESET_BG_COLOR+EMPTY+"\n"
+            + SET_BG_COLOR_BLUE + " 8 " + SET_BG_COLOR_LIGHT_TAN + BLACK_ROOK + SET_BG_COLOR_DARK_TAN + BLACK_KNIGHT +
+              SET_BG_COLOR_LIGHT_TAN + BLACK_BISHOP + SET_BG_COLOR_DARK_TAN + BLACK_QUEEN + SET_BG_COLOR_LIGHT_TAN +
+              BLACK_KING + SET_BG_COLOR_DARK_TAN + BLACK_BISHOP + SET_BG_COLOR_LIGHT_TAN + BLACK_KNIGHT +
+              SET_BG_COLOR_DARK_TAN + BLACK_ROOK + SET_BG_COLOR_BLUE + " 8 " + RESET_BG_COLOR + EMPTY + "\n"
+              + SET_BG_COLOR_BLUE + " 7 " + SET_BG_COLOR_DARK_TAN + BLACK_PAWN +SET_BG_COLOR_LIGHT_TAN + BLACK_PAWN +
+              SET_BG_COLOR_DARK_TAN + BLACK_PAWN + SET_BG_COLOR_LIGHT_TAN + BLACK_PAWN + SET_BG_COLOR_DARK_TAN +
+              BLACK_PAWN + SET_BG_COLOR_LIGHT_TAN + BLACK_PAWN + SET_BG_COLOR_DARK_TAN + BLACK_PAWN +
+              SET_BG_COLOR_LIGHT_TAN + BLACK_PAWN + SET_BG_COLOR_BLUE + " 7 " + RESET_BG_COLOR + EMPTY + "\n"
+              + SET_BG_COLOR_BLUE + " 6 " + SET_BG_COLOR_LIGHT_TAN + "   " + SET_BG_COLOR_DARK_TAN + "   " +
+              SET_BG_COLOR_LIGHT_TAN + "   " + SET_BG_COLOR_DARK_TAN + "   " + SET_BG_COLOR_LIGHT_TAN + "   " +
+              SET_BG_COLOR_DARK_TAN + "   " + SET_BG_COLOR_LIGHT_TAN + "   " + SET_BG_COLOR_DARK_TAN + "   " +
+              SET_BG_COLOR_BLUE + " 6 " + RESET_BG_COLOR + EMPTY + "\n"
+              + SET_BG_COLOR_BLUE + " 5 " + SET_BG_COLOR_DARK_TAN + "   " + SET_BG_COLOR_LIGHT_TAN + "   " +
+              SET_BG_COLOR_DARK_TAN + "   " + SET_BG_COLOR_LIGHT_TAN + "   " + SET_BG_COLOR_DARK_TAN + "   " +
+              SET_BG_COLOR_LIGHT_TAN + "   " + SET_BG_COLOR_DARK_TAN + "   " + SET_BG_COLOR_LIGHT_TAN + "   " +
+              SET_BG_COLOR_BLUE + " 5 " + RESET_BG_COLOR + EMPTY + "\n"
+              + SET_BG_COLOR_BLUE + " 4 " + SET_BG_COLOR_LIGHT_TAN + "   " + SET_BG_COLOR_DARK_TAN + "   " +
+              SET_BG_COLOR_LIGHT_TAN + "   " + SET_BG_COLOR_DARK_TAN + "   " + SET_BG_COLOR_LIGHT_TAN + "   " +
+              SET_BG_COLOR_DARK_TAN + "   " + SET_BG_COLOR_LIGHT_TAN + "   " + SET_BG_COLOR_DARK_TAN + "   " +
+              SET_BG_COLOR_BLUE + " 4 " + RESET_BG_COLOR + EMPTY + "\n"
+              + SET_BG_COLOR_BLUE + " 3 " + SET_BG_COLOR_DARK_TAN + "   " + SET_BG_COLOR_LIGHT_TAN + "   " +
+              SET_BG_COLOR_DARK_TAN + "   " + SET_BG_COLOR_LIGHT_TAN + "   " + SET_BG_COLOR_DARK_TAN + "   " +
+              SET_BG_COLOR_LIGHT_TAN + "   " + SET_BG_COLOR_DARK_TAN + "   " + SET_BG_COLOR_LIGHT_TAN + "   " +
+              SET_BG_COLOR_BLUE + " 3 " + RESET_BG_COLOR + EMPTY + "\n"
+              + SET_BG_COLOR_BLUE + " 2 " + SET_BG_COLOR_LIGHT_TAN + WHITE_PAWN +SET_BG_COLOR_DARK_TAN + WHITE_PAWN +
+              SET_BG_COLOR_LIGHT_TAN + WHITE_PAWN + SET_BG_COLOR_DARK_TAN + WHITE_PAWN + SET_BG_COLOR_LIGHT_TAN +
+              WHITE_PAWN + SET_BG_COLOR_DARK_TAN + WHITE_PAWN + SET_BG_COLOR_LIGHT_TAN + WHITE_PAWN +
+              SET_BG_COLOR_DARK_TAN + WHITE_PAWN + SET_BG_COLOR_BLUE + " 2 " + RESET_BG_COLOR + EMPTY + "\n"
+              + SET_BG_COLOR_BLUE + " 1 " + SET_BG_COLOR_DARK_TAN + WHITE_ROOK + SET_BG_COLOR_LIGHT_TAN + WHITE_KNIGHT +
+              SET_BG_COLOR_DARK_TAN + WHITE_BISHOP + SET_BG_COLOR_LIGHT_TAN + WHITE_QUEEN + SET_BG_COLOR_DARK_TAN +
+              WHITE_KING + SET_BG_COLOR_LIGHT_TAN + WHITE_BISHOP + SET_BG_COLOR_DARK_TAN + WHITE_KNIGHT +
+              SET_BG_COLOR_LIGHT_TAN + WHITE_ROOK + SET_BG_COLOR_BLUE + " 1 " + RESET_BG_COLOR + EMPTY + "\n" +
+              SET_BG_COLOR_BLUE+SET_TEXT_COLOR_BLACK+ "   "+" a "+" b "+" c "+" d "+" e "+" f "+" g "+" h "+"   "+RESET_BG_COLOR+EMPTY;
+
+    }
+    private String drawBoardBlack(){
+        return SET_BG_COLOR_BLUE+SET_TEXT_COLOR_BLACK+ "   "+" a "+" b "+" c "+" d "+" e "+" f "+" g "+" h "+"   "+RESET_BG_COLOR+EMPTY+"\n"
+                + SET_BG_COLOR_BLUE + " 1 " + SET_BG_COLOR_DARK_TAN + WHITE_ROOK + SET_BG_COLOR_LIGHT_TAN + WHITE_KNIGHT +
+                SET_BG_COLOR_DARK_TAN + WHITE_BISHOP + SET_BG_COLOR_LIGHT_TAN + WHITE_QUEEN + SET_BG_COLOR_DARK_TAN +
+                WHITE_KING + SET_BG_COLOR_LIGHT_TAN + WHITE_BISHOP + SET_BG_COLOR_DARK_TAN + WHITE_KNIGHT +
+                SET_BG_COLOR_LIGHT_TAN + WHITE_ROOK + SET_BG_COLOR_BLUE + " 1 " + RESET_BG_COLOR + EMPTY + "\n"
+                + SET_BG_COLOR_BLUE + " 2 " + SET_BG_COLOR_LIGHT_TAN + WHITE_PAWN + SET_BG_COLOR_DARK_TAN + WHITE_PAWN +
+                SET_BG_COLOR_LIGHT_TAN + WHITE_PAWN + SET_BG_COLOR_DARK_TAN + WHITE_PAWN + SET_BG_COLOR_LIGHT_TAN +
+                WHITE_PAWN + SET_BG_COLOR_DARK_TAN + WHITE_PAWN + SET_BG_COLOR_LIGHT_TAN + WHITE_PAWN +
+                SET_BG_COLOR_DARK_TAN + WHITE_PAWN + SET_BG_COLOR_BLUE + " 2 " + RESET_BG_COLOR + EMPTY + "\n"
+                + SET_BG_COLOR_BLUE + " 3 " + SET_BG_COLOR_DARK_TAN + "   " + SET_BG_COLOR_LIGHT_TAN + "   " +
+                SET_BG_COLOR_DARK_TAN + "   " + SET_BG_COLOR_LIGHT_TAN + "   " + SET_BG_COLOR_DARK_TAN + "   " +
+                SET_BG_COLOR_LIGHT_TAN + "   " + SET_BG_COLOR_DARK_TAN + "   " + SET_BG_COLOR_LIGHT_TAN + "   " +
+                SET_BG_COLOR_BLUE + " 3 " + RESET_BG_COLOR + EMPTY + "\n"
+                + SET_BG_COLOR_BLUE + " 4 " + SET_BG_COLOR_LIGHT_TAN + "   " + SET_BG_COLOR_DARK_TAN + "   " +
+                SET_BG_COLOR_LIGHT_TAN + "   " + SET_BG_COLOR_DARK_TAN + "   " + SET_BG_COLOR_LIGHT_TAN + "   " +
+                SET_BG_COLOR_DARK_TAN + "   " + SET_BG_COLOR_LIGHT_TAN + "   " + SET_BG_COLOR_DARK_TAN + "   " +
+                SET_BG_COLOR_BLUE + " 4 " + RESET_BG_COLOR + EMPTY + "\n"
+                + SET_BG_COLOR_BLUE + " 5 " + SET_BG_COLOR_DARK_TAN + "   " + SET_BG_COLOR_LIGHT_TAN + "   " +
+                SET_BG_COLOR_DARK_TAN + "   " + SET_BG_COLOR_LIGHT_TAN + "   " + SET_BG_COLOR_DARK_TAN + "   " +
+                SET_BG_COLOR_LIGHT_TAN + "   " + SET_BG_COLOR_DARK_TAN + "   " + SET_BG_COLOR_LIGHT_TAN + "   " +
+                SET_BG_COLOR_BLUE + " 5 " + RESET_BG_COLOR + EMPTY + "\n"
+                + SET_BG_COLOR_BLUE + " 6 " + SET_BG_COLOR_LIGHT_TAN + "   " + SET_BG_COLOR_DARK_TAN + "   " +
+                SET_BG_COLOR_LIGHT_TAN + "   " + SET_BG_COLOR_DARK_TAN + "   " + SET_BG_COLOR_LIGHT_TAN + "   " +
+                SET_BG_COLOR_DARK_TAN + "   " + SET_BG_COLOR_LIGHT_TAN + "   " + SET_BG_COLOR_DARK_TAN + "   " +
+                SET_BG_COLOR_BLUE + " 6 " + RESET_BG_COLOR + EMPTY + "\n"
+                + SET_BG_COLOR_BLUE + " 7 " + SET_BG_COLOR_DARK_TAN + BLACK_PAWN + SET_BG_COLOR_LIGHT_TAN + BLACK_PAWN +
+                SET_BG_COLOR_DARK_TAN + BLACK_PAWN + SET_BG_COLOR_LIGHT_TAN + BLACK_PAWN + SET_BG_COLOR_DARK_TAN +
+                BLACK_PAWN + SET_BG_COLOR_LIGHT_TAN + BLACK_PAWN + SET_BG_COLOR_DARK_TAN + BLACK_PAWN +
+                SET_BG_COLOR_LIGHT_TAN + BLACK_PAWN + SET_BG_COLOR_BLUE + " 7 " + RESET_BG_COLOR + EMPTY + "\n"
+                + SET_BG_COLOR_BLUE + " 8 " + SET_BG_COLOR_LIGHT_TAN + BLACK_ROOK + SET_BG_COLOR_DARK_TAN + BLACK_KNIGHT +
+                SET_BG_COLOR_LIGHT_TAN + BLACK_BISHOP + SET_BG_COLOR_DARK_TAN + BLACK_QUEEN + SET_BG_COLOR_LIGHT_TAN +
+                BLACK_KING + SET_BG_COLOR_DARK_TAN + BLACK_BISHOP + SET_BG_COLOR_LIGHT_TAN + BLACK_KNIGHT +
+                SET_BG_COLOR_DARK_TAN + BLACK_ROOK + SET_BG_COLOR_BLUE + " 8 " + RESET_BG_COLOR + EMPTY + "\n"
+                + SET_BG_COLOR_BLUE +SET_TEXT_COLOR_BLACK+ "   "+" a "+" b "+" c "+" d "+" e "+" f "+" g "+" h "+"   "+RESET_BG_COLOR+EMPTY;
     }
 
 
