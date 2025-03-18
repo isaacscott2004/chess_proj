@@ -56,10 +56,10 @@ public class ServerFacade {
 //        logger.info("request to list all the games");
         return makeRequest("GET" , path, null, ListGamesResult.class, authToken);
     }
-    public JoinGameResult playGame(JoinGameRequest request, String authToken) throws DataAccessException {
+    public void playGame(JoinGameRequest request, String authToken) throws DataAccessException {
         String path = "/game";
 //        logger.info("request to join an existing game: " + request.gameID());
-        return makeRequest("PUT", path, request, JoinGameResult.class, authToken);
+        makeRequest("PUT", path, request, JoinGameResult.class, authToken);
     }
 
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass, String authToken) throws DataAccessException {
@@ -87,6 +87,8 @@ public class ServerFacade {
                 case "RegisterResult" -> "Error: This username already exists please choose a different one.";
                 case "LoginResult" -> "Error: Your username or password is incorrect. Please try again or register to create a " +
                         "new user.";
+                case "JoinGameResult" -> "Error: The team you tried to play with is already taken. Please choose a different team\n" +
+                        "type 'list' to see what teams and games are available";
                 default -> throw new IllegalStateException("Error: Unexpected value: " + responseClass.getSimpleName());
             };
                 throw new DataAccessException(errorMessage);
