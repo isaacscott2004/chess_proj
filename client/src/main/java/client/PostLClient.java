@@ -1,10 +1,13 @@
 package client;
 
 import dataaccess.DataAccessException;
+import model.GameData;
 import request.CreateGameRequest;
 import result.CreateGameResult;
+import result.ListGamesResult;
 import ui.ServerFacade;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class PostLClient extends Client{
@@ -65,12 +68,33 @@ public class PostLClient extends Client{
     public String createGame(String ... params) throws DataAccessException {
         if(params.length != 1){
             return "Error: you must enter a gamename. Please make your gamename has no spaces\n" +
-                    "Expected: create <gameName>. Examples: gameName, gamename, game_name";
+                    "Expected: create <gamename>. Examples: gameName, gamename, game_name";
         }
         String authToken = AuthTokenManager.getAuthToken();
         CreateGameRequest createGameRequest = new CreateGameRequest(params[0]);
-        CreateGameResult createGameResult = this.server.createGame(createGameRequest, authToken);
-        return "You have successfully created a new game, game name: " + params[0] + " ,id " + createGameResult.gameID();
+        this.server.createGame(createGameRequest, authToken);
+        return "You have successfully created a new game, game name: " + params[0];
     }
+    @Override
+    public String listGames()throws DataAccessException {
+        String authToken = AuthTokenManager.getAuthToken();
+        ListGamesResult listGamesResult = this.server.listGames(authToken);
+        ArrayList<GameData> allGames = new ArrayList<>(listGamesResult.games());
+        ArrayList<ClientGameData> listOfGames= new ArrayList<>();
+        if(allGames.isEmpty()){
+            return "Error: there are no games. Please create a new game by using create <gamename>";
+        }
+        int count = 1;
+        for(GameData gameData : allGames){
+            listOfGames.add(new ClientGameData(count, gameData.getGameID(), gameData.getWhiteUsername(), gameData.getBlackUsername(), gameData.getGameName()));
+            count++;
+        }
+        StringBuilder output = new StringBuilder();
+        for(ClientGameData clientGameData: listOfGames){
+            output.append(clientGameData.toString()).append("\n");
+        }
+        return output.toString();
+    }
+
 
 }

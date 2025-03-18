@@ -1,6 +1,7 @@
 package server;
 
 import dataaccess.*;
+import model.GameData;
 import spark.*;
 
 public class Server {
@@ -10,11 +11,17 @@ public class Server {
 
     public Server(){
         chooseMemoryType(MemoryType.SQL_MEMORY);
+        try{
+            GameData.initializeGameIDCounter(gameDAO);
+        } catch (DataAccessException e) {
+            GameData.resetGameIDCounter();
+        }
     }
 
 
 
-    public int run(int desiredPort) {
+
+    public int run(int desiredPort)  {
         Spark.port(desiredPort);
 
         Spark.staticFiles.location("web");

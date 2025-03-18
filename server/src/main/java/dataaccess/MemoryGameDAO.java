@@ -52,6 +52,11 @@ public class MemoryGameDAO implements GameDAO {
 
     }
 
+    @Override
+    public int getLargestGameID() {
+        return getListGames().size();
+    }
+
     /**
      * Updates a games with a username and that username's color
      *

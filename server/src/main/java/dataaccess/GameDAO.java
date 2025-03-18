@@ -30,6 +30,13 @@ public interface GameDAO {
     void checkGameID(int gameID) throws DataAccessException;
 
     /**
+     * gets the largest gameID
+     * @return the largest gameID
+     * @throws DataAccessException
+     */
+    int getLargestGameID() throws DataAccessException;
+
+    /**
      * Updates a games with a username and that username's color
      *
      * @param username    the username to be added to a game

@@ -55,6 +55,25 @@ public class MySqlGameDAO extends MySqlDAO implements GameDAO{
     }
 
     @Override
+    public int getLargestGameID() throws DataAccessException {
+        String statement = "SELECT MAX(gameID) AS maxGameID FROM game_data";
+        Integer maxGameID = null;
+
+        try (Connection conn = DatabaseManager.getConnection()) {
+            try (PreparedStatement ps = conn.prepareStatement(statement)) {
+                ResultSet rs = ps.executeQuery();
+                if (rs.next()) {
+                    maxGameID = rs.getInt("maxGameID");
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Unable to execute query: " + e.getMessage());
+        }
+
+        return (maxGameID != null) ? maxGameID : 1;
+    }
+
+    @Override
     public void updateGame(String username, ChessGame.TeamColor playerColor, int gameID) throws DataAccessException {
         String statementOne = "SELECT gameID, white_username, black_username, game_name, json_game FROM game_data WHERE " +
                 "gameID=?";
@@ -79,19 +98,19 @@ public class MySqlGameDAO extends MySqlDAO implements GameDAO{
         if(selectedData == null){
             throw new DataAccessException("There is no game with the specified gameID");
         }
-            if (playerColor.equals(ChessGame.TeamColor.WHITE)) {
-                if (selectedData.getWhiteUsername() != null) {
-                    throw new DataAccessException("White username already taken");
-                }
-                selectedData.setWhiteUsername(username);
-            } else {
-                if (selectedData.getBlackUsername() != null) {
-                    throw new DataAccessException("Black username already taken");
-                }
-                selectedData.setBlackUsername(username);
+        if (playerColor.equals(ChessGame.TeamColor.WHITE)) {
+            if (selectedData.getWhiteUsername() != null) {
+                throw new DataAccessException("White username already taken");
             }
-            String statementTwo = "UPDATE game_data SET white_username=?, black_username=? WHERE gameID=?";
-            executeUpdate(statementTwo, selectedData.getWhiteUsername(), selectedData.getBlackUsername(), selectedData.getGameID());
+            selectedData.setWhiteUsername(username);
+        } else {
+            if (selectedData.getBlackUsername() != null) {
+                throw new DataAccessException("Black username already taken");
+            }
+            selectedData.setBlackUsername(username);
+        }
+        String statementTwo = "UPDATE game_data SET white_username=?, black_username=? WHERE gameID=?";
+        executeUpdate(statementTwo, selectedData.getWhiteUsername(), selectedData.getBlackUsername(), selectedData.getGameID());
     }
 
     @Override
