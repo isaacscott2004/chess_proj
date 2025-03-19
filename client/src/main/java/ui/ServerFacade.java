@@ -70,11 +70,11 @@ public class ServerFacade {
             throwIfNotSuccessful(http);
             return readBody(http, responseClass);
         } catch (NullPointerException e){
-
             String errorMessage = switch (responseClass.getSimpleName()) {
                 case "RegisterResult" -> "Error: This username already exists please choose a different one.";
                 case "LoginResult" -> "Error: Your username or password is incorrect. Please try again or register to create a " +
                         "new user.";
+                case "LogoutResult", "CreateGameResult", "ListGamesResult" -> "Error: You are not logged in or registered";
                 case "JoinGameResult" -> "Error: The team you tried to play with is already taken. Please choose a different team\n" +
                         "type 'list' to see what teams and games are available";
                 default -> throw new IllegalStateException("Error: Unexpected value: " + responseClass.getSimpleName());
