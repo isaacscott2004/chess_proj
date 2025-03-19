@@ -16,7 +16,7 @@ public class PreLClient extends Client {
     @Override
     public String eval(String input){
         try {
-            String[] tokens = input.split(" ");
+            String[] tokens = input.stripLeading().split(" ");
             String command = (tokens.length > 0) ? tokens[0].toLowerCase() : "help";
             String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
             return switch(command){

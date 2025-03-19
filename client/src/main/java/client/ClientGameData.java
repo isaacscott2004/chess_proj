@@ -1,9 +1,5 @@
 package client;
 
-import chess.ChessGame;
-
-import java.util.HashMap;
-
 public class ClientGameData {
     private int number;
     private int id;

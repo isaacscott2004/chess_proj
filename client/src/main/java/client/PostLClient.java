@@ -16,7 +16,6 @@ import java.util.HashMap;
 import static ui.EscapeSequences.*;
 
 public class PostLClient extends Client{
-//    private static HashMap<Integer, Integer> numberToGameId = new HashMap<>();
     private final ServerFacade  server;
     public PostLClient(String serverURL){
         this.server = new ServerFacade(serverURL);
@@ -25,7 +24,7 @@ public class PostLClient extends Client{
     @Override
     public String eval(String input) {
         try {
-            String[] tokens = input.split(" ");
+            String[] tokens = input.stripLeading().split(" ");
             String command = (tokens.length > 0) ? tokens[0].toLowerCase() : "help";
             String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
             return switch(command){
@@ -33,7 +32,7 @@ public class PostLClient extends Client{
                 case "create" -> createGame(params);
                 case "list" -> listGames();
                 case "play" -> playGame(params);
-                case "observe" -> observeGame();
+                case "observe" -> observeGame(params);
                 default -> {
                     Client.calledHelp = true;
                     yield help();
@@ -116,7 +115,6 @@ public class PostLClient extends Client{
                     "Expected: play <WHITE|BLACK ID>";
         }
         HashMap<Integer, GameData> listNumToGameData = new HashMap<>();
-        allGames.sort(Comparator.comparingInt(GameData::getGameID));
         int count = 1;
         for(GameData gameData: allGames){
             listNumToGameData.put(count, gameData);
@@ -147,15 +145,49 @@ public class PostLClient extends Client{
 
 
     }
+    @Override
+    public String observeGame(String ... params) throws DataAccessException {
+        ArrayList<GameData> allGames = getListOfGames();
+        HashMap<Integer, GameData> listNumToGameData = new HashMap<>();
+        int count = 1;
+        for(GameData gameData: allGames){
+            listNumToGameData.put(count, gameData);
+            count++;
+        }
+        int choice;
+        try{
+            choice = Integer.parseInt(params[0]);
+        } catch (NumberFormatException e){
+            return "Error ID must be a valid number\n" +
+                    "Expected observe <ID>";
+        }
+        GameData chosenGame = listNumToGameData.get(choice);
+        if(chosenGame == null){
+            return """
+                    Error: the number you chose is too high.\s
+                    Please call list to see which numbers you can choose from
+                    """;
+        }
+        return drawBoardWhite() + RESET_TEXT_COLOR + "\nYou are currently viewing " + chosenGame.getGameName() + "\nWHITE: " + chosenGame.getWhiteUsername() +
+                ", BLACK: " + chosenGame.getBlackUsername();
+
+
+
+    }
     private ArrayList<GameData> getListOfGames() throws DataAccessException {
         String authToken = AuthTokenManager.getAuthToken();
         ListGamesResult listGamesResult = this.server.listGames(authToken);
-        return new ArrayList<>(listGamesResult.games());
+        ArrayList<GameData> allGames = new ArrayList<>(listGamesResult.games());
+        allGames.sort(Comparator.comparingInt(GameData::getGameID));
+        return  allGames;
+
 
     }
 
+
     private String drawBoardWhite(){
-      return SET_BG_COLOR_BLUE+SET_TEXT_COLOR_BLACK+ "   "+" a "+" b "+" c "+" d "+" e "+" f "+" g "+" h "+"   "+RESET_BG_COLOR+EMPTY+"\n"
+      return SET_BG_COLOR_BLUE + SET_TEXT_COLOR_BLACK + "   " + " a " + " b " + " c " + " d " + " e " + " f " + " g " +
+              " h " + "   " + RESET_BG_COLOR + EMPTY + "\n"
             + SET_BG_COLOR_BLUE + " 8 " + SET_BG_COLOR_LIGHT_TAN + BLACK_ROOK + SET_BG_COLOR_DARK_TAN + BLACK_KNIGHT +
               SET_BG_COLOR_LIGHT_TAN + BLACK_BISHOP + SET_BG_COLOR_DARK_TAN + BLACK_QUEEN + SET_BG_COLOR_LIGHT_TAN +
               BLACK_KING + SET_BG_COLOR_DARK_TAN + BLACK_BISHOP + SET_BG_COLOR_LIGHT_TAN + BLACK_KNIGHT +
@@ -188,11 +220,13 @@ public class PostLClient extends Client{
               SET_BG_COLOR_DARK_TAN + WHITE_BISHOP + SET_BG_COLOR_LIGHT_TAN + WHITE_QUEEN + SET_BG_COLOR_DARK_TAN +
               WHITE_KING + SET_BG_COLOR_LIGHT_TAN + WHITE_BISHOP + SET_BG_COLOR_DARK_TAN + WHITE_KNIGHT +
               SET_BG_COLOR_LIGHT_TAN + WHITE_ROOK + SET_BG_COLOR_BLUE + " 1 " + RESET_BG_COLOR + EMPTY + "\n" +
-              SET_BG_COLOR_BLUE+SET_TEXT_COLOR_BLACK+ "   "+" a "+" b "+" c "+" d "+" e "+" f "+" g "+" h "+"   "+RESET_BG_COLOR+EMPTY;
+              SET_BG_COLOR_BLUE + SET_TEXT_COLOR_BLACK + "   " + " a " + " b " + " c " + " d " + " e " + " f " + " g "
+              + " h " + "   " + RESET_BG_COLOR + EMPTY;
 
     }
     private String drawBoardBlack(){
-        return SET_BG_COLOR_BLUE+SET_TEXT_COLOR_BLACK+ "   "+" a "+" b "+" c "+" d "+" e "+" f "+" g "+" h "+"   "+RESET_BG_COLOR+EMPTY+"\n"
+        return SET_BG_COLOR_BLUE + SET_TEXT_COLOR_BLACK + "   " + " a " + " b " + " c " + " d " + " e " + " f " + " g "
+                + " h " + "   " + RESET_BG_COLOR + EMPTY + "\n"
                 + SET_BG_COLOR_BLUE + " 1 " + SET_BG_COLOR_DARK_TAN + WHITE_ROOK + SET_BG_COLOR_LIGHT_TAN + WHITE_KNIGHT +
                 SET_BG_COLOR_DARK_TAN + WHITE_BISHOP + SET_BG_COLOR_LIGHT_TAN + WHITE_QUEEN + SET_BG_COLOR_DARK_TAN +
                 WHITE_KING + SET_BG_COLOR_LIGHT_TAN + WHITE_BISHOP + SET_BG_COLOR_DARK_TAN + WHITE_KNIGHT +
@@ -225,7 +259,8 @@ public class PostLClient extends Client{
                 SET_BG_COLOR_LIGHT_TAN + BLACK_BISHOP + SET_BG_COLOR_DARK_TAN + BLACK_QUEEN + SET_BG_COLOR_LIGHT_TAN +
                 BLACK_KING + SET_BG_COLOR_DARK_TAN + BLACK_BISHOP + SET_BG_COLOR_LIGHT_TAN + BLACK_KNIGHT +
                 SET_BG_COLOR_DARK_TAN + BLACK_ROOK + SET_BG_COLOR_BLUE + " 8 " + RESET_BG_COLOR + EMPTY + "\n"
-                + SET_BG_COLOR_BLUE +SET_TEXT_COLOR_BLACK+ "   "+" a "+" b "+" c "+" d "+" e "+" f "+" g "+" h "+"   "+RESET_BG_COLOR+EMPTY;
+                + SET_BG_COLOR_BLUE + SET_TEXT_COLOR_BLACK + "   " + " a " + " b " + " c " + " d " + " e " + " f " +
+                " g " + " h " + "   " + RESET_BG_COLOR + EMPTY;
     }
 
 
