@@ -89,7 +89,8 @@ public class PostLClient extends Client{
         }
         int count = 1;
         for(GameData gameData : allGames){
-            listOfGames.add(new ClientGameData(count, gameData.getGameID(), gameData.getWhiteUsername(), gameData.getBlackUsername(), gameData.getGameName()));
+            listOfGames.add(new ClientGameData(count, gameData.getGameID(), gameData.getWhiteUsername(),
+                    gameData.getBlackUsername(), gameData.getGameName()));
             count++;
         }
         StringBuilder output = new StringBuilder();
@@ -167,8 +168,8 @@ public class PostLClient extends Client{
                     Please call list to see which numbers you can choose from
                     """;
         }
-        return drawBoardWhite() + RESET_TEXT_COLOR + "\nYou are currently viewing " + chosenGame.getGameName() + "\nWHITE: " + chosenGame.getWhiteUsername() +
-                ", BLACK: " + chosenGame.getBlackUsername();
+        return drawBoardWhite() + RESET_TEXT_COLOR + "\nYou are currently viewing " + chosenGame.getGameName() +
+                "\nWHITE: " + chosenGame.getWhiteUsername() + ", BLACK: " + chosenGame.getBlackUsername();
 
 
 
