@@ -36,7 +36,6 @@ public class MySqlGameDAOTests {
         }else{
             gameDAOAccessObject.clearGameData();
         }
-        GameData.resetGameIDCounter();
         gameDAOAccessObject.createGame("First Game");
         gameDAOAccessObject.createGame("Second Game");
         gameDAOAccessObject.createGame("Third Game");

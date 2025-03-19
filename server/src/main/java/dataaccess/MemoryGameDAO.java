@@ -8,6 +8,7 @@ import java.util.Collection;
 
 public class MemoryGameDAO implements GameDAO {
     private static final Collection<GameData> GAME_DATA_STORAGE = new ArrayList<>();
+    private int gameCounter = 0;
 
     /**
      * gets all the current active games
@@ -30,7 +31,7 @@ public class MemoryGameDAO implements GameDAO {
         if(gameName == null){
             throw new DataAccessException("gameName cannot be null");
         }
-        GameData data = new GameData(null, null, gameName, new ChessGame());
+        GameData data = new GameData(gameCounter++, null, null, gameName, new ChessGame());
         GAME_DATA_STORAGE.add(data);
         return data.getGameID();
     }
@@ -90,7 +91,7 @@ public class MemoryGameDAO implements GameDAO {
     @Override
     public void clearGameData() {
         GAME_DATA_STORAGE.clear();
-        GameData.resetGameIDCounter();
+        gameCounter = 0;
 
     }
 }

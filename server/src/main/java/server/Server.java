@@ -11,11 +11,6 @@ public class Server {
 
     public Server(){
         chooseMemoryType(MemoryType.SQL_MEMORY);
-        try{
-            GameData.initializeGameIDCounter(gameDAO);
-        } catch (DataAccessException e) {
-            GameData.resetGameIDCounter();
-        }
     }
 
 

@@ -37,10 +37,12 @@ public class MySqlGameDAO extends MySqlDAO implements GameDAO{
 
     @Override
     public int createGame(String gameName) throws DataAccessException {
-        GameData data = new GameData(null, null, gameName, new ChessGame());
+        int id = getLargestGameID();
+        id++;
+        GameData data = new GameData(id, null, null, gameName, new ChessGame());
         String statement = "INSERT INTO game_data(gameID, white_username, black_username, game_name, json_game) VALUES " +
                 "(?, ?, ?, ?, ?)";
-        executeUpdate(statement, data.getGameID(), data.getWhiteUsername(), data.getBlackUsername(), data.getGameName(),
+        executeUpdate(statement, id, data.getWhiteUsername(), data.getBlackUsername(), data.getGameName(),
                 setJsonGame(data.getGame()));
         return data.getGameID();
     }
@@ -119,7 +121,6 @@ public class MySqlGameDAO extends MySqlDAO implements GameDAO{
     public void clearGameData() throws DataAccessException {
         String statement = "TRUNCATE TABLE game_data";
         executeUpdate(statement);
-        GameData.resetGameIDCounter();
     }
 
     private ChessGame readJsonGame(String jsonGame){

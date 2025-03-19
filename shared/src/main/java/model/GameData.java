@@ -2,7 +2,6 @@ package model;
 
 import chess.ChessGame;
 import dataaccess.DataAccessException;
-import dataaccess.GameDAO;
 
 import java.util.Objects;
 
@@ -12,19 +11,19 @@ public class GameData {
     private String blackUsername;
     private String gameName;
     private ChessGame game;
-    private static int gameIDCounter;
 
-    public GameData(String whiteUsername, String blackUsername, String gameName, ChessGame game) throws DataAccessException {
-        this.gameID = gameIDCounter++;
+
+    public GameData(int id, String whiteUsername, String blackUsername, String gameName, ChessGame game) throws DataAccessException {
+        this.gameID = id ;
         this.whiteUsername = whiteUsername;
         this.blackUsername = blackUsername;
         this.gameName = gameName;
         this.game = game;
     }
-
-    public static void initializeGameIDCounter(GameDAO gameDAO) throws DataAccessException {
-        gameIDCounter = gameDAO.getLargestGameID() + 1;
-    }
+//    public static void initializeGameIDCounter(GameDAO gameDAO) throws DataAccessException {
+////        gameIDCounter = gameDAO.getLargestGameID() + 1;
+////    }
+////
 
     public GameData(){
         this.gameID = 0;
@@ -34,9 +33,6 @@ public class GameData {
         this.game = null;
     }
 
-    public static void resetGameIDCounter() {
-        gameIDCounter = 1;
-    }
 
     public int getGameID() {
         return gameID;
