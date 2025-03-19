@@ -1,11 +1,11 @@
 package client;
 
 public class ClientGameData {
-    private int number;
-    private int id;
-    private String whiteUsername;
-    private String blackUsername;
-    private String gameName;
+    private final int number;
+    private final int id;
+    private final String whiteUsername;
+    private final String blackUsername;
+    private final String gameName;
     public ClientGameData(int number, int id, String whiteUsername, String blackUsername, String gameName){
         this.number = number;
         this.id = id;

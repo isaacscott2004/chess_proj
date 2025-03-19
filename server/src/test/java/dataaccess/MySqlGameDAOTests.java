@@ -112,5 +112,9 @@ public class MySqlGameDAOTests {
         assertTrue(listOfGames.isEmpty());
 
     }
+    @Test
+    void testGetLargestGameId() throws DataAccessException {
+        assertEquals(3, gameDAOAccessObject.getLargestGameID());
+    }
 
 }

@@ -77,7 +77,7 @@ public class ServerFacade {
                 case "LogoutResult", "CreateGameResult", "ListGamesResult" -> "Error: You are not logged in or registered";
                 case "JoinGameResult" -> "Error: The team you tried to play with is already taken. Please choose a different team\n" +
                         "type 'list' to see what teams and games are available";
-                default -> throw new IllegalStateException("Error: Unexpected value: " + responseClass.getSimpleName());
+                default -> "Error: Unexpected Error";
             };
                 throw new DataAccessException(errorMessage);
         } catch (Exception ex) {

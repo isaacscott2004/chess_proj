@@ -69,8 +69,12 @@ public class MySqlGameDAO extends MySqlDAO implements GameDAO{
         } catch (SQLException e) {
             throw new DataAccessException("Unable to execute query: " + e.getMessage());
         }
+        if(maxGameID == null){
+            return 1;
+        }
+        return maxGameID;
 
-        return (maxGameID != null) ? maxGameID : 1;
+//        return (maxGameID != null) ? maxGameID : 1;
     }
 
     @Override

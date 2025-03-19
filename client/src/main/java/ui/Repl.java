@@ -101,7 +101,7 @@ public class Repl {
     private Client createClient(String serverURL, ClientType type){
         Client client = null;
         switch (type){
-//            case GAME -> client = new GameClient(serverURL, this);
+            case GAME -> client = new GameClient(serverURL);
             case PREL -> client = new PreLClient(serverURL);
             case POSTL -> client = new PostLClient(serverURL);
         }
