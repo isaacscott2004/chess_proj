@@ -30,7 +30,7 @@ public class ServerFacadeTests {
     private static ServerFacade testServerFacade;
 
     @BeforeAll
-    public static void init() throws DataAccessException {
+    public static void init() throws ResponseException {
         server = new Server();
         var port = server.run(0);
         System.out.println("Started test HTTP server on " + port);
@@ -53,7 +53,7 @@ public class ServerFacadeTests {
 
 
     @Test
-    public void registerSuccess() throws DataAccessException {
+    public void registerSuccess() throws ResponseException, DataAccessException {
         RegisterRequest request = new RegisterRequest("Isaac", "1234", "isi@hotmail.com");
         testServerFacade.register(request);
         ArrayList<UserData> listOfUsers = new ArrayList<>(userDataAccessObject.getUserDataStorage());
@@ -67,14 +67,14 @@ public class ServerFacadeTests {
 
     }
     @Test
-    public void registerThrowsException() throws DataAccessException {
+    public void registerThrowsException() throws ResponseException {
         RegisterRequest requestOne = new RegisterRequest("Isaac", "1234", "isi@hotmail.com");
         testServerFacade.register(requestOne);
         RegisterRequest requestTwo = new RegisterRequest("Isaac", "1234", "isi@hotmail.com");
-        assertThrows(DataAccessException.class, () -> testServerFacade.register(requestTwo));
+        assertThrows(ResponseException.class, () -> testServerFacade.register(requestTwo));
     }
     @Test
-    public void logoutSuccess() throws DataAccessException {
+    public void logoutSuccess() throws ResponseException, DataAccessException {
         RegisterRequest request = new RegisterRequest("Isaac", "1234", "isi@hotmail.com");
         RegisterResult registerResult = testServerFacade.register(request);
         ArrayList<UserData> listOfUsers = new ArrayList<>(userDataAccessObject.getUserDataStorage());
@@ -89,13 +89,13 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void logoutThrowsExceptionUnauthorized() throws DataAccessException {
+    public void logoutThrowsExceptionUnauthorized() throws ResponseException {
         String fakeAuth = "1234567";
-        assertThrows(DataAccessException.class, () -> testServerFacade.logout(fakeAuth));
+        assertThrows(ResponseException.class, () -> testServerFacade.logout(fakeAuth));
     }
 
     @Test
-    public void loginSuccess() throws DataAccessException {
+    public void loginSuccess() throws ResponseException, DataAccessException {
         RegisterRequest request = new RegisterRequest("Isaac", "1234", "isi@hotmail.com");
         RegisterResult registerResult = testServerFacade.register(request);
         ArrayList<UserData> listOfUsers = new ArrayList<>(userDataAccessObject.getUserDataStorage());
@@ -117,7 +117,7 @@ public class ServerFacadeTests {
 
     @Test
     public void loginWithoutRegistering(){
-        assertThrows(DataAccessException.class, () -> testServerFacade.login(new LoginRequest("Isaac", "1234")));
+        assertThrows(ResponseException.class, () -> testServerFacade.login(new LoginRequest("Isaac", "1234")));
     }
 
     @Test
@@ -130,15 +130,15 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void createGameFailureUnauthorized() throws DataAccessException {
+    public void createGameFailureUnauthorized() throws ResponseException {
         CreateGameRequest createGameRequest = new CreateGameRequest("testGame");
-        assertThrows(DataAccessException.class, () -> testServerFacade.createGame(createGameRequest, "123456"));
+        assertThrows(ResponseException.class, () -> testServerFacade.createGame(createGameRequest, "123456"));
 
 
     }
 
     @Test
-    public void listGamesSuccess() throws DataAccessException {
+    public void listGamesSuccess() throws ResponseException {
         ArrayList<String> authTokens = preGameMethod();
         CreateGameRequest createGameRequestOne = new CreateGameRequest("testGameOne");
         CreateGameRequest createGameRequestTwo = new CreateGameRequest("testGameTwo");
@@ -159,17 +159,17 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void listGamesUnauthorized() throws DataAccessException {
+    public void listGamesUnauthorized() throws ResponseException {
         ArrayList<String> authTokens = preGameMethod();
         CreateGameRequest createGameRequestOne = new CreateGameRequest("testGameOne");
         CreateGameRequest createGameRequestTwo = new CreateGameRequest("testGameTwo");
         testServerFacade.createGame(createGameRequestOne, authTokens.getFirst());
         testServerFacade.createGame(createGameRequestTwo, authTokens.getFirst());
-        assertThrows(DataAccessException.class, () -> testServerFacade.listGames("123456"));
+        assertThrows(ResponseException.class, () -> testServerFacade.listGames("123456"));
     }
 
     @Test
-    public void playGameSuccess() throws DataAccessException {
+    public void playGameSuccess() throws ResponseException, DataAccessException {
         ArrayList<String> authTokens = preGameMethod();
         CreateGameRequest createGameRequestOne = new CreateGameRequest("testGameOne");
         testServerFacade.createGame(createGameRequestOne, authTokens.getFirst());
@@ -181,7 +181,7 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void playGameAttemptJoinSameTeam() throws DataAccessException {
+    public void playGameAttemptJoinSameTeam() throws ResponseException, DataAccessException {
         ArrayList<String> authTokens = preGameMethod();
         CreateGameRequest createGameRequestOne = new CreateGameRequest("testGameOne");
         testServerFacade.createGame(createGameRequestOne, authTokens.getFirst());
@@ -190,12 +190,12 @@ public class ServerFacadeTests {
         ArrayList<GameData> listOfGames = new ArrayList<>(gameDataAccessObject.getListGames());
         GameData firstGame = listOfGames.getFirst();
         assertEquals("Isaac", firstGame.getWhiteUsername());
-        assertThrows(DataAccessException.class, () -> testServerFacade.playGame(joinGameRequest, authTokens.getFirst()));
+        assertThrows(ResponseException.class, () -> testServerFacade.playGame(joinGameRequest, authTokens.getFirst()));
 
     }
 
 
-    private ArrayList<String> preGameMethod() throws DataAccessException {
+    private ArrayList<String> preGameMethod() throws ResponseException {
         ArrayList<String> authTokens = new ArrayList<>();
         RegisterRequest requestOne = new RegisterRequest("Isaac", "1234", "isi@hotmail.com");
         RegisterRequest requestTwo = new RegisterRequest("Bob", "1234", "bob@hotmail.com");

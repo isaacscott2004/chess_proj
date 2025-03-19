@@ -1,5 +1,4 @@
 package client;
-import dataaccess.DataAccessException;
 import request.LoginRequest;
 import request.RegisterRequest;
 import result.LoginResult;
@@ -28,12 +27,12 @@ public class PreLClient extends Client {
                     yield help();
                 }
             };
-        } catch (DataAccessException e){
+        } catch (ResponseException e){
             return e.getMessage();
         }
     }
     @Override
-    public String login(String... params) throws DataAccessException {
+    public String login(String... params) throws ResponseException {
         if(params.length != 2){
             return "Error: you must enter a username and password. Expected: login <username password>";
         }
@@ -44,7 +43,7 @@ public class PreLClient extends Client {
 
     }
     @Override
-    public String register(String... params) throws DataAccessException {
+    public String register(String... params) throws ResponseException {
         if(params.length != 3){
             return "Error: you must enter a username, password, and email. Expected: register <username password email>";
         }
@@ -53,9 +52,6 @@ public class PreLClient extends Client {
         RegisterResult registerResult = this.server.register(registerRequest);
         AuthTokenManager.setAuthToken(registerResult.authToken());
         return params[0] + ", you have registered successfully";
-
-
-
     }
     @Override
     public String help(){

@@ -68,7 +68,7 @@ public class GameData {
 
     public void setGame(ChessGame game){ this.game = game; }
 
-    public void setGameName(String gameName){ this.gameName = gameName; };
+    public void setGameName(String gameName){ this.gameName = gameName; }
 
 
     @Override

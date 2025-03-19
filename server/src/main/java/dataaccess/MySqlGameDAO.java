@@ -73,8 +73,6 @@ public class MySqlGameDAO extends MySqlDAO implements GameDAO{
             return 1;
         }
         return maxGameID;
-
-//        return (maxGameID != null) ? maxGameID : 1;
     }
 
     @Override

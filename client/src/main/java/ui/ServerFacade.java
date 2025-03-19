@@ -1,8 +1,8 @@
 package ui;
 
 
+import client.ResponseException;
 import com.google.gson.Gson;
-import dataaccess.DataAccessException;
 import request.CreateGameRequest;
 import request.JoinGameRequest;
 import request.LoginRequest;
@@ -25,36 +25,36 @@ public class ServerFacade {
         this.serverURL = serverURL;
     }
 
-    public RegisterResult register(RegisterRequest request) throws DataAccessException {
+    public RegisterResult register(RegisterRequest request) throws ResponseException {
        String path = "/user";
        return makeRequest("POST", path, request, RegisterResult.class, null);
     }
 
-    public LoginResult login(LoginRequest request) throws DataAccessException {
+    public LoginResult login(LoginRequest request) throws ResponseException {
         String path = "/session";
         return makeRequest("POST", path, request, LoginResult.class, null);
     }
 
-    public void logout(String authToken) throws DataAccessException {
+    public void logout(String authToken) throws ResponseException {
         String path = "/session";
         makeRequest("DELETE", path, null, LogoutResult.class, authToken);
     }
 
-    public void createGame(CreateGameRequest request, String authToken) throws DataAccessException {
+    public void createGame(CreateGameRequest request, String authToken) throws ResponseException {
         String path = "/game";
         makeRequest("POST", path, request, CreateGameResult.class, authToken);
     }
 
-    public ListGamesResult listGames(String authToken) throws DataAccessException {
+    public ListGamesResult listGames(String authToken) throws ResponseException {
         String path = "/game";
         return makeRequest("GET" , path, null, ListGamesResult.class, authToken);
     }
-    public void playGame(JoinGameRequest request, String authToken) throws DataAccessException {
+    public void playGame(JoinGameRequest request, String authToken) throws ResponseException {
         String path = "/game";
         makeRequest("PUT", path, request, JoinGameResult.class, authToken);
     }
 
-    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass, String authToken) throws DataAccessException {
+    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass, String authToken) throws ResponseException {
         try {
             URL url = (new URI(serverURL + path)).toURL();
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
@@ -79,9 +79,9 @@ public class ServerFacade {
                         "type 'list' to see what teams and games are available";
                 default -> "Error: Unexpected Error";
             };
-                throw new DataAccessException(errorMessage);
+                throw new ResponseException(errorMessage);
         } catch (Exception ex) {
-            throw new DataAccessException(500, ex.getMessage());
+            throw new ResponseException(500, ex.getMessage());
         }
     }
 
@@ -96,16 +96,16 @@ public class ServerFacade {
         }
     }
 
-    private void throwIfNotSuccessful(HttpURLConnection http) throws IOException, DataAccessException {
+    private void throwIfNotSuccessful(HttpURLConnection http) throws IOException, ResponseException {
         var status = http.getResponseCode();
         if (!isSuccessful(status)) {
             try (InputStream respErr = http.getErrorStream()) {
                 if (respErr != null) {
-                    throw DataAccessException.fromJson(respErr);
+                    throw ResponseException.fromJson(respErr);
                 }
             }
 
-            throw new DataAccessException(status, "other failure: " + status);
+            throw new ResponseException(status, "other failure: " + status);
         }
     }
 

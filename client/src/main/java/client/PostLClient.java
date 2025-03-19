@@ -1,7 +1,6 @@
 package client;
 
 import chess.ChessGame;
-import dataaccess.DataAccessException;
 import model.GameData;
 import request.CreateGameRequest;
 import request.JoinGameRequest;
@@ -39,7 +38,7 @@ public class PostLClient extends Client{
                 }
             };
 
-        } catch (DataAccessException e){
+        } catch (ResponseException e){
             return e.getMessage();
         }
 
@@ -58,7 +57,7 @@ public class PostLClient extends Client{
     }
 
     @Override
-    public String logout()throws DataAccessException {
+    public String logout()throws ResponseException {
         String authToken = AuthTokenManager.getAuthToken();
         if(authToken == null){
             return "You have not logged in or registered";
@@ -70,7 +69,7 @@ public class PostLClient extends Client{
     }
 
     @Override
-    public String createGame(String ... params) throws DataAccessException {
+    public String createGame(String ... params) throws ResponseException {
         if(params.length != 1){
             return "Error: you must enter a gamename. Please make your gamename has no spaces\n" +
                     "Expected: create <gamename>. Examples: gameName, gamename, game_name";
@@ -82,7 +81,7 @@ public class PostLClient extends Client{
         return "You have successfully created a new game, game name: " + params[0];
     }
     @Override
-    public String listGames()throws DataAccessException {;
+    public String listGames()throws ResponseException {;
         ArrayList<GameData> allGames = getListOfGames();
         ArrayList<ClientGameData> listOfGames= new ArrayList<>();
         if(allGames.isEmpty()){
@@ -100,7 +99,7 @@ public class PostLClient extends Client{
         return output.toString();
     }
     @Override
-    public String playGame(String ... params)throws DataAccessException {
+    public String playGame(String ... params)throws ResponseException {
         ArrayList<GameData> allGames = getListOfGames();
         if(allGames.isEmpty()){
             return "Error: there are no created games please create a new game.\n" +
@@ -146,7 +145,7 @@ public class PostLClient extends Client{
 
     }
     @Override
-    public String observeGame(String ... params) throws DataAccessException {
+    public String observeGame(String ... params) throws ResponseException {
         ArrayList<GameData> allGames = getListOfGames();
         HashMap<Integer, GameData> listNumToGameData = new HashMap<>();
         int count = 1;
@@ -174,7 +173,7 @@ public class PostLClient extends Client{
 
 
     }
-    private ArrayList<GameData> getListOfGames() throws DataAccessException {
+    private ArrayList<GameData> getListOfGames() throws ResponseException {
         String authToken = AuthTokenManager.getAuthToken();
         ListGamesResult listGamesResult = this.server.listGames(authToken);
         ArrayList<GameData> allGames = new ArrayList<>(listGamesResult.games());
