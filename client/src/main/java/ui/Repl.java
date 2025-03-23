@@ -12,7 +12,6 @@ public class Repl {
     public Repl(String serverURL, ClientType type) {
         this.type = type;
         this.serverURL = serverURL;
-
     }
 
     public void run() {
@@ -82,7 +81,6 @@ public class Repl {
 
     private boolean shouldTransitionToPostl(String line, String result) {
         return (line.toLowerCase().contains("login") || line.toLowerCase().contains("register")) && !result.contains("Error");
-
     }
 
     private boolean shouldTransitionToPrel(String line) {
