@@ -9,7 +9,7 @@ import static ui.EscapeSequences.*;
 import static ui.EscapeSequences.EMPTY;
 
 public class ChessBoardRep {
-    private  ChessBoard board;
+    private final ChessBoard board;
     public ChessBoardRep(ChessBoard board){
         this.board = board;
     }
@@ -72,8 +72,8 @@ public class ChessBoardRep {
                         .append(RESET_BG_COLOR).append(EMPTY).append("\n");
                 count--;
             }
-            restOfBoard.append(SET_BG_COLOR_BLUE + SET_TEXT_COLOR_BLACK + "   " + " a " + " b " + " c " + " d " + " e " + " f " + " g "
-                    + " h " + "   " + RESET_BG_COLOR + EMPTY);
+            restOfBoard.append(SET_BG_COLOR_BLUE + SET_TEXT_COLOR_BLACK + "   " + " a " + " b " + " c " + " d " + " e "
+                    + " f " + " g " + " h " + "   " + RESET_BG_COLOR + EMPTY);
         }
         return restOfBoard.toString();
     }
