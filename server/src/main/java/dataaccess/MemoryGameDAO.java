@@ -1,6 +1,7 @@
 package dataaccess;
 
 import chess.ChessGame;
+import chess.ChessMove;
 import model.GameData;
 
 import java.util.ArrayList;
@@ -56,6 +57,37 @@ public class MemoryGameDAO implements GameDAO {
     @Override
     public int getLargestGameID() {
         return getListGames().size();
+    }
+
+    @Override
+    public ChessGame.TeamColor getPlayerColor(int gameID, String username) throws DataAccessException {
+        ChessGame.TeamColor color = null;
+        for(GameData data : GAME_DATA_STORAGE){
+            if(data.getGameID() == gameID){
+                if(data.getWhiteUsername().equals(username)){
+                    color = ChessGame.TeamColor.WHITE;
+                } else if(data.getBlackUsername().equals(username)){
+                    color = ChessGame.TeamColor.BLACK;
+                } else{
+                    throw new DataAccessException("Game: " + data.getGameID() + " has no matching usernames");
+                }
+            }
+        }
+        if (color == null){
+            throw new DataAccessException("There is no game with gameID: " + gameID);
+        }
+        return color;
+
+    }
+
+    @Override
+    public void updateGameState(int gameID, ChessMove move) throws DataAccessException {
+
+    }
+
+    @Override
+    public void resetPlayer(int gameID, String username) throws DataAccessException {
+
     }
 
     /**

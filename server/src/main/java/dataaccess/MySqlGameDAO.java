@@ -1,6 +1,8 @@
 package dataaccess;
 
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.InvalidMoveException;
 import com.google.gson.Gson;
 import model.GameData;
 import java.sql.Connection;
@@ -79,26 +81,7 @@ public class MySqlGameDAO extends MySqlDAO implements GameDAO{
 
     @Override
     public void updateGame(String username, ChessGame.TeamColor playerColor, int gameID) throws DataAccessException {
-        String statementOne = "SELECT gameID, white_username, black_username, game_name, json_game FROM game_data WHERE " +
-                "gameID=?";
-        GameData selectedData = null;
-        try(Connection connOne = DatabaseManager.getConnection()){
-            try(PreparedStatement psOne = connOne.prepareStatement(statementOne)){
-                psOne.setInt(1, gameID);
-                ResultSet rsOne = psOne.executeQuery();
-                if (rsOne.next()){
-                    GameData data  = new GameData();
-                    data.setGameID(rsOne.getInt("gameID"));
-                    data.setWhiteUsername(rsOne.getString("white_username"));
-                    data.setBlackUsername(rsOne.getString("black_username"));
-                    data.setGameName(rsOne.getString("game_name"));
-                    data.setGame(readJsonGame(rsOne.getString("json_game")));
-                    selectedData = data;
-                }
-            }
-        } catch (SQLException e){
-            throw new DataBaseException(String.format("unable to execute query: %s, %s", statementOne, e.getMessage()));
-        }
+        GameData selectedData = getGame(gameID);
         if(selectedData == null){
             throw new DataAccessException("There is no game with the specified gameID");
         }
@@ -117,6 +100,65 @@ public class MySqlGameDAO extends MySqlDAO implements GameDAO{
         executeUpdate(statementTwo, selectedData.getWhiteUsername(), selectedData.getBlackUsername(), selectedData.getGameID());
     }
 
+
+    @Override
+    public ChessGame.TeamColor getPlayerColor(int gameID, String username) throws DataAccessException{
+        String statement = "SELECT white_username, black_username FROM game_data WHERE gameID = ?";
+        String whiteUsername;
+        String blackUsername;
+        try(Connection connection = DatabaseManager.getConnection()){
+            try(PreparedStatement ps = connection.prepareStatement(statement)){
+                ps.setInt(1, gameID);
+                ResultSet rs = ps.executeQuery();
+                if(rs.next()){
+                    whiteUsername = rs.getString("white_username");
+                    blackUsername = rs.getString("black_username");
+                }
+                else{
+                    throw new DataAccessException("Game with ID: " + gameID + " is not found.");
+                }
+            }
+        } catch (SQLException e){
+            throw new DataBaseException(String.format("unable to execute query: %s, %s", statement, e.getMessage()));
+        }
+        if(username.equals(whiteUsername)){
+            return ChessGame.TeamColor.WHITE;
+        } else if(username.equals(blackUsername)){
+            return ChessGame.TeamColor.BLACK;
+        } else{
+            throw new DataAccessException(username + ", is not found in this game.");
+        }
+    }
+
+    @Override
+    public void updateGameState(int gameID, ChessMove move) throws DataAccessException, InvalidMoveException {
+        GameData selectedData = getGame(gameID);
+        if(selectedData == null){
+            throw new DataAccessException("There is no game with the specified gameID");
+        }
+        ChessGame game = selectedData.getGame();
+        game.makeMove(move);
+        String statement = "UPDATE game_data SET json_game = ? WHERE gameID = ?";
+        executeUpdate(statement,setJsonGame(game), selectedData.getGameID());
+    }
+
+    @Override
+    public void resetPlayer(int gameID, String username) throws DataAccessException {
+        GameData game = getGame(gameID);
+        String blackUsername = game.getBlackUsername();
+        String whiteUsername = game.getWhiteUsername();
+        if (blackUsername != null && blackUsername.equals(username)) {
+            game.setBlackUsername(null);
+        } else if (whiteUsername != null && whiteUsername.equals(username)) {
+            game.setWhiteUsername(null);
+        } else {
+            throw new DataAccessException(username + " does not exist in game: " + gameID);
+        }
+
+        String statement = "UPDATE game_data SET white_username=?, black_username=? WHERE gameID=?";
+        executeUpdate(statement, game.getWhiteUsername(), game.getBlackUsername(), game.getGameID());
+    }
+
     @Override
     public void clearGameData() throws DataAccessException {
         String statement = "TRUNCATE TABLE game_data";
@@ -128,5 +170,29 @@ public class MySqlGameDAO extends MySqlDAO implements GameDAO{
     }
     private String setJsonGame(ChessGame game){
         return  new Gson().toJson(game);
+    }
+
+    private GameData getGame(int gameID){
+        String statementOne = "SELECT gameID, white_username, black_username, game_name, json_game FROM game_data WHERE " +
+                "gameID=?";
+        GameData selectedData = null;
+        try(Connection connOne = DatabaseManager.getConnection()){
+            try(PreparedStatement psOne = connOne.prepareStatement(statementOne)){
+                psOne.setInt(1, gameID);
+                ResultSet rsOne = psOne.executeQuery();
+                if (rsOne.next()){
+                    GameData data  = new GameData();
+                    data.setGameID(rsOne.getInt("gameID"));
+                    data.setWhiteUsername(rsOne.getString("white_username"));
+                    data.setBlackUsername(rsOne.getString("black_username"));
+                    data.setGameName(rsOne.getString("game_name"));
+                    data.setGame(readJsonGame(rsOne.getString("json_game")));
+                    selectedData = data;
+                }
+            }
+        } catch (SQLException | DataAccessException e){
+            throw new DataBaseException(String.format("unable to execute query: %s, %s", statementOne, e.getMessage()));
+        }
+        return selectedData;
     }
 }

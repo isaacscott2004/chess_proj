@@ -2,15 +2,18 @@ package server;
 
 import dataaccess.*;
 import model.GameData;
+import server.websocket.WebSocketHandler;
 import spark.*;
 
 public class Server {
     private AuthDAO authDAO;
     private UserDAO userDAO;
     private GameDAO gameDAO;
+    private final WebSocketHandler webSocketHandler;
 
     public Server(){
         chooseMemoryType(MemoryType.SQL_MEMORY);
+        this.webSocketHandler = new WebSocketHandler();
     }
 
 
@@ -22,6 +25,7 @@ public class Server {
         Spark.staticFiles.location("web");
 
         // Register your endpoints and handle exceptions here.
+        Spark.webSocket("/ws", webSocketHandler);
         Spark.delete("/db", new ClearHandler(authDAO, userDAO, gameDAO));
         Spark.post("/user", new RegisterHandler(authDAO, userDAO));
         Spark.post("/session", new LoginHandler(authDAO, userDAO));

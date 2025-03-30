@@ -1,6 +1,8 @@
 package dataaccess;
 
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.InvalidMoveException;
 import model.GameData;
 
 import java.util.Collection;
@@ -36,6 +38,31 @@ public interface GameDAO {
      */
     int getLargestGameID() throws DataAccessException;
 
+    /**
+     * gets the color of a player who is playing the game matching the gameID
+     * @param gameID id to find game
+     * @param username username to match
+     * @return teamColor username is
+     * @throws DataAccessException if gameId is not found or username is not in game;
+     */
+    ChessGame.TeamColor getPlayerColor(int gameID, String username) throws DataAccessException;
+
+    /**
+     * updates the state of the game
+     * @param gameID the id of the game to update
+     * @param move the change in the game
+     * @throws DataAccessException if the game is not found
+     * @throws InvalidMoveException if the move is not valid
+     */
+    void updateGameState(int gameID, ChessMove move) throws DataAccessException, InvalidMoveException;
+
+    /**
+     * resets username to null
+     * @param gameID the game where the username should be reset
+     * @param username the username to be reset
+     * @throws DataAccessException if the game or the username is not found
+     */
+    void resetPlayer(int gameID, String username) throws DataAccessException;
     /**
      * Updates a games with a username and that username's color
      *
