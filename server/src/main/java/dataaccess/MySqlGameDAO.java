@@ -201,7 +201,26 @@ public class MySqlGameDAO extends MySqlDAO implements GameDAO{
     @Override
     public void updateStatus(int gameID, GameStatus status) throws DataAccessException {
         String statement = "UPDATE game_data SET game_status=? WHERE gameID=?";
-        executeUpdate(statement, status, gameID);
+        executeUpdate(statement, status.name(), gameID);
+    }
+
+    @Override
+    public GameStatus getGameStatus(int gameID) throws DataAccessException {
+        String statement = "SELECT game_status FROM game_data WHERE gameID=?";
+        GameStatus status = null;
+        try(Connection conn = DatabaseManager.getConnection()){
+            try(PreparedStatement ps = conn.prepareStatement(statement)){
+                ps.setInt(1, gameID);
+                ResultSet rs = ps.executeQuery();
+                if(rs.next()){
+                    status = GameStatus.valueOf(rs.getString("game_status"));
+                }
+            }
+        }
+        catch (SQLException e){
+            throw new DataAccessException(String.format("unable to execute query: %s, %s", statement, e.getMessage()));
+        }
+        return status;
     }
 
 

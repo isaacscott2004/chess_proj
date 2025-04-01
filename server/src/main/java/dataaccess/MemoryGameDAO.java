@@ -136,4 +136,9 @@ public class MemoryGameDAO implements GameDAO {
     public void updateStatus(int gameID, GameStatus status) {
 
     }
+
+    @Override
+    public GameStatus getGameStatus(int gameID) throws DataAccessException {
+        return null;
+    }
 }

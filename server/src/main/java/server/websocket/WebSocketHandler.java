@@ -83,6 +83,11 @@ public class WebSocketHandler {
         int gameID = command.getGameID();
         String authToken = command.getAuthToken();
         try{
+            GameStatus status = WebSocketService.getStatus(authDAO, gameDAO, gameID, authToken);
+            if(status != GameStatus.PLAYABLE){
+                ErrorMessage errorMessage = getErrorMessage(status);
+                sendMessage(errorMessage, session);
+            }
             ServerMessage message = WebSocketService.makeMove(authDAO, gameDAO, authToken, gameID, command.getMove());
             ChessGame game = WebSocketService.loadGame(gameID, authDAO, gameDAO, authToken);
             LoadGameMessage gameMessage = new LoadGameMessage(game);
@@ -121,6 +126,7 @@ public class WebSocketHandler {
         try {
             ServerMessage message =  WebSocketService.leaveGame(authDAO, gameDAO, command.getAuthToken(), command.getGameID());
             broadcastMessage(command.getGameID(), message, session);
+            this.connectionManager.removeSessionFromGame(command.getGameID(), session);
         } catch (DataAccessException e){
             ErrorMessage errorMessage = new ErrorMessage(e.getMessage());
             sendMessage(errorMessage, session);
@@ -131,9 +137,16 @@ public class WebSocketHandler {
     }
     private void resignGame(ResignCommand command, Session session){
         try {
+            GameStatus status = WebSocketService.getStatus(authDAO, gameDAO, command.getGameID(), command.getAuthToken());
+            if(status == GameStatus.RESIGNED){
+                ErrorMessage errorMessage = new ErrorMessage("Someone already resigned!");
+                sendMessage(errorMessage, session);
+            }
+
             ServerMessage message = WebSocketService.resign(authDAO, command.getAuthToken());
             WebSocketService.changeStatus(authDAO, gameDAO, command.getGameID(), GameStatus.RESIGNED, command.getAuthToken());
             broadcastMessageToAll(command.getGameID(), message);
+
         } catch (DataAccessException e){
             ErrorMessage errorMessage = new ErrorMessage(e.getMessage());
             sendMessage(errorMessage, session);
@@ -174,6 +187,18 @@ public class WebSocketHandler {
                 throw  new WebSocketException("Unable to send message");
             }
         }
+    }
+
+    private static ErrorMessage getErrorMessage(GameStatus status) {
+        ErrorMessage errorMessage;
+        if(status == GameStatus.CHECKMATE){
+            errorMessage = new ErrorMessage("This game is over, there was a " + status.name().toLowerCase());
+        } else if (status == GameStatus.STALEMATE) {
+            errorMessage = new ErrorMessage("This game is in a " + status.name().toLowerCase());
+        } else {
+            errorMessage = new ErrorMessage("This game is over, someone " + status.name().toLowerCase());
+        }
+        return errorMessage;
     }
 
 

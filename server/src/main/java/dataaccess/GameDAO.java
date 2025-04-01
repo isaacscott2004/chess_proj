@@ -82,4 +82,6 @@ public interface GameDAO {
     GameData getGame(int gameID);
 
     void updateStatus(int gameID, GameStatus status) throws DataAccessException;
+
+    GameStatus getGameStatus(int gameID) throws DataAccessException;
 }

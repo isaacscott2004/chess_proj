@@ -114,6 +114,15 @@ public class WebSocketService {
         gameAccessObject.updateStatus(gameID, status);
     }
 
+    public  static GameStatus getStatus(AuthDAO authAccessObject , GameDAO gameAccessObject, int gameID, String authToken) throws DataAccessException {
+        try{
+            authAccessObject.getAuth(authToken);
+        } catch (DataAccessException e) {
+            throw new UnauthorizedException("Error: unauthorized");
+        }
+        return gameAccessObject.getGameStatus(gameID);
+    }
+
 
 
 }
