@@ -1,19 +1,17 @@
 package service.websocket;
 
-import chess.ChessGame;
-import chess.ChessMove;
-import chess.ChessPosition;
-import chess.InvalidMoveException;
+import chess.*;
 import dataaccess.AuthDAO;
 import dataaccess.DataAccessException;
 import dataaccess.GameDAO;
+import model.GameData;
 import service.UnauthorizedException;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
 public class WebSocketService {
 
-    public static NotificationMessage connect
+    public static ServerMessage connect
             (AuthDAO authAccessObject, GameDAO gameAccessObject, String authToken, Integer gameID, Boolean isObserver)
             throws UnauthorizedException, DataAccessException {
         try{
@@ -30,7 +28,7 @@ public class WebSocketService {
         else{
             message = username + " has joined the game as: " + playerColor;
         }
-        return new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
+        return new NotificationMessage(message);
 
     }
 
@@ -53,8 +51,7 @@ public class WebSocketService {
         String username = authAccessObject.getUsername(authToken);
         gameAccessObject.updateGameState(gameID, move);
 
-        return new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION,
-                username + "move: " + startRowNum + startColLet + " to " + endRowNum + endColLet);
+        return new NotificationMessage(username + "move: " + startRowNum + startColLet + " to " + endRowNum + endColLet);
     }
 
     public static NotificationMessage leaveGame
@@ -67,8 +64,7 @@ public class WebSocketService {
         }
         String username = authAccessObject.getUsername(authToken);
         gameAccessObject.resetPlayer(gameID, username);
-        return new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, username + ", has left" +
-                " the game.");
+        return new NotificationMessage(username + ", has left" + " the game.");
     }
 
     public static NotificationMessage resign(AuthDAO authAccessObject, String authToken) throws DataAccessException {
@@ -79,12 +75,31 @@ public class WebSocketService {
         }
         String username = authAccessObject.getUsername(authToken);
 
-        return new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, username + ", has resigned");
+        return new NotificationMessage(username + ", has resigned");
     }
 
     private static String convertColNumToLetter(int colNum){
         String[] letters = {"a", "b", "c", "d", "e", "f", "g", "h"};
         return letters[colNum - 1];
+    }
+
+    public static ChessGame loadGame(int gameID, AuthDAO authAccessObject, GameDAO gameAccessObject, String authToken) throws DataAccessException{
+        try{
+            authAccessObject.getAuth(authToken);
+        } catch (DataAccessException e) {
+            throw new UnauthorizedException("Error: unauthorized");
+        }
+        GameData gameData = gameAccessObject.getGame(gameID);
+        return gameData.getGame();
+    }
+
+    public static void changeStatus(AuthDAO authAccessObject, GameDAO gameAccessObject, int gameID, GameStatus status, String authToken) throws DataAccessException {
+        try{
+            authAccessObject.getAuth(authToken);
+        } catch (DataAccessException e) {
+            throw new UnauthorizedException("Error: unauthorized");
+        }
+        gameAccessObject.updateStatus(gameID, status);
     }
 
 

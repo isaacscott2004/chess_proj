@@ -2,6 +2,7 @@ package dataaccess;
 
 import chess.ChessGame;
 import chess.ChessMove;
+import chess.GameStatus;
 import chess.InvalidMoveException;
 import model.GameData;
 
@@ -77,4 +78,8 @@ public interface GameDAO {
      * Clears all GameData
      */
     void clearGameData() throws DataAccessException;
+
+    GameData getGame(int gameID);
+
+    void updateStatus(int gameID, GameStatus status) throws DataAccessException;
 }

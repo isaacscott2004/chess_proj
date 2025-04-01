@@ -2,6 +2,7 @@ package dataaccess;
 
 import chess.ChessGame;
 import chess.ChessMove;
+import chess.GameStatus;
 import chess.InvalidMoveException;
 import com.google.gson.Gson;
 import model.GameData;
@@ -172,7 +173,8 @@ public class MySqlGameDAO extends MySqlDAO implements GameDAO{
         return  new Gson().toJson(game);
     }
 
-    private GameData getGame(int gameID){
+    @Override
+    public GameData getGame(int gameID){
         String statementOne = "SELECT gameID, white_username, black_username, game_name, json_game FROM game_data WHERE " +
                 "gameID=?";
         GameData selectedData = null;
@@ -195,4 +197,12 @@ public class MySqlGameDAO extends MySqlDAO implements GameDAO{
         }
         return selectedData;
     }
+
+    @Override
+    public void updateStatus(int gameID, GameStatus status) throws DataAccessException {
+        String statement = "UPDATE game_data SET game_status=? WHERE gameID=?";
+        executeUpdate(statement, status, gameID);
+    }
+
+
 }

@@ -13,7 +13,7 @@ public class Server {
 
     public Server(){
         chooseMemoryType(MemoryType.SQL_MEMORY);
-        this.webSocketHandler = new WebSocketHandler();
+        this.webSocketHandler = new WebSocketHandler(authDAO, gameDAO);
     }
 
 

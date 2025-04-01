@@ -96,11 +96,13 @@ CREATE TABLE IF NOT EXISTS game_data (
     `black_username` varchar(256) DEFAULT NULL,
     `game_name` varchar(256) NOT NULL,
     `json_game` TEXT NOT NULL,
+    `game_status` varchar(256) NOT NULL DEFAULT 'PLAYABLE',
     PRIMARY KEY (`gameID`),
     INDEX(white_username),
     INDEX(black_username),
     INDEX(game_name),
-    INDEX(json_game(100))
+    INDEX(json_game(100)),
+    INDEX(game_status)
     )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
 """
     };

@@ -2,6 +2,7 @@ package dataaccess;
 
 import chess.ChessGame;
 import chess.ChessMove;
+import chess.GameStatus;
 import model.GameData;
 
 import java.util.ArrayList;
@@ -124,6 +125,16 @@ public class MemoryGameDAO implements GameDAO {
     public void clearGameData() {
         GAME_DATA_STORAGE.clear();
         gameCounter = 0;
+
+    }
+
+    @Override
+    public GameData getGame(int gameID) {
+        return null;
+    }
+
+    @Override
+    public void updateStatus(int gameID, GameStatus status) {
 
     }
 }
