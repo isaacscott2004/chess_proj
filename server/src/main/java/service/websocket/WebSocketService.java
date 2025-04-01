@@ -5,6 +5,7 @@ import dataaccess.AuthDAO;
 import dataaccess.DataAccessException;
 import dataaccess.GameDAO;
 import model.GameData;
+import server.websocket.WrongTeamException;
 import service.UnauthorizedException;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
@@ -12,7 +13,7 @@ import websocket.messages.ServerMessage;
 public class WebSocketService {
 
     public static ServerMessage connect
-            (AuthDAO authAccessObject, GameDAO gameAccessObject, String authToken, Integer gameID, Boolean isObserver)
+            (AuthDAO authAccessObject, GameDAO gameAccessObject, String authToken, Integer gameID)
             throws UnauthorizedException, DataAccessException {
         try{
             authAccessObject.getAuth(authToken);
@@ -22,7 +23,8 @@ public class WebSocketService {
         String username = authAccessObject.getUsername(authToken);
         ChessGame.TeamColor playerColor = gameAccessObject.getPlayerColor(gameID, username);
         String message;
-        if (isObserver){
+
+        if (playerColor == null){
             message = username + " has joined as an observer!";
         }
         else{
@@ -32,9 +34,9 @@ public class WebSocketService {
 
     }
 
-    public static NotificationMessage makeMove
+    public static ServerMessage makeMove
             (AuthDAO authAccessObject, GameDAO gameAccessObject,  String authToken, Integer gameID, ChessMove move)
-            throws DataAccessException, InvalidMoveException, UnauthorizedException {
+            throws DataAccessException, InvalidMoveException, UnauthorizedException, WrongTeamException {
 
         ChessPosition startPosition = move.getStartPosition();
         int startRowNum = startPosition.getRow();
@@ -49,14 +51,20 @@ public class WebSocketService {
             throw new UnauthorizedException("Error: unauthorized");
         }
         String username = authAccessObject.getUsername(authToken);
+        ChessGame.TeamColor playerColor = gameAccessObject.getPlayerColor(gameID, username);
+        GameData gameData = gameAccessObject.getGame(gameID);
+        ChessGame game = gameData.getGame();
+        if(game.getBoard().getPiece(new ChessPosition(
+                move.getStartPosition().getRow(), move.getStartPosition().getColumn())).getTeamColor() != playerColor){
+           throw new WrongTeamException("Error: you can only move pieces on your own team");
+        }
         gameAccessObject.updateGameState(gameID, move);
-
         return new NotificationMessage(username + "move: " + startRowNum + startColLet + " to " + endRowNum + endColLet);
     }
 
-    public static NotificationMessage leaveGame
+    public static ServerMessage leaveGame
             (AuthDAO authAccessObject, GameDAO gameAccessObject, String authToken, int gameID)
-            throws DataAccessException {
+            throws DataAccessException, UnauthorizedException {
         try{
             authAccessObject.getAuth(authToken);
         } catch (DataAccessException e) {
@@ -67,7 +75,8 @@ public class WebSocketService {
         return new NotificationMessage(username + ", has left" + " the game.");
     }
 
-    public static NotificationMessage resign(AuthDAO authAccessObject, String authToken) throws DataAccessException {
+    public static ServerMessage resign(AuthDAO authAccessObject, String authToken)
+            throws DataAccessException, UnauthorizedException {
         try{
             authAccessObject.getAuth(authToken);
         } catch (DataAccessException e) {
@@ -79,11 +88,12 @@ public class WebSocketService {
     }
 
     private static String convertColNumToLetter(int colNum){
-        String[] letters = {"a", "b", "c", "d", "e", "f", "g", "h"};
+        String[] letters = {"A", "B", "C", "D", "E", "F", "G", "H"};
         return letters[colNum - 1];
     }
 
-    public static ChessGame loadGame(int gameID, AuthDAO authAccessObject, GameDAO gameAccessObject, String authToken) throws DataAccessException{
+    public static ChessGame loadGame(int gameID, AuthDAO authAccessObject, GameDAO gameAccessObject, String authToken)
+            throws DataAccessException, UnauthorizedException{
         try{
             authAccessObject.getAuth(authToken);
         } catch (DataAccessException e) {
@@ -93,7 +103,9 @@ public class WebSocketService {
         return gameData.getGame();
     }
 
-    public static void changeStatus(AuthDAO authAccessObject, GameDAO gameAccessObject, int gameID, GameStatus status, String authToken) throws DataAccessException {
+    public static void changeStatus(AuthDAO authAccessObject, GameDAO gameAccessObject,
+                                    int gameID, GameStatus status, String authToken)
+            throws UnauthorizedException, DataAccessException {
         try{
             authAccessObject.getAuth(authToken);
         } catch (DataAccessException e) {

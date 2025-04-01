@@ -127,7 +127,7 @@ public class MySqlGameDAO extends MySqlDAO implements GameDAO{
         } else if(username.equals(blackUsername)){
             return ChessGame.TeamColor.BLACK;
         } else{
-            throw new DataAccessException(username + ", is not found in this game.");
+            return null; // must be an observer
         }
     }
 

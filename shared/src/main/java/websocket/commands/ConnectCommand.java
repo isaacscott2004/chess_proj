@@ -1,13 +1,8 @@
 package websocket.commands;
 
 public class ConnectCommand extends UserGameCommand{
-    private final boolean isObserver;
-    public ConnectCommand(String authToken, Integer gameID, Boolean isObserver) {
+    public ConnectCommand(String authToken, Integer gameID) {
         super(CommandType.CONNECT, authToken, gameID);
-        this.isObserver = isObserver;
     }
 
-    public boolean isObserver(){
-        return this.isObserver;
-    }
 }
