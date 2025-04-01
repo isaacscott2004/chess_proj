@@ -152,10 +152,7 @@ public class MySqlGameDAO extends MySqlDAO implements GameDAO{
             game.setBlackUsername(null);
         } else if (whiteUsername != null && whiteUsername.equals(username)) {
             game.setWhiteUsername(null);
-        } else {
-            throw new DataAccessException(username + " does not exist in game: " + gameID);
         }
-
         String statement = "UPDATE game_data SET white_username=?, black_username=? WHERE gameID=?";
         executeUpdate(statement, game.getWhiteUsername(), game.getBlackUsername(), game.getGameID());
     }

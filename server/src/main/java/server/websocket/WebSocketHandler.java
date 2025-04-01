@@ -32,11 +32,6 @@ public class WebSocketHandler {
         this.gameDAO = gameDAO;
     }
 
-    @OnWebSocketConnect
-    public void onConnect(Session session){
-
-    }
-
     @OnWebSocketClose
     public void onClose(Session session, int statusCode, String reason){
         this.connectionManager.removeSession(session);
@@ -138,14 +133,20 @@ public class WebSocketHandler {
     private void resignGame(ResignCommand command, Session session){
         try {
             GameStatus status = WebSocketService.getStatus(authDAO, gameDAO, command.getGameID(), command.getAuthToken());
+            ChessGame.TeamColor playerColor = WebSocketService.getTeamColor(authDAO, command.getAuthToken(), gameDAO, command.getGameID());
+
             if(status == GameStatus.RESIGNED){
                 ErrorMessage errorMessage = new ErrorMessage("Someone already resigned!");
                 sendMessage(errorMessage, session);
             }
-
-            ServerMessage message = WebSocketService.resign(authDAO, command.getAuthToken());
-            WebSocketService.changeStatus(authDAO, gameDAO, command.getGameID(), GameStatus.RESIGNED, command.getAuthToken());
-            broadcastMessageToAll(command.getGameID(), message);
+            else if(playerColor == null){ //observer
+                ErrorMessage errorMessage = new ErrorMessage("Observers can't resign");
+                sendMessage(errorMessage, session);
+            } else {
+                ServerMessage message = WebSocketService.resign(authDAO, command.getAuthToken());
+                WebSocketService.changeStatus(authDAO, gameDAO, command.getGameID(), GameStatus.RESIGNED, command.getAuthToken());
+                broadcastMessageToAll(command.getGameID(), message);
+            }
 
         } catch (DataAccessException e){
             ErrorMessage errorMessage = new ErrorMessage(e.getMessage());

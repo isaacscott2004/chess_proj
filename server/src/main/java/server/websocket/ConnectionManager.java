@@ -33,14 +33,8 @@ public class ConnectionManager {
     }
 
     public void removeSession(Session session){
-        boolean removed = false;
         for(Set<Session> sessions : sessionMap.values()){
-            if(sessions.remove(session)){
-                removed = true;
-            }
-        }
-        if(!(removed)){
-            throw new WebSocketException("Session: " + session + " does not exist.");
+            sessions.remove(session);
         }
     }
 
