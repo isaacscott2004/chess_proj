@@ -12,10 +12,6 @@ public class ConnectionManager {
         this.sessionMap = new ConcurrentHashMap<>();
     }
 
-    public ConcurrentHashMap<Integer, Set<Session>> getSessionMap(){
-        return this.sessionMap;
-    }
-
     public void addSessionToGame(int gameID, Session session){
         this.sessionMap.putIfAbsent(gameID, ConcurrentHashMap.newKeySet());
         this.sessionMap.get(gameID).add(session);

@@ -47,12 +47,15 @@ public class WebSocketService {
         ChessGame.TeamColor playerColor = gameAccessObject.getPlayerColor(gameID, username);
         GameData gameData = gameAccessObject.getGame(gameID);
         ChessGame game = gameData.getGame();
+        if(game.getBoard().getBoard() == null){
+            throw new InvalidMoveException("Error: there is not piece at this position");
+        }
         if(game.getBoard().getPiece(new ChessPosition(
                 move.getStartPosition().getRow(), move.getStartPosition().getColumn())).getTeamColor() != playerColor){
            throw new WrongTeamException("Error: you can only move pieces on your own team");
         }
         gameAccessObject.updateGameState(gameID, move);
-        return new NotificationMessage(username + "move: " + startRowNum + startColLet + " to " + endRowNum + endColLet);
+        return new NotificationMessage(username + "move: " + startColLet + startRowNum + " to " + endColLet + endRowNum);
     }
 
     public static ServerMessage leaveGame

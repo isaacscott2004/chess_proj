@@ -54,6 +54,7 @@ public class WebSocketHandler {
             }
             case RESIGN -> resignGame(new ResignCommand(command.getAuthToken(), command.getGameID()), session);
             case LEAVE -> leaveGame(new LeaveCommand(command.getAuthToken(), command.getGameID()), session);
+            default -> sendMessage(new ErrorMessage("Error: Unknown command"), session);
             }
         }
 
@@ -82,6 +83,7 @@ public class WebSocketHandler {
             if(status != GameStatus.PLAYABLE){
                 ErrorMessage errorMessage = getErrorMessage(status);
                 sendMessage(errorMessage, session);
+                return;
             }
             ServerMessage message = WebSocketService.makeMove(authDAO, gameDAO, authToken, gameID, command.getMove());
             ChessGame game = WebSocketService.loadGame(gameID, authDAO, gameDAO, authToken);
@@ -128,15 +130,23 @@ public class WebSocketHandler {
         }catch (UnauthorizedException e){
             ErrorMessage errorMessage = new ErrorMessage("Error: Unauthorized");
             sendMessage(errorMessage, session);
+
         }
     }
     private void resignGame(ResignCommand command, Session session){
         try {
             GameStatus status = WebSocketService.getStatus(authDAO, gameDAO, command.getGameID(), command.getAuthToken());
-            ChessGame.TeamColor playerColor = WebSocketService.getTeamColor(authDAO, command.getAuthToken(), gameDAO, command.getGameID());
-
+            ChessGame.TeamColor playerColor = null;
+            try {
+                playerColor = WebSocketService.getTeamColor(authDAO, command.getAuthToken(), gameDAO, command.getGameID());
+            }catch (DataAccessException e){
+                sendMessage(new ErrorMessage("Unable to get player color"), session);
+            }
             if(status == GameStatus.RESIGNED){
                 ErrorMessage errorMessage = new ErrorMessage("Someone already resigned!");
+                sendMessage(errorMessage, session);
+            } else if (status != GameStatus.PLAYABLE){
+                ErrorMessage errorMessage = new ErrorMessage("This game is over.");
                 sendMessage(errorMessage, session);
             }
             else if(playerColor == null){ //observer
@@ -166,7 +176,7 @@ public class WebSocketHandler {
         }
     }
     private void broadcastMessage(int gameID, ServerMessage message, Session excludedSession){
-        Set<Session> sessions = this.connectionManager.getSessionsFromGame(gameID);
+        Set<Session> sessions = Set.copyOf(this.connectionManager.getSessionsFromGame(gameID));
         for(Session cSession : sessions){
             if(!(cSession.equals(excludedSession))){
                 try{
@@ -180,7 +190,7 @@ public class WebSocketHandler {
     }
 
     private void broadcastMessageToAll(int gameID, ServerMessage message){
-        Set<Session> sessions = this.connectionManager.getSessionsFromGame(gameID);
+        Set<Session> sessions = Set.copyOf(this.connectionManager.getSessionsFromGame(gameID));
         for(Session cSession : sessions){
             try {
                 cSession.getRemote().sendString(message.toString());
