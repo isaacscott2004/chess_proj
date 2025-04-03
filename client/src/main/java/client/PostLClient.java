@@ -135,6 +135,7 @@ public class PostLClient extends Client{
                     "Please call list to see which numbers you can choose from\n";
         }
         int gameId = chosenGame.getGameID();
+        GameIDManager.setGameID(gameId);
         ChessGame.TeamColor color = ChessGame.TeamColor.valueOf(params[0].toUpperCase());
         JoinGameRequest joinGameRequest = new JoinGameRequest(color, gameId);
         this.server.playGame(joinGameRequest, authToken);

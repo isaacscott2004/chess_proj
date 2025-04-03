@@ -1,6 +1,7 @@
 package ui;
 
 import client.*;
+import ui.websocket.NotificationHandler;
 
 import java.util.Scanner;
 import static ui.EscapeSequences.*;
@@ -8,10 +9,16 @@ import static ui.EscapeSequences.*;
 public class Repl {
     private final String serverURL;
     private ClientType type;
+    private NotificationHandler notificationHandler;
+
 
     public Repl(String serverURL, ClientType type) {
         this.type = type;
         this.serverURL = serverURL;
+        this.notificationHandler = notification -> {
+            System.out.println(SET_TEXT_COLOR_MAGENTA + notification);
+            printPrompt();
+        };
     }
 
     public void run() {
@@ -32,7 +39,7 @@ public class Repl {
 
     private boolean handleSession(Scanner scanner, ClientType clientType) {
         boolean breakOut = false;
-        Client client = createClient(serverURL, type);
+        Client client = createClient(serverURL, notificationHandler, type);
         System.out.println(client.help());
         String result;
         while (true) {
@@ -88,15 +95,14 @@ public class Repl {
     }
 
 
-    private Client createClient(String serverURL, ClientType type) {
+    private Client createClient(String serverURL, NotificationHandler notificationHandler,  ClientType type) {
         Client client = null;
         switch (type) {
-            case GAME -> client = new GameClient(serverURL);
+            case GAME -> client = new GameClient(notificationHandler, serverURL);
             case PREL -> client = new PreLClient(serverURL);
             case POSTL -> client = new PostLClient(serverURL);
         }
         return client;
-
     }
 
     private void printPrompt() {

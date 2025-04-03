@@ -12,7 +12,11 @@ public abstract class Client {
     public String listGames()throws ResponseException {return "";}
     public String playGame(String ... params)throws ResponseException {return "";}
     public String observeGame(String ... params) throws ResponseException {return "";}
-
+    public String leaveGame() throws ResponseException{return "";}
+    public String drawBoard() throws ResponseException {return "";}
+    public String movePiece(String ... params)throws ResponseException{return  "";}
+    public String resign()throws ResponseException{return "";}
+    public String highlightMoves(String ... params)throws ResponseException{return "";}
 
     }
 
