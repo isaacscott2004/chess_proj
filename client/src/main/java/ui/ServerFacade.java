@@ -53,6 +53,9 @@ public class ServerFacade {
         String path = "/game";
         makeRequest("PUT", path, request, JoinGameResult.class, authToken);
     }
+    public String getServerURL(){
+        return this.serverURL;
+    }
 
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass, String authToken) throws ResponseException {
         try {

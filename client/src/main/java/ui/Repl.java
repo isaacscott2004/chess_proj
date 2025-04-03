@@ -1,24 +1,24 @@
 package ui;
 
+import chess.ChessBoard;
+import chess.ChessGame;
 import client.*;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import ui.websocket.NotificationHandler;
+import websocket.messages.ServerMessage;
 
 import java.util.Scanner;
 import static ui.EscapeSequences.*;
 
-public class Repl {
+public class Repl implements NotificationHandler {
     private final String serverURL;
     private ClientType type;
-    private NotificationHandler notificationHandler;
-
 
     public Repl(String serverURL, ClientType type) {
         this.type = type;
         this.serverURL = serverURL;
-        this.notificationHandler = notification -> {
-            System.out.println(SET_TEXT_COLOR_MAGENTA + notification);
-            printPrompt();
-        };
     }
 
     public void run() {
@@ -39,7 +39,7 @@ public class Repl {
 
     private boolean handleSession(Scanner scanner, ClientType clientType) {
         boolean breakOut = false;
-        Client client = createClient(serverURL, notificationHandler, type);
+        Client client = createClient(serverURL, type);
         System.out.println(client.help());
         String result;
         while (true) {
@@ -95,14 +95,15 @@ public class Repl {
     }
 
 
-    private Client createClient(String serverURL, NotificationHandler notificationHandler,  ClientType type) {
+    private Client createClient(String serverURL,  ClientType type) {
         Client client = null;
         switch (type) {
-            case GAME -> client = new GameClient(notificationHandler, serverURL);
+            case GAME -> client = new GameClient(serverURL, this);
             case PREL -> client = new PreLClient(serverURL);
-            case POSTL -> client = new PostLClient(serverURL);
+            case POSTL -> client = new PostLClient(serverURL, this);
         }
         return client;
+
     }
 
     private void printPrompt() {
@@ -110,4 +111,29 @@ public class Repl {
     }
 
 
+    @Override
+    public void notify(ServerMessage message) {
+        Gson gson = new Gson();
+        String strMessage = message.toString();
+        JsonObject jsonMessage = JsonParser.parseString(strMessage).getAsJsonObject();
+        String messageType = jsonMessage.get("serverMessageType").getAsString();
+        if(messageType.equals("LOAD_GAME")){
+            JsonObject jsonGame = jsonMessage.getAsJsonObject("game");
+
+            ChessGame chessGame = gson.fromJson(jsonGame, ChessGame.class);
+            ChessBoard chessBoard = chessGame.getBoard();
+            ChessGame.TeamColor color = chessGame.getTeamTurn();
+            GameManager.setBoard(chessBoard);
+            GameManager.setColor(color);
+
+        } else if(messageType.equals("NOTIFICATION")){
+            String notification = jsonMessage.get("message").getAsString();
+            System.out.println(SET_TEXT_COLOR_MAGENTA + notification + RESET_TEXT_COLOR);
+            printPrompt();
+        } else if(messageType.equals("ERROR")){
+           String error = jsonMessage.get("errorMessage").getAsString();
+           System.out.println(SET_TEXT_COLOR_RED + error + RESET_TEXT_COLOR);
+           printPrompt();
+        }
+    }
 }

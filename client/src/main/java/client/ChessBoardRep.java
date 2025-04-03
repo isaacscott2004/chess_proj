@@ -9,12 +9,10 @@ import static ui.EscapeSequences.*;
 import static ui.EscapeSequences.EMPTY;
 
 public class ChessBoardRep {
-    private final ChessBoard board;
-    public ChessBoardRep(ChessBoard board){
-        this.board = board;
-    }
-    public String drawBoard(ChessGame.TeamColor color){
-        ChessPiece[][] allPieces = this.board.getBoard();
+
+    public String drawBoard(ChessGame.TeamColor color, ChessBoard board,
+                            boolean highlightBoard, ChessPosition startPosition){
+        ChessPiece[][] allPieces = board.getBoard();
         boolean isLightTan;
         StringBuilder restOfBoard = new StringBuilder();
         if (color == ChessGame.TeamColor.BLACK){
@@ -31,8 +29,8 @@ public class ChessBoardRep {
                     else {
                         restOfBoard.append(SET_BG_COLOR_DARK_TAN);
                     }
-                    if(this.board.isPieceOnSquare(i + 1, j + 1)){
-                        ChessPiece currentChessPiece = this.board.getPiece(new ChessPosition(i + 1, j + 1));
+                    if(board.isPieceOnSquare(i + 1, j + 1)){
+                        ChessPiece currentChessPiece = board.getPiece(new ChessPosition(i + 1, j + 1));
                         restOfBoard.append(chessPieceToDraw(currentChessPiece));
                     }
                     else restOfBoard.append("   ");
@@ -61,8 +59,8 @@ public class ChessBoardRep {
                     else {
                         restOfBoard.append(SET_BG_COLOR_DARK_TAN);
                     }
-                    if(this.board.isPieceOnSquare(i + 1, j + 1)){
-                        ChessPiece currentChessPiece = this.board.getPiece(new ChessPosition(i + 1, j + 1));
+                    if(board.isPieceOnSquare(i + 1, j + 1)){
+                        ChessPiece currentChessPiece = board.getPiece(new ChessPosition(i + 1, j + 1));
                         restOfBoard.append(chessPieceToDraw(currentChessPiece));
                     }
                     else restOfBoard.append("   ");

@@ -7,6 +7,8 @@ import request.CreateGameRequest;
 import request.JoinGameRequest;
 import result.ListGamesResult;
 import ui.ServerFacade;
+import ui.websocket.NotificationHandler;
+import ui.websocket.WebSocketFacade;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,8 +19,14 @@ import static ui.EscapeSequences.*;
 
 public class PostLClient extends Client{
     private final ServerFacade  server;
-    public PostLClient(String serverURL){
+    private final NotificationHandler notificationHandler;
+    private  WebSocketFacade wsFacade;
+
+    public PostLClient(String serverURL, NotificationHandler notificationHandler){
         this.server = new ServerFacade(serverURL);
+        this.notificationHandler = notificationHandler;
+        this.wsFacade = null;
+
     }
 
     @Override
@@ -136,15 +144,20 @@ public class PostLClient extends Client{
         }
         int gameId = chosenGame.getGameID();
         GameIDManager.setGameID(gameId);
+
         ChessGame.TeamColor color = ChessGame.TeamColor.valueOf(params[0].toUpperCase());
         JoinGameRequest joinGameRequest = new JoinGameRequest(color, gameId);
         this.server.playGame(joinGameRequest, authToken);
-        ChessBoard board = chosenGame.getGame().getBoard();
-        ChessBoardRep chessBoard = new ChessBoardRep(board);
+
+        this.wsFacade = new WebSocketFacade(server.getServerURL(), notificationHandler);
+        this.wsFacade.connect(authToken, gameId);
+
+        ChessBoardRep chessBoard = new ChessBoardRep();
         if(color == ChessGame.TeamColor.WHITE){
-            return chessBoard.drawBoard(ChessGame.TeamColor.WHITE);
+            return chessBoard.drawBoard(ChessGame.TeamColor.WHITE, GameManager.getBoard(), false, null);
+        }else {
+            return chessBoard.drawBoard(ChessGame.TeamColor.BLACK, GameManager.getBoard(), false, null);
         }
-        return chessBoard.drawBoard(ChessGame.TeamColor.BLACK);
 
 
 
@@ -172,14 +185,21 @@ public class PostLClient extends Client{
                     Please call list to see which numbers you can choose from
                     """;
         }
-        ChessBoard board = chosenGame.getGame().getBoard();
-        ChessBoardRep chessBoard = new ChessBoardRep(board);
-        return chessBoard.drawBoard(ChessGame.TeamColor.WHITE) + RESET_TEXT_COLOR + "\nYou are currently viewing " + chosenGame.getGameName() +
+        String authToken = AuthTokenManager.getAuthToken();
+        this.wsFacade = new WebSocketFacade(server.getServerURL(), notificationHandler);
+        this.wsFacade.connect(authToken, choice);
+
+
+        ChessBoard board = GameManager.getBoard();
+        ChessGame.TeamColor color = GameManager.getColor();
+        ChessBoardRep chessBoard = new ChessBoardRep();
+        return chessBoard.drawBoard(color, board, false, null) + RESET_TEXT_COLOR + "\nYou are currently viewing " + chosenGame.getGameName() +
                 "\nWHITE: " + chosenGame.getWhiteUsername() + ", BLACK: " + chosenGame.getBlackUsername();
 
 
 
     }
+
     private ArrayList<GameData> getListOfGames() throws ResponseException {
         String authToken = AuthTokenManager.getAuthToken();
         ListGamesResult listGamesResult = this.server.listGames(authToken);
