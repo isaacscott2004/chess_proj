@@ -144,6 +144,7 @@ public class PostLClient extends Client{
         }
         int gameId = chosenGame.getGameID();
         GameIDManager.setGameID(gameId);
+        GameManager.setBoard(chosenGame.getGame().getBoard());
 
         ChessGame.TeamColor color = ChessGame.TeamColor.valueOf(params[0].toUpperCase());
         JoinGameRequest joinGameRequest = new JoinGameRequest(color, gameId);
@@ -188,6 +189,8 @@ public class PostLClient extends Client{
         String authToken = AuthTokenManager.getAuthToken();
         this.wsFacade = new WebSocketFacade(server.getServerURL(), notificationHandler);
         this.wsFacade.connect(authToken, choice);
+        GameManager.setBoard(chosenGame.getGame().getBoard());
+        GameManager.setColor(ChessGame.TeamColor.WHITE);
 
 
         ChessBoard board = GameManager.getBoard();

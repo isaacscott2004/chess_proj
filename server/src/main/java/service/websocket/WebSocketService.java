@@ -55,7 +55,7 @@ public class WebSocketService {
            throw new WrongTeamException("Error: you can only move pieces on your own team");
         }
         gameAccessObject.updateGameState(gameID, move);
-        return new NotificationMessage(username + "move: " + startColLet + startRowNum + " to " + endColLet + endRowNum);
+        return new NotificationMessage(username + " moves, " + startColLet + startRowNum + " to " + endColLet + endRowNum);
     }
 
     public static ServerMessage leaveGame

@@ -3,7 +3,9 @@ package ui.websocket;
 import chess.ChessMove;
 import client.ResponseException;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import websocket.commands.*;
+import websocket.deserializer.Deserializer;
 import websocket.messages.ServerMessage;
 
 import javax.websocket.*;
@@ -12,7 +14,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 public class WebSocketFacade extends Endpoint {
-    private Session session;
+    private final Session session;
     NotificationHandler notificationHandler;
 
     public WebSocketFacade(String url, NotificationHandler notificationHandler){
@@ -22,11 +24,16 @@ public class WebSocketFacade extends Endpoint {
             this.notificationHandler = notificationHandler;
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
             this.session = container.connectToServer(this, socketURI);
+            Gson gson = new GsonBuilder()
+                    .registerTypeAdapter(ServerMessage.class, new Deserializer())
+                    .create();
             this.session.addMessageHandler(new MessageHandler.Whole<String>() {
                 @Override
                 public void onMessage(String message){
-                    ServerMessage notification = new Gson().fromJson(message, ServerMessage.class);
+                    ServerMessage notification = gson.fromJson(message, ServerMessage.class);
                     notificationHandler.notify(notification);
+
+
 
                 }
             });

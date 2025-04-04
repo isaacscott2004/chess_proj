@@ -6,6 +6,7 @@ import client.*;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 import ui.websocket.NotificationHandler;
 import websocket.messages.ServerMessage;
 
@@ -34,6 +35,10 @@ public class Repl implements NotificationHandler {
             if (type == ClientType.POSTL) {
                 handleSession(scanner, ClientType.POSTL);
             }
+
+            if(type == ClientType.GAME){
+                handleSession(scanner, ClientType.GAME);
+            }
         }
     }
 
@@ -59,6 +64,14 @@ public class Repl implements NotificationHandler {
                 }
                 if (line.contains("quit") && result.equals("You have quit the program, bye.")) {
                     breakOut = true;
+                    break;
+                }
+                if(clientType == ClientType.POSTL && shouldTransitionToGame(line, result)){
+                    type = ClientType.GAME;
+                    break;
+                }
+                if(clientType == ClientType.GAME && shouldTransitionToPostl(line, result)){
+                    type = ClientType.POSTL;
                     break;
                 }
 
@@ -87,11 +100,15 @@ public class Repl implements NotificationHandler {
     }
 
     private boolean shouldTransitionToPostl(String line, String result) {
-        return (line.toLowerCase().contains("login") || line.toLowerCase().contains("register")) && !result.contains("Error");
+        return (line.toLowerCase().contains("login") || line.toLowerCase().contains("register") || line.toLowerCase().contains("leave")) && !result.contains("Error");
     }
 
     private boolean shouldTransitionToPrel(String line) {
         return line.toLowerCase().contains("logout");
+    }
+
+    private boolean shouldTransitionToGame(String line, String result){
+        return (line.toLowerCase().contains("play") || line.toLowerCase().contains("observe")) &&!result.contains("Error");
     }
 
 
@@ -114,26 +131,32 @@ public class Repl implements NotificationHandler {
     @Override
     public void notify(ServerMessage message) {
         Gson gson = new Gson();
-        String strMessage = message.toString();
+        String strMessage = gson.toJson(message);
+
         JsonObject jsonMessage = JsonParser.parseString(strMessage).getAsJsonObject();
         String messageType = jsonMessage.get("serverMessageType").getAsString();
-        if(messageType.equals("LOAD_GAME")){
-            JsonObject jsonGame = jsonMessage.getAsJsonObject("game");
 
-            ChessGame chessGame = gson.fromJson(jsonGame, ChessGame.class);
-            ChessBoard chessBoard = chessGame.getBoard();
-            ChessGame.TeamColor color = chessGame.getTeamTurn();
-            GameManager.setBoard(chessBoard);
-            GameManager.setColor(color);
+        switch (messageType) {
+            case "LOAD_GAME" -> {
+                JsonObject jsonGame = jsonMessage.getAsJsonObject("game");
+                ChessGame chessGame = gson.fromJson(jsonGame, ChessGame.class);
+                ChessBoard chessBoard = chessGame.getBoard();
+                ChessGame.TeamColor color = chessGame.getTeamTurn();
 
-        } else if(messageType.equals("NOTIFICATION")){
-            String notification = jsonMessage.get("message").getAsString();
-            System.out.println(SET_TEXT_COLOR_MAGENTA + notification + RESET_TEXT_COLOR);
-            printPrompt();
-        } else if(messageType.equals("ERROR")){
-           String error = jsonMessage.get("errorMessage").getAsString();
-           System.out.println(SET_TEXT_COLOR_RED + error + RESET_TEXT_COLOR);
-           printPrompt();
+                GameManager.setBoard(chessBoard);
+                GameManager.setColor(color);
+            }
+            case "NOTIFICATION" -> {
+                String notification = jsonMessage.get("message").getAsString();
+                System.out.println(RESET + SET_TEXT_COLOR_MAGENTA + " -- " + notification + RESET_TEXT_COLOR);
+                printPrompt();
+            }
+            case "ERROR" -> {
+                String error = jsonMessage.get("errorMessage").getAsString();
+                System.out.println(RESET + SET_TEXT_COLOR_RED + " -- " + error + RESET_TEXT_COLOR);
+                printPrompt();
+            }
         }
+
     }
 }

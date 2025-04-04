@@ -10,12 +10,10 @@ import ui.websocket.WebSocketFacade;
 import java.util.Arrays;
 
 public class GameClient extends Client{
-    private final NotificationHandler notificationHandler;
     private final WebSocketFacade webSocketFacade;
     private final ChessBoardRep chessBoardRep;
 
     public GameClient(String serverURL, NotificationHandler notificationHandler){
-        this.notificationHandler = notificationHandler;
         this.webSocketFacade = new WebSocketFacade(serverURL, notificationHandler);
         this.chessBoardRep  = new ChessBoardRep();
     }
@@ -157,10 +155,5 @@ public class GameClient extends Client{
         }
         return new ChessPosition(row, col);
     }
-
-
-
-
-
 
 }

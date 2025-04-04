@@ -180,11 +180,14 @@ public class WebSocketHandler {
         for(Session cSession : sessions){
             if(!(cSession.equals(excludedSession))){
                 try{
-
+                    System.out.println("Sending message to: " + cSession.getRemoteAddress());
                     cSession.getRemote().sendString(message.toString());
                 } catch (IOException e){
                     throw new WebSocketException("Unable to send message.");
                 }
+            } else{
+                System.out.println("Excluding message to: " + cSession.getRemoteAddress());
+
             }
         }
     }
