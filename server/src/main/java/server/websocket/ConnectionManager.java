@@ -6,36 +6,57 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ConnectionManager {
-    private final ConcurrentHashMap<Integer, Set<Session>> sessionMap;
+    private final ConcurrentHashMap<Integer, Set<Connection>> connectionMap;
+    private final ConcurrentHashMap<Session, Connection> sessionConnectionMap;
 
     public ConnectionManager(){
-        this.sessionMap = new ConcurrentHashMap<>();
+        this.connectionMap = new ConcurrentHashMap<>();
+        this.sessionConnectionMap = new ConcurrentHashMap<>();
+
     }
 
-    public void addSessionToGame(int gameID, Session session){
-        this.sessionMap.putIfAbsent(gameID, ConcurrentHashMap.newKeySet());
-        this.sessionMap.get(gameID).add(session);
+    public void addSessionToGame(int gameID, Connection connection){
+        this.connectionMap.putIfAbsent(gameID, ConcurrentHashMap.newKeySet());
+        this.connectionMap.get(gameID).add(connection);
+        this.sessionConnectionMap.put(connection.getSession(), connection);
     }
 
-    public void removeSessionFromGame(int gameID, Session session) throws WebSocketException{
-        Set<Session> specifiedGame = this.sessionMap.get(gameID);
+    public void removeSessionFromGame(int gameID, Connection connection) throws WebSocketException{
+        String thisAuthToken = connection.getAuthToken();
+        Set<Connection> specifiedGame = this.connectionMap.get(gameID);
+
         if(specifiedGame == null){
             throw new WebSocketException("Game ID: " + gameID + " does not exist.");
         }
-        if(!(specifiedGame.contains(session))){
-            throw new WebSocketException("Session: " + session + " does not exist within game " + gameID + ".");
+
+        Connection removed = null;
+        for(Connection conn : specifiedGame){
+            if(conn.getAuthToken().equals(thisAuthToken)){
+                removed = conn;
+                break;
+            }
         }
-        specifiedGame.remove(session);
+
+        if (removed == null) {
+            throw new WebSocketException("Connection with authToken: " + thisAuthToken + " does not exist within game " + gameID + ".");
+        }
+
+        specifiedGame.remove(removed);
+        int size = specifiedGame.size();
+        System.out.println(size);
     }
 
     public void removeSession(Session session){
-        for(Set<Session> sessions : sessionMap.values()){
-            sessions.remove(session);
+        Connection connection = this.sessionConnectionMap.remove(session);
+        if(connection != null) {
+            for (Set<Connection> connections : connectionMap.values()) {
+                connections.remove(connection);
+            }
         }
     }
 
-    public Set<Session> getSessionsFromGame(int gameID){
-        return this.sessionMap.get(gameID);
+    public Set<Connection> getSessionsFromGame(int gameID){
+        return this.connectionMap.get(gameID);
     }
 
 

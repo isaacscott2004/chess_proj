@@ -34,62 +34,65 @@ public class WebSocketHandler {
 
     @OnWebSocketClose
     public void onClose(Session session, int statusCode, String reason){
+
         this.connectionManager.removeSession(session);
 
     }
 
     @OnWebSocketError
     public void onError(Throwable throwable){
-        System.out.println("WebSocket Error: " + throwable.getMessage());
+        System.out.println("WebSocket Error: " + throwable.getCause() + throwable.getMessage());
     }
 
     @OnWebSocketMessage
     public void onMessage(Session session, String str){
             UserGameCommand command = new Gson().fromJson(str, UserGameCommand.class);
+            String authToken = command.getAuthToken();
+            Connection connection = new Connection(authToken, session);
             switch (command.getCommandType()){
-            case CONNECT -> connect(new ConnectCommand(command.getAuthToken(), command.getGameID()), session);
+            case CONNECT -> connect(new ConnectCommand(command.getAuthToken(), command.getGameID()), connection);
             case MAKE_MOVE -> {
                 MakeMoveCommand makeMoveCommand = new Gson().fromJson(str, MakeMoveCommand.class);
-                makeMove(makeMoveCommand, session);
+                makeMove(makeMoveCommand, connection);
             }
-            case RESIGN -> resignGame(new ResignCommand(command.getAuthToken(), command.getGameID()), session);
-            case LEAVE -> leaveGame(new LeaveCommand(command.getAuthToken(), command.getGameID()), session);
-            default -> sendMessage(new ErrorMessage("Error: Unknown command"), session);
+            case RESIGN -> resignGame(new ResignCommand(command.getAuthToken(), command.getGameID()), connection);
+            case LEAVE -> leaveGame(new LeaveCommand(command.getAuthToken(), command.getGameID()), connection);
+            default -> sendMessage(new ErrorMessage("Error: Unknown command"), connection);
             }
         }
 
-    private void connect(ConnectCommand command, Session session) {
+    private void connect(ConnectCommand command, Connection connection) {
         try{
-            this.connectionManager.addSessionToGame(command.getGameID(), session);
+            this.connectionManager.addSessionToGame(command.getGameID(), connection);
             ServerMessage message = WebSocketService.connect(authDAO, gameDAO, command.getAuthToken(), command.getGameID());
             ChessGame game = WebSocketService.loadGame(command.getGameID(), authDAO, gameDAO, command.getAuthToken());
             LoadGameMessage gameMessage = new LoadGameMessage(game);
-            sendMessage(gameMessage, session);
-            broadcastMessage(command.getGameID(), message, session);
+            sendMessage(gameMessage, connection);
+            broadcastMessage(command.getGameID(), message, connection);
 
         } catch (DataAccessException e){
             ErrorMessage errorMessage = new ErrorMessage(e.getMessage());
-            sendMessage(errorMessage, session);
+            sendMessage(errorMessage, connection);
         }catch (UnauthorizedException e){
             ErrorMessage errorMessage = new ErrorMessage("Error: Unauthorized");
-            sendMessage(errorMessage, session);
+            sendMessage(errorMessage, connection);
         }
     }
-    private void makeMove(MakeMoveCommand command, Session session){
+    private void makeMove(MakeMoveCommand command, Connection connection){
         int gameID = command.getGameID();
         String authToken = command.getAuthToken();
         try{
             GameStatus status = WebSocketService.getStatus(authDAO, gameDAO, gameID, authToken);
             if(status != GameStatus.PLAYABLE){
                 ErrorMessage errorMessage = getErrorMessage(status);
-                sendMessage(errorMessage, session);
+                sendMessage(errorMessage, connection);
                 return;
             }
             ServerMessage message = WebSocketService.makeMove(authDAO, gameDAO, authToken, gameID, command.getMove());
             ChessGame game = WebSocketService.loadGame(gameID, authDAO, gameDAO, authToken);
             LoadGameMessage gameMessage = new LoadGameMessage(game);
             broadcastMessageToAll(gameID, gameMessage);
-            broadcastMessage(gameID, message, session);
+            broadcastMessage(gameID, message, connection);
 
             if(game.isInCheck(game.getTeamTurn())){
                 NotificationMessage inCheckMessage = new NotificationMessage(game.getTeamTurn() + " is in check!");
@@ -106,52 +109,52 @@ public class WebSocketHandler {
 
         } catch (DataAccessException e) {
             ErrorMessage errorMessage = new ErrorMessage(e.getMessage());
-            sendMessage(errorMessage, session);
+            sendMessage(errorMessage, connection);
         } catch (InvalidMoveException e){
             ErrorMessage errorMessage = new ErrorMessage("Invalid move");
-            sendMessage(errorMessage, session);
+            sendMessage(errorMessage, connection);
         }catch (UnauthorizedException e){
             ErrorMessage errorMessage = new ErrorMessage("Error: Unauthorized");
-            sendMessage(errorMessage, session);
+            sendMessage(errorMessage, connection);
         } catch (WrongTeamException e){
             ErrorMessage errorMessage = new ErrorMessage("Error: you can't move pieces from the other team");
-            sendMessage(errorMessage, session);
+            sendMessage(errorMessage, connection);
         }
     }
 
-    private void leaveGame(LeaveCommand command, Session session){
+    private void leaveGame(LeaveCommand command, Connection connection){
         try {
             ServerMessage message =  WebSocketService.leaveGame(authDAO, gameDAO, command.getAuthToken(), command.getGameID());
-            broadcastMessage(command.getGameID(), message, session);
-            this.connectionManager.removeSessionFromGame(command.getGameID(), session);
+            broadcastMessage(command.getGameID(), message, connection);
+            this.connectionManager.removeSessionFromGame(command.getGameID(), connection);
         } catch (DataAccessException e){
             ErrorMessage errorMessage = new ErrorMessage(e.getMessage());
-            sendMessage(errorMessage, session);
+            sendMessage(errorMessage, connection);
         }catch (UnauthorizedException e){
             ErrorMessage errorMessage = new ErrorMessage("Error: Unauthorized");
-            sendMessage(errorMessage, session);
+            sendMessage(errorMessage, connection);
 
         }
     }
-    private void resignGame(ResignCommand command, Session session){
+    private void resignGame(ResignCommand command, Connection connection){
         try {
             GameStatus status = WebSocketService.getStatus(authDAO, gameDAO, command.getGameID(), command.getAuthToken());
             ChessGame.TeamColor playerColor = null;
             try {
                 playerColor = WebSocketService.getTeamColor(authDAO, command.getAuthToken(), gameDAO, command.getGameID());
             }catch (DataAccessException e){
-                sendMessage(new ErrorMessage("Unable to get player color"), session);
+                sendMessage(new ErrorMessage("Unable to get player color"), connection);
             }
             if(status == GameStatus.RESIGNED){
                 ErrorMessage errorMessage = new ErrorMessage("Someone already resigned!");
-                sendMessage(errorMessage, session);
+                sendMessage(errorMessage, connection);
             } else if (status != GameStatus.PLAYABLE){
                 ErrorMessage errorMessage = new ErrorMessage("This game is over.");
-                sendMessage(errorMessage, session);
+                sendMessage(errorMessage, connection);
             }
             else if(playerColor == null){ //observer
                 ErrorMessage errorMessage = new ErrorMessage("Observers can't resign");
-                sendMessage(errorMessage, session);
+                sendMessage(errorMessage, connection);
             } else {
                 ServerMessage message = WebSocketService.resign(authDAO, command.getAuthToken());
                 WebSocketService.changeStatus(authDAO, gameDAO, command.getGameID(), GameStatus.RESIGNED, command.getAuthToken());
@@ -160,43 +163,39 @@ public class WebSocketHandler {
 
         } catch (DataAccessException e){
             ErrorMessage errorMessage = new ErrorMessage(e.getMessage());
-            sendMessage(errorMessage, session);
+            sendMessage(errorMessage, connection);
         } catch (UnauthorizedException e){
             ErrorMessage errorMessage = new ErrorMessage("Error: Unauthorized");
-            sendMessage(errorMessage, session);
+            sendMessage(errorMessage, connection);
         }
 
     }
 
-    private void sendMessage(ServerMessage message, Session session) {
+    private void sendMessage(ServerMessage message, Connection connection) {
         try {
-            session.getRemote().sendString(message.toString());
+            connection.getSession().getRemote().sendString(message.toString());
         } catch (IOException e){
             throw new WebSocketException("Unable to send message.");
         }
     }
-    private void broadcastMessage(int gameID, ServerMessage message, Session excludedSession){
-        Set<Session> sessions = Set.copyOf(this.connectionManager.getSessionsFromGame(gameID));
-        for(Session cSession : sessions){
-            if(!(cSession.equals(excludedSession))){
-                try{
-                    System.out.println("Sending message to: " + cSession.getRemoteAddress());
-                    cSession.getRemote().sendString(message.toString());
-                } catch (IOException e){
+    private void broadcastMessage(int gameID, ServerMessage message, Connection excludedConnection){
+        Set<Connection> connections = Set.copyOf(this.connectionManager.getSessionsFromGame(gameID));
+        for(Connection cConnection : connections){
+            if(!(cConnection.getAuthToken().equals(excludedConnection.getAuthToken()))) {
+                try {
+                    cConnection.getSession().getRemote().sendString(message.toString());
+                } catch (IOException e) {
                     throw new WebSocketException("Unable to send message.");
                 }
-            } else{
-                System.out.println("Excluding message to: " + cSession.getRemoteAddress());
-
             }
         }
     }
 
     private void broadcastMessageToAll(int gameID, ServerMessage message){
-        Set<Session> sessions = Set.copyOf(this.connectionManager.getSessionsFromGame(gameID));
-        for(Session cSession : sessions){
+        Set<Connection> connections = Set.copyOf(this.connectionManager.getSessionsFromGame(gameID));
+        for(Connection cConnection : connections){
             try {
-                cSession.getRemote().sendString(message.toString());
+                cConnection.getSession().getRemote().sendString(message.toString());
             } catch (IOException e){
                 throw  new WebSocketException("Unable to send message");
             }

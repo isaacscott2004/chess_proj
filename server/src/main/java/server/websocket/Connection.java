@@ -12,10 +12,19 @@ public class Connection {
         this.authToken = authToken;
         this.session = session;
     }
+    public Session getSession(){
+        return this.session;
+    }
+    public String getAuthToken(){
+        return this.authToken;
+    }
 
+    @Override
+    public String toString() {
+        return "Connection{" +
+                "authToken='" + authToken + '\'' +
+                ", session=" + session +
+                '}';
+    }
 
-
-//    public void send(String msg) throws IOException {
-//        session.getRemote().sendString(msg);
-//    }
 }
