@@ -1,6 +1,5 @@
 package client;
 
-import chess.ChessBoard;
 import chess.ChessGame;
 import model.GameData;
 import request.CreateGameRequest;
@@ -90,7 +89,7 @@ public class PostLClient extends Client{
         return "You have successfully created a new game, game name: " + params[0];
     }
     @Override
-    public String listGames()throws ResponseException {;
+    public String listGames()throws ResponseException {
         ArrayList<GameData> allGames = getListOfGames();
         ArrayList<ClientGameData> listOfGames= new ArrayList<>();
         if(allGames.isEmpty()){
@@ -139,8 +138,10 @@ public class PostLClient extends Client{
         }
         GameData chosenGame = listNumToGameData.get(choice);
         if(chosenGame == null){
-            return "Error: the number you chose is too high.\n" +
-                    "Please call list to see which numbers you can choose from\n";
+            return """
+                    Error: the number you chose is too high.
+                    Please call list to see which numbers you can choose from
+                    """;
         }
         int gameId = chosenGame.getGameID();
         GameIDManager.setGameID(gameId);
@@ -149,19 +150,15 @@ public class PostLClient extends Client{
         ChessGame.TeamColor color = ChessGame.TeamColor.valueOf(params[0].toUpperCase());
         JoinGameRequest joinGameRequest = new JoinGameRequest(color, gameId);
         this.server.playGame(joinGameRequest, authToken);
+        if(color == ChessGame.TeamColor.WHITE){
+            GameManager.setColor(ChessGame.TeamColor.WHITE);
+        }else {
+            GameManager.setColor(ChessGame.TeamColor.BLACK);
 
+        }
         this.wsFacade = new WebSocketFacade(server.getServerURL(), notificationHandler);
         this.wsFacade.connect(authToken, gameId);
-
-        ChessBoardRep chessBoard = new ChessBoardRep();
-        if(color == ChessGame.TeamColor.WHITE){
-            return chessBoard.drawBoard(ChessGame.TeamColor.WHITE, GameManager.getBoard(), false, null);
-        }else {
-            return chessBoard.drawBoard(ChessGame.TeamColor.BLACK, GameManager.getBoard(), false, null);
-        }
-
-
-
+        return "";
     }
     @Override
     public String observeGame(String ... params) throws ResponseException {
@@ -187,16 +184,12 @@ public class PostLClient extends Client{
                     """;
         }
         String authToken = AuthTokenManager.getAuthToken();
+        GameManager.setColor(ChessGame.TeamColor.WHITE);
         this.wsFacade = new WebSocketFacade(server.getServerURL(), notificationHandler);
         this.wsFacade.connect(authToken, choice);
-        GameManager.setBoard(chosenGame.getGame().getBoard());
-        GameManager.setColor(ChessGame.TeamColor.WHITE);
 
 
-        ChessBoard board = GameManager.getBoard();
-        ChessGame.TeamColor color = GameManager.getColor();
-        ChessBoardRep chessBoard = new ChessBoardRep();
-        return chessBoard.drawBoard(color, board, false, null) + RESET_TEXT_COLOR + "\nYou are currently viewing " + chosenGame.getGameName() +
+        return RESET_TEXT_COLOR + "\nYou are currently viewing " + chosenGame.getGameName() +
                 "\nWHITE: " + chosenGame.getWhiteUsername() + ", BLACK: " + chosenGame.getBlackUsername();
 
 

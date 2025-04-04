@@ -62,6 +62,7 @@ public class EscapeSequences {
     public static final String BLACK_ROOK = " ♜ ";
     public static final String BLACK_PAWN = " ♟ ";
     public static final String EMPTY = " \u2003 ";
+    public static final String INVISIBLESEPERATOR = " \u2063";
 
     private static final String ESCAPE = "\u001b[";
     public static final String RESET = ESCAPE + "0m";

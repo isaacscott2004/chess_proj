@@ -6,7 +6,6 @@ import client.*;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.google.gson.JsonSyntaxException;
 import ui.websocket.NotificationHandler;
 import websocket.messages.ServerMessage;
 
@@ -45,10 +44,20 @@ public class Repl implements NotificationHandler {
     private boolean handleSession(Scanner scanner, ClientType clientType) {
         boolean breakOut = false;
         Client client = createClient(serverURL, type);
-        System.out.println(client.help());
-        String result;
+
+        if(!(type == ClientType.GAME )) {
+            System.out.println(client.help());
+        }
+        String result = null;
+
         while (true) {
-            printPrompt();
+            if(type != ClientType.GAME) {
+                printPrompt();
+            }
+            else if(result != null && result.contains(INVISIBLESEPERATOR)){
+                printPrompt();
+            }
+
             String line = scanner.nextLine();
             System.out.println(RESET_TEXT_COLOR);
             try {
@@ -141,22 +150,23 @@ public class Repl implements NotificationHandler {
                 JsonObject jsonGame = jsonMessage.getAsJsonObject("game");
                 ChessGame chessGame = gson.fromJson(jsonGame, ChessGame.class);
                 ChessBoard chessBoard = chessGame.getBoard();
-                ChessGame.TeamColor color = chessGame.getTeamTurn();
-
                 GameManager.setBoard(chessBoard);
-                GameManager.setColor(color);
+                ChessBoardRep chessBoardRep = new ChessBoardRep();
+                System.out.println(chessBoardRep.drawBoard(GameManager.getColor(), chessBoard, false, null));
+
             }
             case "NOTIFICATION" -> {
                 String notification = jsonMessage.get("message").getAsString();
                 System.out.println(RESET + SET_TEXT_COLOR_MAGENTA + " -- " + notification + RESET_TEXT_COLOR);
-                printPrompt();
+
             }
             case "ERROR" -> {
                 String error = jsonMessage.get("errorMessage").getAsString();
                 System.out.println(RESET + SET_TEXT_COLOR_RED + " -- " + error + RESET_TEXT_COLOR);
-                printPrompt();
+
             }
         }
+        printPrompt();
 
     }
 }

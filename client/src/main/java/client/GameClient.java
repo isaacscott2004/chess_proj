@@ -9,6 +9,9 @@ import ui.websocket.WebSocketFacade;
 
 import java.util.Arrays;
 
+import static ui.EscapeSequences.INVISIBLESEPERATOR;
+import static ui.EscapeSequences.RESET;
+
 public class GameClient extends Client{
     private final WebSocketFacade webSocketFacade;
     private final ChessBoardRep chessBoardRep;
@@ -50,21 +53,21 @@ public class GameClient extends Client{
         move <startPosition, endPosition, ?promotionPiece>
         resign
         highlight <position>
-        """;
+        """ + INVISIBLESEPERATOR;
     }
 
     @Override
     public String leaveGame(){
         webSocketFacade.leave(AuthTokenManager.getAuthToken(), GameIDManager.getGameID());
         GameIDManager.clearGameID();
-        return "You have left the game.";
+        return "";
     }
 
     @Override
     public String drawBoard(){
         ChessBoard board = GameManager.getBoard();
         ChessGame.TeamColor color = GameManager.getColor();
-        return this.chessBoardRep.drawBoard(color, board, false, null);
+        return this.chessBoardRep.drawBoard(color, board, false, null) + INVISIBLESEPERATOR;
     }
 
     @Override
@@ -84,14 +87,13 @@ public class GameClient extends Client{
             return (e.getMessage());
         }
         webSocketFacade.makeMove(AuthTokenManager.getAuthToken(), GameIDManager.getGameID(), move);
-
         return "";
     }
 
     @Override
     public String resign(){
         webSocketFacade.resign(AuthTokenManager.getAuthToken(), GameIDManager.getGameID());
-        return "You have resigned!";
+        return "";
     }
 
     @Override
@@ -115,7 +117,7 @@ public class GameClient extends Client{
         ChessBoard board = GameManager.getBoard();
         ChessGame.TeamColor color = GameManager.getColor();
 
-        return this.chessBoardRep.drawBoard(color, board, true, position);
+        return this.chessBoardRep.drawBoard(color, board, true, position) + INVISIBLESEPERATOR;
     }
 
 
