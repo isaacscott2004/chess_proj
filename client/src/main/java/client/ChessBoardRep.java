@@ -22,7 +22,7 @@ public class ChessBoardRep {
             for(int i = 0; i < allPieces.length; i++){
                 restOfBoard.append(SET_BG_COLOR_BLUE + " ").append(count).append(" ");
                 isLightTan = count % 2 != 0;
-                for(int j = 0; j < allPieces[0].length; j++){
+                for (int j = 7; j >= 0; j--) {
                     if(isLightTan){
                         restOfBoard.append(SET_BG_COLOR_LIGHT_TAN);
                     }
@@ -52,7 +52,7 @@ public class ChessBoardRep {
             for(int i = 7; i >= 0; i--){
                 restOfBoard.append(SET_BG_COLOR_BLUE + " ").append(count).append(" ");
                 isLightTan = count % 2 == 0;
-                for(int j = 7; j >= 0; j--){
+                for(int j = 0; j < allPieces[0].length; j++){
                     if(isLightTan){
                         restOfBoard.append(SET_BG_COLOR_LIGHT_TAN);
                     }

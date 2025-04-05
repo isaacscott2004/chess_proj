@@ -15,10 +15,12 @@ import static ui.EscapeSequences.RESET;
 public class GameClient extends Client{
     private final WebSocketFacade webSocketFacade;
     private final ChessBoardRep chessBoardRep;
+    private  boolean typedResign;
 
     public GameClient(String serverURL, NotificationHandler notificationHandler){
         this.webSocketFacade = new WebSocketFacade(serverURL, notificationHandler);
         this.chessBoardRep  = new ChessBoardRep();
+        this.typedResign = false;
     }
 
     @Override
@@ -31,8 +33,17 @@ public class GameClient extends Client{
                 case "leave" -> leaveGame();
                 case "drawboard" -> drawBoard();
                 case "move" -> movePiece(params);
-                case "resign" -> resign();
+                case "resign" -> askToResign();
                 case "highlight" -> highlightMoves(params);
+                case "yes" -> {
+                    if(typedResign) {
+                        this.typedResign = false;
+                        yield resign();
+                    } else{
+                        yield didNotResignMessage();
+                    }
+                }
+                case "no" -> didNotResignMessage();
                 default -> {
                     Client.calledHelp = true;
                     yield help();
@@ -125,7 +136,6 @@ public class GameClient extends Client{
 
 
     private ChessMove convertToChessMove(String startPosition, String endPosition){
-        //assume string length is 2
         String letters = "abcdefgh";
         char[] startPositionArray = startPosition.toCharArray();
         char[] endPositionArray = endPosition.toCharArray();
@@ -156,6 +166,14 @@ public class GameClient extends Client{
             throw new IllegalArgumentException("Error: Error: the second character must be 1-8");
         }
         return new ChessPosition(row, col);
+    }
+
+    private String askToResign(){
+        this.typedResign = true;
+        return "Are you sure you want to resign? \nType 'yes' to resign or 'no' to keep playing." + INVISIBLESEPERATOR;
+    }
+    private String didNotResignMessage(){
+        return "You did not resign." + INVISIBLESEPERATOR;
     }
 
 }
