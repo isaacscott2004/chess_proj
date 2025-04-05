@@ -161,12 +161,12 @@ public class Repl implements NotificationHandler {
             }
             case "NOTIFICATION" -> {
                 String notification = jsonMessage.get("message").getAsString();
-                System.out.println("\r" + RESET + SET_TEXT_COLOR_MAGENTA + " -- " + notification + RESET_TEXT_COLOR);
+                System.out.println("\r" + RESET + SET_TEXT_COLOR_MAGENTA + "-- " + notification + RESET_TEXT_COLOR);
 
             }
             case "ERROR" -> {
                 String error = jsonMessage.get("errorMessage").getAsString();
-                System.out.println("\r" + RESET + SET_TEXT_COLOR_RED + " -- " + error + RESET_TEXT_COLOR);
+                System.out.println("\r" + RESET + SET_TEXT_COLOR_RED + "Error: " + error + RESET_TEXT_COLOR);
 
             }
         }

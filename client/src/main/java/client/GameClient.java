@@ -1,9 +1,6 @@
 package client;
 
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessMove;
-import chess.ChessPosition;
+import chess.*;
 import ui.websocket.NotificationHandler;
 import ui.websocket.WebSocketFacade;
 
@@ -12,12 +9,11 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import static ui.EscapeSequences.INVISIBLESEPERATOR;
-import static ui.EscapeSequences.RESET;
-
 public class GameClient extends Client{
     private final WebSocketFacade webSocketFacade;
     private final ChessBoardRep chessBoardRep;
-    private  boolean typedResign;
+    private boolean typedResign;
+    private boolean typedMove;
 
     public GameClient(String serverURL, NotificationHandler notificationHandler){
         this.webSocketFacade = new WebSocketFacade(serverURL, notificationHandler);
@@ -45,7 +41,14 @@ public class GameClient extends Client{
                         yield didNotResignMessage();
                     }
                 }
-                case "no" -> didNotResignMessage();
+                case "q", "r", "b", "n" -> {
+                    if(typedMove) {
+                        this.typedMove = false;
+                        yield promotePiece(command);
+                    } else{
+                        yield help();
+                    }
+                }
                 default -> {
                     Client.calledHelp = true;
                     yield help();
@@ -63,7 +66,7 @@ public class GameClient extends Client{
         help
         leave
         drawboard
-        move <startPosition, endPosition, ?promotionPiece>
+        move <startPosition, endPosition>
         resign
         highlight <position>
         """ + INVISIBLESEPERATOR;
@@ -86,20 +89,50 @@ public class GameClient extends Client{
     @Override
     public String movePiece(String ... params){
         ChessMove move;
+        ChessBoard board = GameManager.getBoard();
         if (params.length !=2){
             return "Error: you must provide a start position and an end position \n" +
-                    "Expected: move <startPosition, endPosition> Example: move A3 A4";
+                    "Expected: move <startPosition, endPosition> Example: move A3 A4" + INVISIBLESEPERATOR;
         }
         if(params[0].length() != 2 || params[1].length()!= 2){
             return "Error: your positions must contain one letter and one number\n" +
-                    "Example A1";
+                    "Example A1" + INVISIBLESEPERATOR;
         }
         try{
             move = convertToChessMove(params[0], params[1]);
         } catch (IllegalArgumentException e){
             return (e.getMessage());
         }
-        webSocketFacade.makeMove(AuthTokenManager.getAuthToken(), GameIDManager.getGameID(), move);
+        ChessPiece.PieceType type;
+        try {
+            type = board.getPiece(move.getStartPosition()).getPieceType();
+        } catch (NullPointerException e){
+            return "Error: there is no piece on that square please choose another piece to move."+ INVISIBLESEPERATOR;
+        }
+        ChessGame.TeamColor pieceColor = board.getPiece(move.getStartPosition()).getTeamColor();
+        if (type == ChessPiece.PieceType.PAWN &&
+                (((pieceColor == ChessGame.TeamColor.BLACK && move.getEndPosition().getRow() == 1) ||
+                        (pieceColor == ChessGame.TeamColor.WHITE && move.getEndPosition().getRow() == 8)))) {
+
+            MoveManager.setMove(move);
+            return askToPromote(move);
+        } else {
+            webSocketFacade.makeMove(AuthTokenManager.getAuthToken(), GameIDManager.getGameID(), move);
+        }
+        return "";
+    }
+
+    private String promotePiece(String pieceLetter){
+        String uppercasePieceLetter = pieceLetter.toUpperCase();
+        ChessPiece.PieceType selectedType;
+        try {
+            selectedType = pieceSelector(uppercasePieceLetter);
+        } catch (IllegalArgumentException e){
+            return e.getMessage();
+        }
+        ChessMove preMove = MoveManager.getMove();
+        ChessMove promotionMove = new ChessMove(preMove.getStartPosition(),preMove.getEndPosition(),selectedType);
+        webSocketFacade.makeMove(AuthTokenManager.getAuthToken(), GameIDManager.getGameID(), promotionMove);
         return "";
     }
 
@@ -115,11 +148,11 @@ public class GameClient extends Client{
         if(params.length != 1){
             return "Error: You must provide a chessPosition. \n" +
                     "The positionYou provide must have a piece on it. \n" +
-                    "Expected: highlight<position>, Example: highlight A5";
+                    "Expected: highlight<position>, Example: highlight A5" + INVISIBLESEPERATOR;
         }
         if(params[0].length() != 2){
-            return "Error: Your chess position much only have a letter for the column and a number for the row. \n" +
-                    "Expected: highlight<position>, Example: highlight A5";
+            return "Error: Your chess position must only have a letter for the column and a number for the row. \n" +
+                    "Expected: highlight<position>, Example: highlight A5" + INVISIBLESEPERATOR;
         }
         try{
             position = convertToChessPosition(params[0]);
@@ -133,7 +166,7 @@ public class GameClient extends Client{
         ChessGame game = GameManager.getGame();
         Collection<ChessMove> moves = game.validMoves(position);
         if(moves == null){
-            return "Error: there is no piece at the position you selected";
+            return "Error: there is no piece at the position you selected" + INVISIBLESEPERATOR;
         }
         ArrayList<ChessPosition> potentialFinalPos = new ArrayList<>();
         for(ChessMove move : moves){
@@ -157,10 +190,10 @@ public class GameClient extends Client{
         int startRow = Character.getNumericValue(startPositionArray[1]);
         int endRow = Character.getNumericValue(endPositionArray[1]);
         if (startCol == 0 || endCol == 0) {
-            throw new IllegalArgumentException("Error: The first character must be a-h.");
+            throw new IllegalArgumentException("Error: The first character must be a-h." + INVISIBLESEPERATOR);
         }
         if(startRow > 8 || startRow < 1 || endRow > 8 || endRow < 1){
-            throw new IllegalArgumentException("Error: the second character must be 1-8");
+            throw new IllegalArgumentException("Error: the second character must be 1-8" + INVISIBLESEPERATOR);
         }
 
         return new ChessMove(new ChessPosition(startRow, startCol), new ChessPosition(endRow, endCol), null);
@@ -173,10 +206,10 @@ public class GameClient extends Client{
         int col = letters.indexOf(positionArray[0]) + 1;
         int row = Character.getNumericValue(positionArray[1]);
         if(col == 0){
-            throw new IllegalArgumentException("Error: The first character must be a-h.");
+            throw new IllegalArgumentException("Error: The first character must be a-h." + INVISIBLESEPERATOR);
         }
         if(row > 8  || row < 1){
-            throw new IllegalArgumentException("Error: Error: the second character must be 1-8");
+            throw new IllegalArgumentException("Error: Error: the second character must be 1-8" + INVISIBLESEPERATOR);
         }
         return new ChessPosition(row, col);
     }
@@ -188,5 +221,27 @@ public class GameClient extends Client{
     private String didNotResignMessage(){
         return "You did not resign." + INVISIBLESEPERATOR;
     }
+
+    private String askToPromote(ChessMove move){
+        this.typedMove = true;
+        return "Your pawn is moving to row " + move.getEndPosition().getRow() + ".\n" +
+                "What piece do you want to promote your pawn to?\n" +
+                "Please choose one of the four options Q (queen), R (rook), B (bishop), N (knight)" + INVISIBLESEPERATOR;
+
+    }
+    private ChessPiece.PieceType pieceSelector(String pieceLetter){
+        ChessPiece.PieceType selectedType;
+        switch (pieceLetter){
+            case "Q" -> selectedType = ChessPiece.PieceType.QUEEN;
+            case "R" -> selectedType = ChessPiece.PieceType.ROOK;
+            case "B" -> selectedType = ChessPiece.PieceType.BISHOP;
+            case "N" -> selectedType = ChessPiece.PieceType.KNIGHT;
+            default -> throw new IllegalArgumentException(
+                    "Error: you must choose Q (queen), R (rook), B (bishop), or N (knight)" + INVISIBLESEPERATOR);
+        }
+        return selectedType;
+    }
+
+
 
 }

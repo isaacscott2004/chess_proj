@@ -34,7 +34,6 @@ public class WebSocketHandler {
 
     @OnWebSocketClose
     public void onClose(Session session, int statusCode, String reason){
-
         this.connectionManager.removeSession(session);
 
     }
@@ -57,7 +56,7 @@ public class WebSocketHandler {
             }
             case RESIGN -> resignGame(new ResignCommand(command.getAuthToken(), command.getGameID()), connection);
             case LEAVE -> leaveGame(new LeaveCommand(command.getAuthToken(), command.getGameID()), connection);
-            default -> sendMessage(new ErrorMessage("Error: Unknown command"), connection);
+            default -> sendMessage(new ErrorMessage("Unknown command"), connection);
             }
         }
 
@@ -74,7 +73,7 @@ public class WebSocketHandler {
             ErrorMessage errorMessage = new ErrorMessage(e.getMessage());
             sendMessage(errorMessage, connection);
         }catch (UnauthorizedException e){
-            ErrorMessage errorMessage = new ErrorMessage("Error: Unauthorized");
+            ErrorMessage errorMessage = new ErrorMessage("Unauthorized");
             sendMessage(errorMessage, connection);
         }
     }
@@ -99,7 +98,7 @@ public class WebSocketHandler {
                 broadcastMessageToAll(gameID, inCheckMessage);
             } else if(game.isInCheckmate(game.getTeamTurn())){
                 WebSocketService.changeStatus(authDAO, gameDAO, gameID, GameStatus.CHECKMATE, authToken);
-                NotificationMessage inCheckMateMessage = new NotificationMessage(game.getTeamTurn() + " in in checkmate!");
+                NotificationMessage inCheckMateMessage = new NotificationMessage(game.getTeamTurn() + " is in checkmate!");
                 broadcastMessageToAll(gameID, inCheckMateMessage);
             } else if(game.isInStalemate(game.getTeamTurn())){
                 WebSocketService.changeStatus(authDAO, gameDAO, gameID, GameStatus.STALEMATE, authToken);
@@ -107,17 +106,18 @@ public class WebSocketHandler {
                 broadcastMessageToAll(gameID, inStalemateMessage);
             }
 
+
+        } catch (WrongTeamException e){
+            ErrorMessage errorMessage = new ErrorMessage("You can't move pieces from the other team");
+            sendMessage(errorMessage, connection);
         } catch (DataAccessException e) {
             ErrorMessage errorMessage = new ErrorMessage(e.getMessage());
             sendMessage(errorMessage, connection);
         } catch (InvalidMoveException e){
-            ErrorMessage errorMessage = new ErrorMessage("Invalid move");
+            ErrorMessage errorMessage = new ErrorMessage("Its not your turn.");
             sendMessage(errorMessage, connection);
         }catch (UnauthorizedException e){
-            ErrorMessage errorMessage = new ErrorMessage("Error: Unauthorized");
-            sendMessage(errorMessage, connection);
-        } catch (WrongTeamException e){
-            ErrorMessage errorMessage = new ErrorMessage("Error: you can't move pieces from the other team");
+            ErrorMessage errorMessage = new ErrorMessage("Unauthorized");
             sendMessage(errorMessage, connection);
         }
     }
@@ -131,7 +131,7 @@ public class WebSocketHandler {
             ErrorMessage errorMessage = new ErrorMessage(e.getMessage());
             sendMessage(errorMessage, connection);
         }catch (UnauthorizedException e){
-            ErrorMessage errorMessage = new ErrorMessage("Error: Unauthorized");
+            ErrorMessage errorMessage = new ErrorMessage("Unauthorized");
             sendMessage(errorMessage, connection);
 
         }
@@ -165,7 +165,7 @@ public class WebSocketHandler {
             ErrorMessage errorMessage = new ErrorMessage(e.getMessage());
             sendMessage(errorMessage, connection);
         } catch (UnauthorizedException e){
-            ErrorMessage errorMessage = new ErrorMessage("Error: Unauthorized");
+            ErrorMessage errorMessage = new ErrorMessage("Unauthorized");
             sendMessage(errorMessage, connection);
         }
 
