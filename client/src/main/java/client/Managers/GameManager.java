@@ -1,4 +1,4 @@
-package client;
+package client.Managers;
 
 import chess.ChessBoard;
 import chess.ChessGame;

@@ -1,4 +1,4 @@
-package client;
+package client.Managers;
 
 public class AuthTokenManager {
     private static String authToken;

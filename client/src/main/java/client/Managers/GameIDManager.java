@@ -1,4 +1,4 @@
-package client;
+package client.Managers;
 
 public class GameIDManager {
     private static int gameID;

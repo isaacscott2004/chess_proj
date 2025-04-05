@@ -1,6 +1,7 @@
 package client;
 
 import chess.*;
+import client.Managers.*;
 import ui.websocket.NotificationHandler;
 import ui.websocket.WebSocketFacade;
 
@@ -32,7 +33,13 @@ public class GameClient extends Client{
                 case "leave" -> leaveGame();
                 case "drawboard" -> drawBoard();
                 case "move" -> movePiece(params);
-                case "resign" -> askToResign();
+                case "resign" -> {
+                    if(!ObserverManager.isIsObserver()) {
+                        yield askToResign();
+                    } else {
+                        yield resign();
+                    }
+                }
                 case "highlight" -> highlightMoves(params);
                 case "yes" -> {
                     if(typedResign) {
@@ -50,6 +57,10 @@ public class GameClient extends Client{
                         yield help();
                     }
                 }
+                case "help" -> {
+                    Client.calledHelp = true;
+                    yield help();
+                }
                 default -> {
                     Client.calledHelp = true;
                     yield SET_TEXT_COLOR_RED + "UNKNOWN COMMAND: " + RESET_TEXT_COLOR + "\n" + help();
@@ -64,19 +75,24 @@ public class GameClient extends Client{
     @Override
     public String help() {
         return """
+        COMMANDS:
         help
-        leave
         drawboard
+        highlight <position>
         move <startPosition, endPosition>
         resign
-        highlight <position>
+        leave
         """ + INVISIBLESEPERATOR;
     }
 
     @Override
     public String leaveGame(){
+        if(ObserverManager.isIsObserver()){
+            ObserverManager.setIsObserver(false);
+        }
         webSocketFacade.leave(AuthTokenManager.getAuthToken(), GameIDManager.getGameID());
         GameIDManager.clearGameID();
+
         return "";
     }
 
@@ -89,6 +105,10 @@ public class GameClient extends Client{
 
     @Override
     public String movePiece(String ... params){
+        if(ObserverManager.isIsObserver()){
+            return "Error: observers can't move pieces." + INVISIBLESEPERATOR;
+        }
+
         ChessMove move;
         ChessBoard board = GameManager.getBoard();
         if (params.length !=2){
@@ -139,6 +159,9 @@ public class GameClient extends Client{
 
     @Override
     public String resign(){
+        if(ObserverManager.isIsObserver()){
+            return "Error: Observers can't resign!" + INVISIBLESEPERATOR;
+        }
         webSocketFacade.resign(AuthTokenManager.getAuthToken(), GameIDManager.getGameID());
         return "";
     }

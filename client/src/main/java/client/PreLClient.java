@@ -1,4 +1,5 @@
 package client;
+import client.Managers.AuthTokenManager;
 import request.LoginRequest;
 import request.RegisterRequest;
 import result.LoginResult;
@@ -25,6 +26,10 @@ public class PreLClient extends Client {
                 case "quit" -> "You have quit the program, bye.";
                 case "login" -> login(params);
                 case "register" -> register(params);
+                case "help" -> {
+                    Client.calledHelp = true;
+                    yield help();
+                }
                 default -> {
                     Client.calledHelp = true;
                     yield SET_TEXT_COLOR_RED + "UNKNOWN COMMAND: " + RESET_TEXT_COLOR + "\n" + help();
@@ -59,6 +64,7 @@ public class PreLClient extends Client {
     @Override
     public String help(){
         return """
+        COMMANDS:
         help
         register <username password email>
         login <username password>

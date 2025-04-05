@@ -99,19 +99,19 @@ public class ChessGame {
         ChessPosition moveEndPosition = move.getEndPosition();
         ChessGame.TeamColor currentColor = getTeamTurn();
         ChessPiece.PieceType promotionPiece = move.getPromotionPiece();
+        if (!(board.isPieceOnSquare(moveStartPosition.getRow(), moveStartPosition.getColumn()))) {
+            throw new InvalidMoveException("This move is not a valid move.");
+        }
         if (board.getPiece(moveStartPosition).getTeamColor() != currentColor) {
             throw new InvalidMoveException("It is " + currentColor + "'s move. " +
                     "You are on team " + board.getPiece(moveStartPosition).getTeamColor() + ".");
-        }
-        if (!(board.isPieceOnSquare(moveStartPosition.getRow(), moveStartPosition.getColumn()))) {
-            throw new InvalidMoveException("This move is not a valid move.");
         }
         Collection<ChessMove> validMoves = validMoves(moveStartPosition);
         if (!(validMoves.contains(move))) {
             throw new InvalidMoveException("This move is not a valid move.");
         }
-        if (isInCheck(currentColor)) {
-            throw new InvalidMoveException("This move is not a valid move as " + currentColor + " is in check");
+        if (isInCheckmate(currentColor)) {
+            throw new InvalidMoveException("This move is not a valid move as " + currentColor + " is in checkmate");
         }
         if (board.getPiece(moveStartPosition).getPieceType() == ChessPiece.PieceType.PAWN && promotionPiece != null) {
             if (currentColor == TeamColor.BLACK && moveStartPosition.getRow() == 2 ||

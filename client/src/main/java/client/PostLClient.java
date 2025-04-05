@@ -1,6 +1,10 @@
 package client;
 
 import chess.ChessGame;
+import client.Managers.AuthTokenManager;
+import client.Managers.GameIDManager;
+import client.Managers.GameManager;
+import client.Managers.ObserverManager;
 import model.GameData;
 import request.CreateGameRequest;
 import request.JoinGameRequest;
@@ -40,6 +44,10 @@ public class PostLClient extends Client{
                 case "list" -> listGames();
                 case "play" -> playGame(params);
                 case "observe" -> observeGame(params);
+                case "help" -> {
+                    Client.calledHelp = true;
+                    yield help();
+                }
                 default -> {
                     Client.calledHelp = true;
                     yield SET_TEXT_COLOR_RED + "UNKNOWN COMMAND: " + RESET_TEXT_COLOR + "\n" + help();
@@ -55,12 +63,13 @@ public class PostLClient extends Client{
     @Override
     public String help() {
         return """
+        COMMANDS:
         help
-        logout
         create <gamename>
         list
         play <WHITE|BLACK ID>
         observe <ID>
+        logout
         """;
     }
 
@@ -185,6 +194,7 @@ public class PostLClient extends Client{
         }
         String authToken = AuthTokenManager.getAuthToken();
         GameManager.setColor(ChessGame.TeamColor.WHITE);
+        ObserverManager.setIsObserver(true);
         this.wsFacade = new WebSocketFacade(server.getServerURL(), notificationHandler);
         this.wsFacade.connect(authToken, choice);
 
