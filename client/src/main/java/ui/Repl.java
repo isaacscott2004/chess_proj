@@ -151,6 +151,7 @@ public class Repl implements NotificationHandler {
                 ChessGame chessGame = gson.fromJson(jsonGame, ChessGame.class);
                 ChessBoard chessBoard = chessGame.getBoard();
                 GameManager.setBoard(chessBoard);
+                GameManager.setGame(chessGame);
                 ChessGame.TeamColor currentColor = chessGame.getTeamTurn();
                 ChessBoardRep chessBoardRep = new ChessBoardRep();
                 System.out.println("\r" + chessBoardRep.drawBoard(GameManager.getColor(),

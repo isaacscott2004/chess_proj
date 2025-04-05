@@ -6,6 +6,7 @@ import chess.ChessGame;
 public class GameManager {
     private static ChessBoard board;
     private static ChessGame.TeamColor color;
+    private static ChessGame game;
 
     public static ChessBoard getBoard(){
         return board;
@@ -13,6 +14,10 @@ public class GameManager {
 
     public static ChessGame.TeamColor getColor(){
         return color;
+    }
+
+    public static ChessGame getGame(){
+        return game;
     }
 
     public static void setBoard(ChessBoard otherBoard){
@@ -23,6 +28,9 @@ public class GameManager {
         color = otherColor;
     }
 
+    public static void setGame(ChessGame game) {
+        GameManager.game = game;
+    }
 
     public static void clearBoard(){
         board = null;

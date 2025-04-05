@@ -7,7 +7,9 @@ import chess.ChessPosition;
 import ui.websocket.NotificationHandler;
 import ui.websocket.WebSocketFacade;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 
 import static ui.EscapeSequences.INVISIBLESEPERATOR;
 import static ui.EscapeSequences.RESET;
@@ -125,10 +127,21 @@ public class GameClient extends Client{
             return (e.getMessage());
         }
 
+
         ChessBoard board = GameManager.getBoard();
         ChessGame.TeamColor color = GameManager.getColor();
+        ChessGame game = GameManager.getGame();
+        Collection<ChessMove> moves = game.validMoves(position);
+        if(moves == null){
+            return "Error: there is no piece at the position you selected";
+        }
+        ArrayList<ChessPosition> potentialFinalPos = new ArrayList<>();
+        for(ChessMove move : moves){
+            potentialFinalPos.add(move.getEndPosition());
+        }
 
-        return this.chessBoardRep.drawBoard(color, board, true, position) + INVISIBLESEPERATOR;
+
+        return this.chessBoardRep.drawBoard(color, board, true, potentialFinalPos) + INVISIBLESEPERATOR;
     }
 
 

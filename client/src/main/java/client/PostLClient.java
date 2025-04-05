@@ -145,7 +145,7 @@ public class PostLClient extends Client{
         }
         int gameId = chosenGame.getGameID();
         GameIDManager.setGameID(gameId);
-        GameManager.setBoard(chosenGame.getGame().getBoard());
+//        GameManager.setBoard(chosenGame.getGame().getBoard());
 
         ChessGame.TeamColor color = ChessGame.TeamColor.valueOf(params[0].toUpperCase());
         JoinGameRequest joinGameRequest = new JoinGameRequest(color, gameId);
