@@ -42,7 +42,7 @@ public class PostLClient extends Client{
                 case "observe" -> observeGame(params);
                 default -> {
                     Client.calledHelp = true;
-                    yield help();
+                    yield SET_TEXT_COLOR_RED + "UNKNOWN COMMAND: " + RESET_TEXT_COLOR + "\n" + help();
                 }
             };
 

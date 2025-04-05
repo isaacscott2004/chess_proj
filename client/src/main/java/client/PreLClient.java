@@ -7,6 +7,9 @@ import ui.ServerFacade;
 
 import java.util.Arrays;
 
+import static ui.EscapeSequences.RESET_TEXT_COLOR;
+import static ui.EscapeSequences.SET_TEXT_COLOR_RED;
+
 public class PreLClient extends Client {
     private final ServerFacade server;
     public PreLClient(String serverURL){
@@ -24,7 +27,7 @@ public class PreLClient extends Client {
                 case "register" -> register(params);
                 default -> {
                     Client.calledHelp = true;
-                    yield help();
+                    yield SET_TEXT_COLOR_RED + "UNKNOWN COMMAND: " + RESET_TEXT_COLOR + "\n" + help();
                 }
             };
         } catch (ResponseException e){

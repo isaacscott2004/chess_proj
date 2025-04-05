@@ -8,7 +8,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 
-import static ui.EscapeSequences.INVISIBLESEPERATOR;
+import static ui.EscapeSequences.*;
+
 public class GameClient extends Client{
     private final WebSocketFacade webSocketFacade;
     private final ChessBoardRep chessBoardRep;
@@ -51,7 +52,7 @@ public class GameClient extends Client{
                 }
                 default -> {
                     Client.calledHelp = true;
-                    yield help();
+                    yield SET_TEXT_COLOR_RED + "UNKNOWN COMMAND: " + RESET_TEXT_COLOR + "\n" + help();
                 }
             };
 
@@ -83,7 +84,7 @@ public class GameClient extends Client{
     public String drawBoard(){
         ChessBoard board = GameManager.getBoard();
         ChessGame.TeamColor color = GameManager.getColor();
-        return this.chessBoardRep.drawBoard(color, board, false, null) + INVISIBLESEPERATOR;
+        return this.chessBoardRep.drawBoard(color, board, false, null, null) + INVISIBLESEPERATOR;
     }
 
     @Override
@@ -174,7 +175,7 @@ public class GameClient extends Client{
         }
 
 
-        return this.chessBoardRep.drawBoard(color, board, true, potentialFinalPos) + INVISIBLESEPERATOR;
+        return this.chessBoardRep.drawBoard(color, board, true, potentialFinalPos, position) + INVISIBLESEPERATOR;
     }
 
 

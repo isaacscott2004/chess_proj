@@ -102,21 +102,15 @@ public class WebSocketHandler {
                 broadcastMessageToAll(gameID, inCheckMateMessage);
             } else if(game.isInStalemate(game.getTeamTurn())){
                 WebSocketService.changeStatus(authDAO, gameDAO, gameID, GameStatus.STALEMATE, authToken);
-                NotificationMessage inStalemateMessage = new NotificationMessage("Game is in a stalemate");
+                NotificationMessage inStalemateMessage = new NotificationMessage("Game is in a stalemate.");
                 broadcastMessageToAll(gameID, inStalemateMessage);
             }
 
 
-        } catch (WrongTeamException e){
-            ErrorMessage errorMessage = new ErrorMessage("You can't move pieces from the other team");
-            sendMessage(errorMessage, connection);
-        } catch (DataAccessException e) {
+        } catch (WrongTeamException | InvalidMoveException | DataAccessException e){
             ErrorMessage errorMessage = new ErrorMessage(e.getMessage());
             sendMessage(errorMessage, connection);
-        } catch (InvalidMoveException e){
-            ErrorMessage errorMessage = new ErrorMessage("Its not your turn.");
-            sendMessage(errorMessage, connection);
-        }catch (UnauthorizedException e){
+        } catch (UnauthorizedException e){
             ErrorMessage errorMessage = new ErrorMessage("Unauthorized");
             sendMessage(errorMessage, connection);
         }

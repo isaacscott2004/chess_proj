@@ -13,9 +13,9 @@ import static ui.EscapeSequences.EMPTY;
 public class ChessBoardRep {
 
     public String drawBoard(ChessGame.TeamColor color, ChessBoard board,
-                            boolean highlightBoard, ArrayList<ChessPosition> potentialFinalPositions){
+                            boolean highlightBoard, ArrayList<ChessPosition> potentialFinalPositions, ChessPosition startPosition){
         ChessPiece[][] allPieces = board.getBoard();
-        boolean isLightTan;
+        boolean isLight;
         StringBuilder restOfBoard = new StringBuilder();
         if (color == ChessGame.TeamColor.BLACK){
             if(!highlightBoard) {
@@ -24,9 +24,9 @@ public class ChessBoardRep {
                         + " a " + "   " + RESET_BG_COLOR + EMPTY + "\n");
                 for (int i = 0; i < allPieces.length; i++) {
                     restOfBoard.append(SET_BG_COLOR_BLUE + " ").append(count).append(" ");
-                    isLightTan = count % 2 != 0;
+                    isLight = count % 2 != 0;
                     for (int j = 7; j >= 0; j--) {
-                        if (isLightTan) {
+                        if (isLight) {
                             restOfBoard.append(SET_BG_COLOR_LIGHT_TAN);
                         } else {
                             restOfBoard.append(SET_BG_COLOR_DARK_TAN);
@@ -35,7 +35,7 @@ public class ChessBoardRep {
                             ChessPiece currentChessPiece = board.getPiece(new ChessPosition(i + 1, j + 1));
                             restOfBoard.append(chessPieceToDraw(currentChessPiece));
                         } else restOfBoard.append("   ");
-                        isLightTan = !isLightTan;
+                        isLight = !isLight;
 
                     }
                     restOfBoard.append(SET_BG_COLOR_BLUE + " ").append(count).append(" ")
@@ -48,27 +48,37 @@ public class ChessBoardRep {
             }else{
                 int count = 1;
                 boolean highlight;
+                boolean startPos;
                 ChessPosition cPosition;
                 restOfBoard.append(SET_BG_COLOR_BLUE + SET_TEXT_COLOR_BLACK + "   " + " h " + " g " + " f " + " e " + " d " + " c " + " b "
                         + " a " + "   " + RESET_BG_COLOR + EMPTY + "\n");
                 for(int i = 0; i < allPieces.length; i++){
                     restOfBoard.append(SET_BG_COLOR_BLUE + " ").append(count).append(" ");
-                    isLightTan = count % 2 != 0;
+                    isLight = count % 2 != 0;
                     for (int j = 7; j >= 0; j--) {
                         cPosition = new ChessPosition(i + 1, j + 1);
+                        startPos = cPosition.equals(startPosition);
                         highlight = potentialFinalPositions.contains(cPosition);
-                        if(highlight){
-                            restOfBoard.append(SET_BG_COLOR_GREEN);
-                        } else if(isLightTan){
-                            restOfBoard.append(SET_BG_COLOR_LIGHT_TAN);
-                        } else{
-                            restOfBoard.append(SET_BG_COLOR_DARK_TAN);
+                        if(startPos) {
+                            restOfBoard.append(SET_BG_COLOR_YELLOW);
+                        }else if(highlight){
+                            if(isLight) {
+                                restOfBoard.append(SET_BG_COLOR_GREEN);
+                            } else {
+                                restOfBoard.append(SET_BG_COLOR_DARK_GREEN);
+                            }
+                        } else {
+                            if (isLight) {
+                                restOfBoard.append(SET_BG_COLOR_LIGHT_TAN);
+                            } else {
+                                restOfBoard.append(SET_BG_COLOR_DARK_TAN);
+                            }
                         }
                         if (board.isPieceOnSquare(i + 1, j + 1)) {
                             ChessPiece currentChessPiece = board.getPiece(new ChessPosition(i + 1, j + 1));
                             restOfBoard.append(chessPieceToDraw(currentChessPiece));
                         } else restOfBoard.append("   ");
-                        isLightTan = !isLightTan;
+                        isLight = !isLight;
 
                     }
                     restOfBoard.append(SET_BG_COLOR_BLUE + " ").append(count).append(" ")
@@ -86,9 +96,9 @@ public class ChessBoardRep {
                         + " f " + " g " + " h " + "   " + RESET_BG_COLOR + EMPTY + "\n");
                 for (int i = 7; i >= 0; i--) {
                     restOfBoard.append(SET_BG_COLOR_BLUE + " ").append(count).append(" ");
-                    isLightTan = count % 2 == 0;
+                    isLight = count % 2 == 0;
                     for (int j = 0; j < allPieces[0].length; j++) {
-                        if (isLightTan) {
+                        if (isLight) {
                             restOfBoard.append(SET_BG_COLOR_LIGHT_TAN);
                         } else {
                             restOfBoard.append(SET_BG_COLOR_DARK_TAN);
@@ -97,7 +107,7 @@ public class ChessBoardRep {
                             ChessPiece currentChessPiece = board.getPiece(new ChessPosition(i + 1, j + 1));
                             restOfBoard.append(chessPieceToDraw(currentChessPiece));
                         } else restOfBoard.append("   ");
-                        isLightTan = !isLightTan;
+                        isLight = !isLight;
                     }
                     restOfBoard.append(SET_BG_COLOR_BLUE + " ").append(count).append(" ")
                             .append(RESET_BG_COLOR).append(EMPTY).append("\n");
@@ -108,27 +118,37 @@ public class ChessBoardRep {
             } else{
                 int count = 8;
                 boolean highlight;
+                boolean startPos;
                 ChessPosition cPosition;
                 restOfBoard.append(SET_BG_COLOR_BLUE + SET_TEXT_COLOR_BLACK + "   " + " a " + " b " + " c " + " d " + " e "
                         + " f " + " g " + " h " + "   " + RESET_BG_COLOR + EMPTY + "\n");
                 for (int i = 7; i >= 0; i--) {
                     restOfBoard.append(SET_BG_COLOR_BLUE + " ").append(count).append(" ");
-                    isLightTan = count % 2 == 0;
+                    isLight = count % 2 == 0;
                     for (int j = 0; j < allPieces[0].length; j++) {
                         cPosition = new ChessPosition(i + 1, j + 1);
+                        startPos = cPosition.equals(startPosition);
                         highlight = potentialFinalPositions.contains(cPosition);
-                        if(highlight){
-                            restOfBoard.append(SET_BG_COLOR_GREEN);
-                        } else if(isLightTan){
-                            restOfBoard.append(SET_BG_COLOR_LIGHT_TAN);
-                        } else{
-                            restOfBoard.append(SET_BG_COLOR_DARK_TAN);
+                        if (startPos) {
+                            restOfBoard.append(SET_BG_COLOR_YELLOW);
+                        }else if(highlight){
+                            if(isLight) {
+                                restOfBoard.append(SET_BG_COLOR_GREEN);
+                            } else {
+                                restOfBoard.append(SET_BG_COLOR_DARK_GREEN);
+                            }
+                        } else {
+                            if (isLight) {
+                                restOfBoard.append(SET_BG_COLOR_LIGHT_TAN);
+                            } else {
+                                restOfBoard.append(SET_BG_COLOR_DARK_TAN);
+                            }
                         }
                         if (board.isPieceOnSquare(i + 1, j + 1)) {
                             ChessPiece currentChessPiece = board.getPiece(new ChessPosition(i + 1, j + 1));
                             restOfBoard.append(chessPieceToDraw(currentChessPiece));
                         } else restOfBoard.append("   ");
-                        isLightTan = !isLightTan;
+                        isLight = !isLight;
                     }
                     restOfBoard.append(SET_BG_COLOR_BLUE + " ").append(count).append(" ")
                             .append(RESET_BG_COLOR).append(EMPTY).append("\n");

@@ -155,7 +155,7 @@ public class Repl implements NotificationHandler {
                 ChessGame.TeamColor currentColor = chessGame.getTeamTurn();
                 ChessBoardRep chessBoardRep = new ChessBoardRep();
                 System.out.println("\r" + chessBoardRep.drawBoard(GameManager.getColor(),
-                        chessBoard, false, null) + "\n" + SET_TEXT_COLOR_BROWN +  currentColor
+                        chessBoard, false, null, null) + "\n" + SET_TEXT_COLOR_BROWN +  currentColor
                         + "'s move" + RESET_TEXT_COLOR);
 
             }
