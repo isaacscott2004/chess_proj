@@ -2,7 +2,7 @@ package server.websocket;
 
 
 import chess.ChessGame;
-import chess.GameStatus;
+import websocket.GameStatus;
 import chess.InvalidMoveException;
 import com.google.gson.Gson;
 import dataaccess.AuthDAO;

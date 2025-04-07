@@ -3,7 +3,7 @@ package ui;
 import chess.ChessBoard;
 import chess.ChessGame;
 import client.*;
-import client.Managers.GameManager;
+import client.managers.GameManager;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -110,7 +110,8 @@ public class Repl implements NotificationHandler {
     }
 
     private boolean shouldTransitionToPostl(String line, String result) {
-        return (line.toLowerCase().contains("login") || line.toLowerCase().contains("register") || line.toLowerCase().contains("leave")) && !result.contains("Error");
+        return (line.toLowerCase().contains("login") || line.toLowerCase().contains("register")
+                || line.toLowerCase().contains("leave")) && !result.contains("Error");
     }
 
     private boolean shouldTransitionToPrel(String line) {
@@ -156,7 +157,8 @@ public class Repl implements NotificationHandler {
                 ChessGame.TeamColor currentColor = chessGame.getTeamTurn();
                 ChessBoardRep chessBoardRep = new ChessBoardRep();
                 System.out.println("\r" + chessBoardRep.drawBoard(GameManager.getColor(),
-                        chessBoard, false, null, null) + "\n" + SET_TEXT_COLOR_BROWN +  currentColor
+                        chessBoard, false, null, null) + "\n" +
+                        SET_TEXT_COLOR_BROWN +  currentColor
                         + "'s move" + RESET_TEXT_COLOR);
 
             }

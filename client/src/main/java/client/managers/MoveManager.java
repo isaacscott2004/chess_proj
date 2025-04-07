@@ -1,4 +1,4 @@
-package client.Managers;
+package client.managers;
 
 import chess.ChessMove;
 

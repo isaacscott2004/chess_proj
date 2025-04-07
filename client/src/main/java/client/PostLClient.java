@@ -1,10 +1,10 @@
 package client;
 
 import chess.ChessGame;
-import client.Managers.AuthTokenManager;
-import client.Managers.GameIDManager;
-import client.Managers.GameManager;
-import client.Managers.ObserverManager;
+import client.managers.AuthTokenManager;
+import client.managers.GameIDManager;
+import client.managers.GameManager;
+import client.managers.ObserverManager;
 import model.GameData;
 import request.CreateGameRequest;
 import request.JoinGameRequest;

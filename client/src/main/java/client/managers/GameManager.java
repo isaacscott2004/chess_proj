@@ -1,4 +1,4 @@
-package client.Managers;
+package client.managers;
 
 import chess.ChessBoard;
 import chess.ChessGame;
@@ -32,13 +32,6 @@ public class GameManager {
         GameManager.game = game;
     }
 
-    public static void clearBoard(){
-        board = null;
-    }
-
-    public static void clearColor(){
-        color = null;
-    }
 
 
 }

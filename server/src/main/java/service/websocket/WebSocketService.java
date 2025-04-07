@@ -7,6 +7,7 @@ import dataaccess.GameDAO;
 import model.GameData;
 import server.websocket.WrongTeamException;
 import service.UnauthorizedException;
+import websocket.GameStatus;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
@@ -86,12 +87,14 @@ public class WebSocketService {
         gameAccessObject.updateStatus(gameID, status);
     }
 
-    public static GameStatus getStatus(AuthDAO authAccessObject , GameDAO gameAccessObject, int gameID, String authToken) throws DataAccessException {
+    public static GameStatus getStatus(AuthDAO authAccessObject , GameDAO gameAccessObject, int gameID, String authToken)
+            throws DataAccessException {
         authorize(authAccessObject, authToken);
         return gameAccessObject.getGameStatus(gameID);
     }
 
-    public static ChessGame.TeamColor getTeamColor(AuthDAO authAccessObject, String authToken, GameDAO gameAccessObject, int gameID) throws DataAccessException{
+    public static ChessGame.TeamColor getTeamColor(AuthDAO authAccessObject, String authToken, GameDAO gameAccessObject,
+                                                   int gameID) throws DataAccessException{
         authorize(authAccessObject, authToken);
         String username = authAccessObject.getUsername(authToken);
         return gameAccessObject.getPlayerColor(gameID, username);

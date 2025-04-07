@@ -1,4 +1,4 @@
-package client.Managers;
+package client.managers;
 
 public class ObserverManager {
     private static boolean isObserver = false;

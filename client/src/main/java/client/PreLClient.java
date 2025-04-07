@@ -1,5 +1,5 @@
 package client;
-import client.Managers.AuthTokenManager;
+import client.managers.AuthTokenManager;
 import request.LoginRequest;
 import request.RegisterRequest;
 import result.LoginResult;

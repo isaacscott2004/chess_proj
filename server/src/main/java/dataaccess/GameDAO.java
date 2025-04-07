@@ -2,7 +2,7 @@ package dataaccess;
 
 import chess.ChessGame;
 import chess.ChessMove;
-import chess.GameStatus;
+import websocket.GameStatus;
 import chess.InvalidMoveException;
 import model.GameData;
 

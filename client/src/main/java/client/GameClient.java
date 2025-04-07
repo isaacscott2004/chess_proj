@@ -1,7 +1,7 @@
 package client;
 
 import chess.*;
-import client.Managers.*;
+import client.managers.*;
 import ui.websocket.NotificationHandler;
 import ui.websocket.WebSocketFacade;
 
