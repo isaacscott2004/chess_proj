@@ -49,6 +49,7 @@ public class GameClient extends Client{
                         yield didNotResignMessage();
                     }
                 }
+                case "no" -> INVISIBLESEPERATOR;
                 case "q", "r", "b", "n" -> {
                     if(typedMove) {
                         this.typedMove = false;
