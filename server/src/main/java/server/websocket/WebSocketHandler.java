@@ -92,15 +92,14 @@ public class WebSocketHandler {
             LoadGameMessage gameMessage = new LoadGameMessage(game);
             broadcastMessageToAll(gameID, gameMessage);
             broadcastMessage(gameID, message, connection);
-
-            if(game.isInCheck(game.getTeamTurn())){
+             if(game.isInCheckmate(game.getTeamTurn())){
+                WebSocketService.changeStatus(authDAO, gameDAO, gameID, GameStatus.CHECKMATE, authToken);
+                NotificationMessage inCheckMateMessage = new NotificationMessage("GAME OVER: " + game.getTeamTurn() + " is in checkmate!");
+                broadcastMessageToAll(gameID, inCheckMateMessage);
+            } else if(game.isInCheck(game.getTeamTurn())){
                 NotificationMessage inCheckMessage = new NotificationMessage(game.getTeamTurn() + " is in check!");
                 broadcastMessageToAll(gameID, inCheckMessage);
-            } else if(game.isInCheckmate(game.getTeamTurn())){
-                WebSocketService.changeStatus(authDAO, gameDAO, gameID, GameStatus.CHECKMATE, authToken);
-                NotificationMessage inCheckMateMessage = new NotificationMessage(game.getTeamTurn() + " is in checkmate!");
-                broadcastMessageToAll(gameID, inCheckMateMessage);
-            } else if(game.isInStalemate(game.getTeamTurn())){
+            }  else if(game.isInStalemate(game.getTeamTurn())){
                 WebSocketService.changeStatus(authDAO, gameDAO, gameID, GameStatus.STALEMATE, authToken);
                 NotificationMessage inStalemateMessage = new NotificationMessage("Game is in a stalemate.");
                 broadcastMessageToAll(gameID, inStalemateMessage);

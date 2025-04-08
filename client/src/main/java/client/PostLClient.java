@@ -195,6 +195,7 @@ public class PostLClient extends Client{
         String authToken = AuthTokenManager.getAuthToken();
         GameManager.setColor(ChessGame.TeamColor.WHITE);
         ObserverManager.setIsObserver(true);
+        GameIDManager.setGameID(choice);
         this.wsFacade = new WebSocketFacade(server.getServerURL(), notificationHandler);
         this.wsFacade.connect(authToken, choice);
 
